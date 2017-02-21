@@ -1,0 +1,17 @@
+{
+  "name": "dragster",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/factory.js",
+  "scripts": {
+    "webpack": "webpack --watch"
+  },
+  "devDependencies": {
+    "babel-core": "^6.18.0",
+    "babel-loader": "^6.2.7",
+    "babel-preset-es2015": "^6.18.0",
+    "json-loader": "^0.5.4",
+    "source-map-support": "^0.4.10",
+    "webpack": "^1.14.0"
+  }
+}
