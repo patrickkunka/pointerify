@@ -12,6 +12,11 @@ export const EVENT_POINTER_DRAG = 'pointerDrag';
 export const EVENT_POINTER_UP   = 'pointerUp';
 export const EVENT_POINTER_STOP = 'pointerStop';
 
+export const DIRECTION_LEFT  = Symbol('DIRECTION_LEFT');
+export const DIRECTION_RIGHT = Symbol('DIRECTION_RIGHT');
+export const DIRECTION_UP    = Symbol('DIRECTION_UP');
+export const DIRECTION_DOWN  = Symbol('DIRECTION_DOWN');
+
 export const AXIS_X    = 'X';
 export const AXIS_Y    = 'Y';
 export const AXIS_BOTH = 'BOTH';

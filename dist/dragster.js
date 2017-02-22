@@ -285,6 +285,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var target = e.target;
 	            var handleSelector = this.config.selectors.handle;
 	
+	            var pointer = null;
+	
+	            if (e.button !== 0) return;
+	
+	            if (this.pointers.length > 0) {
+	                pointer = this.pointers[0];
+	
+	                this.cancelPointer(pointer);
+	            }
+	
 	            if (handleSelector && !_Util2.default.closestParent(target, handleSelector, true)) return;
 	
 	            this.pointers.push(this.createPointer(e, _Constants.POINTER_TYPE_MOUSE));
@@ -458,6 +468,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var initialVelocityX = pointer.velocityX;
 	            var initialVelocityY = pointer.velocityY;
+	            var directionX = initialVelocityX < 0 ? _Constants.DIRECTION_LEFT : _Constants.DIRECTION_RIGHT;
+	            var directionY = initialVelocityY < 0 ? _Constants.DIRECTION_UP : _Constants.DIRECTION_DOWN;
 	
 	            var render = function render() {
 	                var progress = _this2.config.physics.friction * count;
@@ -465,6 +477,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                var newVelocityX = initialVelocityX - initialVelocityX * eased;
 	                var newVelocityY = initialVelocityY - initialVelocityY * eased;
+	
+	                newVelocityX = directionX === _Constants.DIRECTION_RIGHT ? Math.max(0, newVelocityX) : Math.min(0, newVelocityX);
+	                newVelocityY = directionY === _Constants.DIRECTION_DOWN ? Math.max(0, newVelocityY) : Math.min(0, newVelocityY);
+	
+	                console.log(newVelocityX, newVelocityY);
 	
 	                if (newVelocityX === 0 && newVelocityY === 0) {
 	                    // Pointer is stationary
@@ -489,7 +506,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                lastX = pointer.currentX;
 	                lastY = pointer.currentY;
 	
-	                requestAnimationFrame(render);
+	                pointer.rafIdInertia = requestAnimationFrame(render);
 	            };
 	
 	            var count = 1;
@@ -498,7 +515,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            pointer.state = _Constants.POINTER_STATE_STOPPING;
 	
-	            requestAnimationFrame(render);
+	            pointer.rafIdInertia = requestAnimationFrame(render);
+	        }
+	    }, {
+	        key: 'cancelPointer',
+	        value: function cancelPointer(pointer) {
+	            cancelAnimationFrame(pointer.rafIdInertia);
+	
+	            this.deletePointer(pointer);
 	        }
 	
 	        /**
@@ -632,6 +656,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EVENT_POINTER_UP = exports.EVENT_POINTER_UP = 'pointerUp';
 	var EVENT_POINTER_STOP = exports.EVENT_POINTER_STOP = 'pointerStop';
 	
+	var DIRECTION_LEFT = exports.DIRECTION_LEFT = Symbol('DIRECTION_LEFT');
+	var DIRECTION_RIGHT = exports.DIRECTION_RIGHT = Symbol('DIRECTION_RIGHT');
+	var DIRECTION_UP = exports.DIRECTION_UP = Symbol('DIRECTION_UP');
+	var DIRECTION_DOWN = exports.DIRECTION_DOWN = Symbol('DIRECTION_DOWN');
+	
 	var AXIS_X = exports.AXIS_X = 'X';
 	var AXIS_Y = exports.AXIS_Y = 'Y';
 	var AXIS_BOTH = exports.AXIS_BOTH = 'BOTH';
@@ -725,6 +754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.dragster = null;
 	        this.state = _Constants.POINTER_STATE_PRISTINE;
 	        this.intervalIdVelocity = -1;
+	        this.rafIdInertia = -1;
 	
 	        Object.seal(this);
 	    }

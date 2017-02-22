@@ -4,7 +4,10 @@ import {
     POINTER_STATE_MOVING,
     POINTER_STATE_INSPECTING,
     POINTER_STATE_STOPPING,
-    SIXTY_FPS
+    DIRECTION_LEFT,
+    DIRECTION_RIGHT,
+    DIRECTION_DOWN,
+    DIRECTION_UP
 } from './Constants';
 
 import Dom          from './Dom';
@@ -156,6 +159,16 @@ class Dragster {
     handleMouseDown(e) {
         const target = e.target;
         const handleSelector = this.config.selectors.handle;
+
+        let pointer = null;
+
+        if (e.button !== 0) return;
+
+        if (this.pointers.length > 0) {
+            pointer = this.pointers[0];
+
+            this.cancelPointer(pointer);
+        }
 
         if (handleSelector && !Util.closestParent(target, handleSelector, true)) return;
 
@@ -310,13 +323,20 @@ class Dragster {
     stopPointer(pointer) {
         const initialVelocityX = pointer.velocityX;
         const initialVelocityY = pointer.velocityY;
+        const directionX = initialVelocityX < 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
+        const directionY = initialVelocityY < 0 ? DIRECTION_UP : DIRECTION_DOWN;
 
         const render = () => {
             const progress = this.config.physics.friction * count;
             const eased    = this.config.physics.easing(progress);
 
-            const newVelocityX = initialVelocityX - (initialVelocityX * eased);
-            const newVelocityY = initialVelocityY - (initialVelocityY * eased);
+            let newVelocityX = initialVelocityX - (initialVelocityX * eased);
+            let newVelocityY = initialVelocityY - (initialVelocityY * eased);
+
+            newVelocityX = directionX === DIRECTION_RIGHT ? Math.max(0, newVelocityX) : Math.min(0, newVelocityX);
+            newVelocityY = directionY === DIRECTION_DOWN ? Math.max(0, newVelocityY) : Math.min(0, newVelocityY);
+
+            console.log(newVelocityX, newVelocityY);
 
             if (newVelocityX === 0 && newVelocityY === 0) {
                 // Pointer is stationary
@@ -341,16 +361,22 @@ class Dragster {
             lastX = pointer.currentX;
             lastY = pointer.currentY;
 
-            requestAnimationFrame(render);
+            pointer.rafIdInertia = requestAnimationFrame(render);
         };
 
-        let count = 1;
-        let lastX = pointer.currentX;
-        let lastY = pointer.currentY;
+        let count  = 1;
+        let lastX  = pointer.currentX;
+        let lastY  = pointer.currentY;
 
         pointer.state = POINTER_STATE_STOPPING;
 
-        requestAnimationFrame(render);
+        pointer.rafIdInertia = requestAnimationFrame(render);
+    }
+
+    cancelPointer(pointer) {
+        cancelAnimationFrame(pointer.rafIdInertia);
+
+        this.deletePointer(pointer);
     }
 
     /**

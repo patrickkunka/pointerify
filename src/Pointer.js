@@ -30,6 +30,7 @@ class Pointer {
         this.dragster    = null;
         this.state       = POINTER_STATE_PRISTINE;
         this.intervalIdVelocity = -1;
+        this.rafIdInertia       = -1;
 
         Object.seal(this);
     }
