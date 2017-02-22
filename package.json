@@ -1,8 +1,8 @@
 {
   "name": "dragster",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "private": true,
-  "main": "./src/factory.js",
+  "main": "./dist/dragster.js",
   "scripts": {
     "webpack": "webpack --watch"
   },
