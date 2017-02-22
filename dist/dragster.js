@@ -96,15 +96,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Pointer2 = _interopRequireDefault(_Pointer);
 	
-	var _Util = __webpack_require__(6);
+	var _Util = __webpack_require__(7);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _Config = __webpack_require__(7);
+	var _Config = __webpack_require__(8);
 	
 	var _Config2 = _interopRequireDefault(_Config);
 	
-	var _events = __webpack_require__(10);
+	var _events = __webpack_require__(12);
 	
 	var _events2 = _interopRequireDefault(_events);
 	
@@ -129,6 +129,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.bindings = [];
 	        this.dom = new _Dom2.default();
 	        this.config = new _Config2.default();
+	        this.isClicking = false;
 	
 	        Object.seal(this);
 	
@@ -259,6 +260,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
+	         * @param  {MouseEvent} e
+	         * @return {void}
+	         */
+	
+	    }, {
+	        key: 'handleClick',
+	        value: function handleClick(e) {
+	            if (this.isClicking) return;
+	
+	            e.preventDefault();
+	            e.stopPropagation();
+	        }
+	
+	        /**
 	         * @private
 	         * @param   {MouseEvent} e
 	         * @return  {void}
@@ -288,7 +303,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function handleMouseMove(e) {
 	            var pointer = null;
 	
-	            // TODO: manage inspector (including start/end events when enters/leaves the target)
+	            // TODO: manage inspector
 	
 	            if (this.pointers.length < 1) return;
 	
@@ -531,7 +546,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'click',
 	        value: function click(e) {
+	            this.isClicking = true;
+	
 	            e.target.click();
+	
+	            this.isClicking = false;
 	        }
 	
 	        /* Static Methods
@@ -689,7 +708,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Constants = __webpack_require__(2);
 	
-	var _State = __webpack_require__(12);
+	var _State = __webpack_require__(6);
 	
 	var _State2 = _interopRequireDefault(_State);
 	
@@ -848,6 +867,31 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports) {
 
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var State = function State() {
+	    _classCallCheck(this, State);
+	
+	    this.deltaX = -1;
+	    this.deltaY = -1;
+	    this.multiplierX = -1;
+	    this.multiplierY = -1;
+	
+	    Object.seal(this);
+	};
+	
+	exports.default = State;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -977,7 +1021,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Util;
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -986,15 +1030,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _ConfigBehavior = __webpack_require__(8);
+	var _ConfigBehavior = __webpack_require__(9);
 	
 	var _ConfigBehavior2 = _interopRequireDefault(_ConfigBehavior);
 	
-	var _ConfigPhysics = __webpack_require__(11);
+	var _ConfigPhysics = __webpack_require__(10);
 	
 	var _ConfigPhysics2 = _interopRequireDefault(_ConfigPhysics);
 	
-	var _ConfigSelectors = __webpack_require__(9);
+	var _ConfigSelectors = __webpack_require__(11);
 	
 	var _ConfigSelectors2 = _interopRequireDefault(_ConfigSelectors);
 	
@@ -1015,7 +1059,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Config;
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1040,70 +1084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ConfigBehavior;
 
 /***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var ConfigSelectors = function ConfigSelectors() {
-	    _classCallCheck(this, ConfigSelectors);
-	
-	    this.handle = '';
-	
-	    Object.seal(this);
-	};
-	
-	exports.default = ConfigSelectors;
-
-/***/ },
 /* 10 */
-/***/ function(module, exports) {
-
-	module.exports = [
-		{
-			"el": "root",
-			"on": "mousedown",
-			"bind": "handleMouseDown"
-		},
-		{
-			"el": "root",
-			"on": "touchstart",
-			"bind": "handleTouchStart"
-		},
-		{
-			"on": [
-				"mousemove"
-			],
-			"bind": "handleMouseMove"
-		},
-		{
-			"on": [
-				"touchmove"
-			],
-			"bind": "handleTouchMove"
-		},
-		{
-			"on": [
-				"mouseup"
-			],
-			"bind": "handleMouseUp"
-		},
-		{
-			"on": [
-				"touchend"
-			],
-			"bind": "handleTouchEnd"
-		}
-	];
-
-/***/ },
-/* 11 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1127,10 +1108,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ConfigPhysics;
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -1138,18 +1119,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var State = function State() {
-	    _classCallCheck(this, State);
+	var ConfigSelectors = function ConfigSelectors() {
+	    _classCallCheck(this, ConfigSelectors);
 	
-	    this.deltaX = -1;
-	    this.deltaY = -1;
-	    this.multiplierX = -1;
-	    this.multiplierY = -1;
+	    this.handle = '';
 	
 	    Object.seal(this);
 	};
 	
-	exports.default = State;
+	exports.default = ConfigSelectors;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	module.exports = [
+		{
+			"el": "root",
+			"on": "mousedown",
+			"bind": "handleMouseDown"
+		},
+		{
+			"el": "root",
+			"on": "touchstart",
+			"bind": "handleTouchStart"
+		},
+		{
+			"el": "root",
+			"on": "click",
+			"bind": "handleClick"
+		},
+		{
+			"on": "mousemove",
+			"bind": "handleMouseMove"
+		},
+		{
+			"on": "touchmove",
+			"bind": "handleTouchMove"
+		},
+		{
+			"on": "mouseup",
+			"bind": "handleMouseUp"
+		},
+		{
+			"on": "touchend",
+			"bind": "handleTouchEnd"
+		}
+	];
 
 /***/ }
 /******/ ])

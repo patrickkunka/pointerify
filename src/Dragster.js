@@ -22,11 +22,12 @@ class Dragster {
      */
 
     constructor(root, config) {
-        this.inspector = new Pointer();
-        this.pointers  = [];
-        this.bindings  = [];
-        this.dom       = new Dom();
-        this.config    = new Config();
+        this.inspector  = new Pointer();
+        this.pointers   = [];
+        this.bindings   = [];
+        this.dom        = new Dom();
+        this.config     = new Config();
+        this.isClicking = false;
 
         Object.seal(this);
 
@@ -135,6 +136,18 @@ class Dragster {
     }
 
     /**
+     * @param  {MouseEvent} e
+     * @return {void}
+     */
+
+    handleClick(e) {
+        if (this.isClicking) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    /**
      * @private
      * @param   {MouseEvent} e
      * @return  {void}
@@ -160,7 +173,7 @@ class Dragster {
     handleMouseMove(e) {
         let pointer = null;
 
-        // TODO: manage inspector (including start/end events when enters/leaves the target)
+        // TODO: manage inspector
 
         if (this.pointers.length < 1) return;
 
@@ -379,7 +392,11 @@ class Dragster {
      */
 
     click(e) {
+        this.isClicking = true;
+
         e.target.click();
+
+        this.isClicking = false;
     }
 
     /* Static Methods

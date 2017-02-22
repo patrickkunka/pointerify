@@ -10,19 +10,24 @@
         "bind": "handleTouchStart"
     },
     {
-        "on": ["mousemove"],
+        "el": "root",
+        "on": "click",
+        "bind": "handleClick"
+    },
+    {
+        "on": "mousemove",
         "bind": "handleMouseMove"
     },
     {
-        "on": ["touchmove"],
+        "on": "touchmove",
         "bind": "handleTouchMove"
     },
     {
-        "on": ["mouseup"],
+        "on": "mouseup",
         "bind": "handleMouseUp"
     },
     {
-        "on": ["touchend"],
+        "on": "touchend",
         "bind": "handleTouchEnd"
     }
 ]
