@@ -16,7 +16,7 @@ body:after {
 
 #sandbox {
     display: inline-block;
-    background: red;
+    background: #eee;
     vertical-align: middle;
     width: 500px;
     height: 500px;

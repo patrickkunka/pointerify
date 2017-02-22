@@ -15,9 +15,9 @@
             const sb = document.getElementById('sandbox');
             const drg = dragster(document.getElementById('sandbox'));
 
-            sb.addEventListener('pointerDrag', (e) => console.log(e.detail));
+            sb.addEventListener('pointerDrag', (e) => console.log(e.detail.deltaX));
 
-            window.addEventListener('click', (e) => console.log('click', e.target));
+            // window.addEventListener('click', (e) => console.log('click', e.target));
         </script>
     </body>
 </html>

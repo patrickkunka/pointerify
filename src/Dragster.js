@@ -316,8 +316,8 @@ class Dragster {
 
 
     stopPointer(pointer) {
-        const initialVelocityX  = pointer.velocityX;
-        const initialVelocityY  = pointer.velocityY;
+        const initialVelocityX = pointer.velocityX;
+        const initialVelocityY = pointer.velocityY;
 
         let lastX = pointer.currentX;
         let lastY = pointer.currentY;
@@ -325,8 +325,8 @@ class Dragster {
         const intervalId = setInterval(() => {
             const progress = this.config.physics.friction * count;
 
-            const newVelocityX = Math.max(Math.abs(initialVelocityX - (initialVelocityX * progress)));
-            const newVelocityY = Math.max(Math.abs(initialVelocityY - (initialVelocityY * progress)));
+            const newVelocityX = initialVelocityX - (initialVelocityX * progress);
+            const newVelocityY = initialVelocityY - (initialVelocityY * progress);
 
             if (newVelocityX === 0 && newVelocityY === 0) {
                 // Pointer is stationary

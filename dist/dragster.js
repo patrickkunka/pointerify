@@ -473,8 +473,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var intervalId = setInterval(function () {
 	                var progress = _this2.config.physics.friction * count;
 	
-	                var newVelocityX = Math.max(Math.abs(initialVelocityX - initialVelocityX * progress));
-	                var newVelocityY = Math.max(Math.abs(initialVelocityY - initialVelocityY * progress));
+	                var newVelocityX = initialVelocityX - initialVelocityX * progress;
+	                var newVelocityY = initialVelocityY - initialVelocityY * progress;
 	
 	                if (newVelocityX === 0 && newVelocityY === 0) {
 	                    // Pointer is stationary
