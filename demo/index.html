@@ -15,7 +15,18 @@
             const sb = document.getElementById('sandbox');
             const drg = dragster(document.getElementById('sandbox'));
 
-            sb.addEventListener('pointerDrag', (e) => console.log(e.detail.deltaX));
+            sb.addEventListener('pointerDrag', (e) => {
+                let text = '';
+                let total = Math.abs(e.detail.deltaX);
+
+                while (total) {
+                    text += '.';
+
+                    total--;
+                }
+
+                console.log(text);
+            });
 
             // window.addEventListener('click', (e) => console.log('click', e.target));
         </script>

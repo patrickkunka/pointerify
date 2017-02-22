@@ -459,16 +459,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var initialVelocityX = pointer.velocityX;
 	            var initialVelocityY = pointer.velocityY;
 	
-	            console.log('initial velocity', initialVelocityX);
-	
 	            var lastX = pointer.currentX;
 	            var lastY = pointer.currentY;
 	
 	            var intervalId = setInterval(function () {
 	                var progress = _this2.config.physics.friction * count;
+	                var eased = _this2.config.physics.easing(progress);
 	
-	                var newVelocityX = initialVelocityX - initialVelocityX * progress;
-	                var newVelocityY = initialVelocityY - initialVelocityY * progress;
+	                var newVelocityX = initialVelocityX - initialVelocityX * eased;
+	                var newVelocityY = initialVelocityY - initialVelocityY * eased;
 	
 	                if (newVelocityX === 0 && newVelocityY === 0) {
 	                    // Pointer is stationary
@@ -1110,7 +1109,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    this.inertia = true;
 	    this.friction = 0.05;
-	    this.easing = null;
+	    this.easing = function (t) {
+	        return --t * t * t + 1;
+	    };
 	
 	    Object.seal(this);
 	};
