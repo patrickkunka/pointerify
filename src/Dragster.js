@@ -267,15 +267,7 @@ class Dragster {
      */
 
     movePointer(pointer, {clientX, clientY}) {
-        const lastX = pointer.currentX;
-        const lastY = pointer.currentY;
-
         pointer.state = POINTER_STATE_MOVING;
-
-        // NB: Velocity equates to pixels per frame at ~60FPS
-
-        pointer.velocityX = clientX - lastX;
-        pointer.velocityY = clientY - lastY;
 
         pointer.currentX = clientX;
         pointer.currentY = clientY;
@@ -319,6 +311,8 @@ class Dragster {
         const initialVelocityX = pointer.velocityX;
         const initialVelocityY = pointer.velocityY;
 
+        console.log('initial velocity', initialVelocityX);
+
         let lastX = pointer.currentX;
         let lastY = pointer.currentY;
 
@@ -337,9 +331,6 @@ class Dragster {
 
                 return;
             }
-
-            pointer.velocityX = newVelocityX;
-            pointer.velocityY = newVelocityY;
 
             pointer.currentX = Math.round(pointer.currentX + newVelocityX);
             pointer.currentY = Math.round(pointer.currentY + newVelocityY);

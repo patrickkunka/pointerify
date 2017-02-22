@@ -410,15 +410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var clientX = _ref2.clientX,
 	                clientY = _ref2.clientY;
 	
-	            var lastX = pointer.currentX;
-	            var lastY = pointer.currentY;
-	
 	            pointer.state = _Constants.POINTER_STATE_MOVING;
-	
-	            // NB: Velocity equates to pixels per frame at ~60FPS
-	
-	            pointer.velocityX = clientX - lastX;
-	            pointer.velocityY = clientY - lastY;
 	
 	            pointer.currentX = clientX;
 	            pointer.currentY = clientY;
@@ -467,6 +459,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var initialVelocityX = pointer.velocityX;
 	            var initialVelocityY = pointer.velocityY;
 	
+	            console.log('initial velocity', initialVelocityX);
+	
 	            var lastX = pointer.currentX;
 	            var lastY = pointer.currentY;
 	
@@ -485,9 +479,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                    return;
 	                }
-	
-	                pointer.velocityX = newVelocityX;
-	                pointer.velocityY = newVelocityY;
 	
 	                pointer.currentX = Math.round(pointer.currentX + newVelocityX);
 	                pointer.currentY = Math.round(pointer.currentY + newVelocityY);
@@ -728,8 +719,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.rootHeight = -1;
 	        this.rootOffsetX = -1;
 	        this.rootOffsetY = -1;
-	        this.velocityX = -1;
-	        this.velocityY = -1;
+	        this.velocitiesX = [];
+	        this.velocitiesY = [];
 	        this.type = null;
 	        this.dragster = null;
 	        this.state = _Constants.POINTER_STATE_PRISTINE;
@@ -769,14 +760,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function startMonitorVelocity() {
 	            var _this = this;
 	
+	            var SAMPLE_SIZE = 4;
+	
 	            var lastX = this.currentX;
 	            var lastY = this.currentY;
 	
 	            if (this.intervalIdVelocity > -1) return;
 	
 	            this.intervalIdVelocity = setInterval(function () {
-	                _this.velocityX = lastX - _this.currentX;
-	                _this.velocityY = lastY - _this.currentY;
+	                if (_this.velocitiesX.length === SAMPLE_SIZE) _this.velocitiesX.shift();
+	                if (_this.velocitiesY.length === SAMPLE_SIZE) _this.velocitiesX.shift();
+	
+	                _this.velocitiesX.push(_this.currentX - lastX);
+	                _this.velocitiesY.push(_this.currentY - lastY);
 	
 	                lastX = _this.currentX;
 	                lastY = _this.currentY;
@@ -830,6 +826,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'multiplierY',
 	        get: function get() {
 	            return (this.rootOffsetY + this.deltaY) / this.rootHeight;
+	        }
+	    }, {
+	        key: 'velocityX',
+	        get: function get() {
+	            return this.velocitiesX.reduce(function (value, sum) {
+	                return value + sum;
+	            }, 0) / this.velocitiesX.length;
+	        }
+	    }, {
+	        key: 'velocityY',
+	        get: function get() {
+	            return this.velocitiesY.reduce(function (value, sum) {
+	                return value + sum;
+	            }, 0) / this.velocitiesY.length;
 	        }
 	    }, {
 	        key: 'isMousePointer',

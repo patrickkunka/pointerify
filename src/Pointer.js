@@ -24,8 +24,8 @@ class Pointer {
         this.rootHeight  = -1;
         this.rootOffsetX = -1;
         this.rootOffsetY = -1;
-        this.velocityX   = -1;
-        this.velocityY   = -1;
+        this.velocitiesX = [];
+        this.velocitiesY = [];
         this.type        = null;
         this.dragster    = null;
         this.state       = POINTER_STATE_PRISTINE;
@@ -48,6 +48,14 @@ class Pointer {
 
     get multiplierY() {
         return (this.rootOffsetY + this.deltaY) / this.rootHeight;
+    }
+
+    get velocityX() {
+        return this.velocitiesX.reduce((value, sum) => value + sum, 0) / this.velocitiesX.length;
+    }
+
+    get velocityY() {
+        return this.velocitiesY.reduce((value, sum) => value + sum, 0) / this.velocitiesY.length;
     }
 
     get isMousePointer() {
@@ -93,14 +101,19 @@ class Pointer {
     }
 
     startMonitorVelocity() {
+        const SAMPLE_SIZE = 4;
+
         let lastX = this.currentX;
         let lastY = this.currentY;
 
         if (this.intervalIdVelocity > -1) return;
 
         this.intervalIdVelocity = setInterval(() => {
-            this.velocityX = lastX - this.currentX;
-            this.velocityY = lastY - this.currentY;
+            if (this.velocitiesX.length === SAMPLE_SIZE) this.velocitiesX.shift();
+            if (this.velocitiesY.length === SAMPLE_SIZE) this.velocitiesX.shift();
+
+            this.velocitiesX.push(this.currentX - lastX);
+            this.velocitiesY.push(this.currentY - lastY);
 
             lastX = this.currentX;
             lastY = this.currentY;
