@@ -459,10 +459,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var initialVelocityX = pointer.velocityX;
 	            var initialVelocityY = pointer.velocityY;
 	
-	            var lastX = pointer.currentX;
-	            var lastY = pointer.currentY;
-	
-	            var intervalId = setInterval(function () {
+	            var render = function render() {
 	                var progress = _this2.config.physics.friction * count;
 	                var eased = _this2.config.physics.easing(progress);
 	
@@ -471,8 +468,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                if (newVelocityX === 0 && newVelocityY === 0) {
 	                    // Pointer is stationary
-	
-	                    clearInterval(intervalId);
 	
 	                    _this2.deletePointer(pointer);
 	
@@ -493,11 +488,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                lastX = pointer.currentX;
 	                lastY = pointer.currentY;
-	            }, _Constants.SIXTY_FPS);
+	
+	                requestAnimationFrame(render);
+	            };
 	
 	            var count = 1;
+	            var lastX = pointer.currentX;
+	            var lastY = pointer.currentY;
 	
 	            pointer.state = _Constants.POINTER_STATE_STOPPING;
+	
+	            requestAnimationFrame(render);
 	        }
 	
 	        /**
