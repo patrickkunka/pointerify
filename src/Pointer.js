@@ -110,7 +110,7 @@ class Pointer {
 
         this.intervalIdVelocity = setInterval(() => {
             if (this.velocitiesX.length === SAMPLE_SIZE) this.velocitiesX.shift();
-            if (this.velocitiesY.length === SAMPLE_SIZE) this.velocitiesX.shift();
+            if (this.velocitiesY.length === SAMPLE_SIZE) this.velocitiesY.shift();
 
             this.velocitiesX.push(this.currentX - lastX);
             this.velocitiesY.push(this.currentY - lastY);

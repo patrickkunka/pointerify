@@ -768,7 +768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.intervalIdVelocity = setInterval(function () {
 	                if (_this.velocitiesX.length === SAMPLE_SIZE) _this.velocitiesX.shift();
-	                if (_this.velocitiesY.length === SAMPLE_SIZE) _this.velocitiesX.shift();
+	                if (_this.velocitiesY.length === SAMPLE_SIZE) _this.velocitiesY.shift();
 	
 	                _this.velocitiesX.push(_this.currentX - lastX);
 	                _this.velocitiesY.push(_this.currentY - lastY);
