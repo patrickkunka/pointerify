@@ -1,0 +1,23 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    text-align: center;
+}
+
+body:after {
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+
+#sandbox {
+    display: inline-block;
+    background: red;
+    vertical-align: middle;
+    width: 500px;
+    height: 500px;
+}

@@ -1,0 +1,28 @@
+[
+    {
+        "el": "root",
+        "on": "mousedown",
+        "bind": "handleMouseDown"
+    },
+    {
+        "el": "root",
+        "on": "touchstart",
+        "bind": "handleTouchStart"
+    },
+    {
+        "on": ["mousemove"],
+        "bind": "handleMouseMove"
+    },
+    {
+        "on": ["touchmove"],
+        "bind": "handleTouchMove"
+    },
+    {
+        "on": ["mouseup"],
+        "bind": "handleMouseUp"
+    },
+    {
+        "on": ["touchend"],
+        "bind": "handleTouchEnd"
+    }
+]
