@@ -9,7 +9,7 @@ import {
     DIRECTION_RIGHT,
     DIRECTION_DOWN,
     DIRECTION_UP
-} from './Constants';
+} from './constants';
 
 import Dom          from './Dom';
 import EventBinding from './EventBinding';
@@ -304,11 +304,11 @@ class Dragster {
      */
 
     releasePointer(pointer, e) {
-        if (!pointer.isMoving) {
-            if (pointer.isPristine) {
-                this.click(e);
-            }
+        if (pointer.isNew) {
+            this.click(e);
+        }
 
+        if (!pointer.isMoving) {
             this.deletePointer(pointer);
 
             return;
@@ -334,8 +334,8 @@ class Dragster {
     stopPointer(pointer) {
         const initialVelocityX = pointer.velocityX;
         const initialVelocityY = pointer.velocityY;
-        const directionX = initialVelocityX < 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
-        const directionY = initialVelocityY < 0 ? DIRECTION_UP : DIRECTION_DOWN;
+        const directionX = pointer.directionX;
+        const directionY = pointer.directionY;
 
         const render = () => {
             const progress = this.config.physics.friction * count;

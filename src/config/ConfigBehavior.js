@@ -1,4 +1,4 @@
-import {AXIS_BOTH} from '../Constants';
+import {AXIS_BOTH} from '../constants';
 
 class ConfigBehavior {
     constructor() {

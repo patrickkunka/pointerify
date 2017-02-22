@@ -1,7 +1,11 @@
 import {
+    DIRECTION_LEFT,
+    DIRECTION_RIGHT,
+    DIRECTION_UP,
+    DIRECTION_DOWN,
     POINTER_TYPE_MOUSE,
     POINTER_TYPE_TOUCH,
-    POINTER_STATE_PRISTINE,
+    POINTER_STATE_NEW,
     POINTER_STATE_EXTENDING,
     POINTER_STATE_MOVING,
     POINTER_STATE_STOPPING,
@@ -11,7 +15,7 @@ import {
     EVENT_POINTER_UP,
     EVENT_POINTER_STOP,
     SIXTY_FPS
-} from './Constants';
+} from './constants';
 
 import State from './State';
 
@@ -29,7 +33,7 @@ class Pointer {
         this.velocitiesY = [];
         this.type        = null;
         this.dragster    = null;
-        this.state       = POINTER_STATE_PRISTINE;
+        this.state       = POINTER_STATE_NEW;
         this.intervalIdVelocity = -1;
         this.rafIdInertia       = -1;
 
@@ -68,8 +72,8 @@ class Pointer {
         return this.target === POINTER_TYPE_TOUCH;
     }
 
-    get isPristine() {
-        return this.state === POINTER_STATE_PRISTINE;
+    get isNew() {
+        return this.state === POINTER_STATE_NEW;
     }
 
     get isExtending() {
@@ -82,6 +86,14 @@ class Pointer {
 
     get isStopping() {
         return this.state === POINTER_STATE_STOPPING;
+    }
+
+    get directionX() {
+        return this.velocityX < 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
+    }
+
+    get directionY() {
+        return this.velocityY < 0 ? DIRECTION_UP : DIRECTION_DOWN;
     }
 
     down() {
@@ -148,6 +160,11 @@ class Pointer {
         state.deltaY      = this.deltaY;
         state.multiplierX = this.multiplierX;
         state.multiplierY = this.multiplierY;
+        state.velocityX   = this.velocityX;
+        state.velocityY   = this.velocityY;
+        state.directionX  = this.directionX;
+        state.directionY  = this.directionY;
+        state.state       = this.state;
 
         return Object.freeze(state);
     }

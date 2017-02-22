@@ -60,6 +60,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Dragster2 = _interopRequireDefault(_Dragster);
 	
+	var _constants = __webpack_require__(2);
+	
+	var _constants2 = _interopRequireDefault(_constants);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function dragster(root) {
@@ -67,6 +71,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return new _Dragster2.default(root, config);
 	}
+	
+	dragster.constants = _constants2.default;
 	
 	module.exports = dragster;
 
@@ -82,7 +88,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Constants = __webpack_require__(2);
+	var _constants = __webpack_require__(2);
 	
 	var _Dom = __webpack_require__(3);
 	
@@ -152,8 +158,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.configure(config);
 	
-	            this.inspector.type = _Constants.POINTER_TYPE_HOVER;
-	            this.inspector.state = _Constants.POINTER_STATE_INSPECTING;
+	            this.inspector.type = _constants.POINTER_TYPE_HOVER;
+	            this.inspector.state = _constants.POINTER_STATE_INSPECTING;
 	
 	            this.bindEvents(_events2.default);
 	        }
@@ -300,7 +306,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (handleSelector && !_Util2.default.closestParent(target, handleSelector, true)) return;
 	
-	            this.pointers.push(this.createPointer(e, _Constants.POINTER_TYPE_MOUSE, didCancel));
+	            this.pointers.push(this.createPointer(e, _constants.POINTER_TYPE_MOUSE, didCancel));
 	
 	            e.preventDefault();
 	        }
@@ -397,7 +403,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var rect = this.dom.root.getBoundingClientRect();
 	
 	            if (isExtending) {
-	                pointer.state = _Constants.POINTER_STATE_EXTENDING;
+	                pointer.state = _constants.POINTER_STATE_EXTENDING;
 	            }
 	
 	            pointer.type = type;
@@ -428,7 +434,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var clientX = _ref2.clientX,
 	                clientY = _ref2.clientY;
 	
-	            pointer.state = _Constants.POINTER_STATE_MOVING;
+	            pointer.state = _constants.POINTER_STATE_MOVING;
 	
 	            pointer.currentX = clientX;
 	            pointer.currentY = clientY;
@@ -445,11 +451,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'releasePointer',
 	        value: function releasePointer(pointer, e) {
-	            if (!pointer.isMoving) {
-	                if (pointer.isPristine) {
-	                    this.click(e);
-	                }
+	            if (pointer.isNew) {
+	                this.click(e);
+	            }
 	
+	            if (!pointer.isMoving) {
 	                this.deletePointer(pointer);
 	
 	                return;
@@ -478,8 +484,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var initialVelocityX = pointer.velocityX;
 	            var initialVelocityY = pointer.velocityY;
-	            var directionX = initialVelocityX < 0 ? _Constants.DIRECTION_LEFT : _Constants.DIRECTION_RIGHT;
-	            var directionY = initialVelocityY < 0 ? _Constants.DIRECTION_UP : _Constants.DIRECTION_DOWN;
+	            var directionX = pointer.directionX;
+	            var directionY = pointer.directionY;
 	
 	            var render = function render() {
 	                var progress = _this2.config.physics.friction * count;
@@ -488,8 +494,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var newVelocityX = initialVelocityX - initialVelocityX * eased;
 	                var newVelocityY = initialVelocityY - initialVelocityY * eased;
 	
-	                newVelocityX = directionX === _Constants.DIRECTION_RIGHT ? Math.max(0, newVelocityX) : Math.min(0, newVelocityX);
-	                newVelocityY = directionY === _Constants.DIRECTION_DOWN ? Math.max(0, newVelocityY) : Math.min(0, newVelocityY);
+	                newVelocityX = directionX === _constants.DIRECTION_RIGHT ? Math.max(0, newVelocityX) : Math.min(0, newVelocityX);
+	                newVelocityY = directionY === _constants.DIRECTION_DOWN ? Math.max(0, newVelocityY) : Math.min(0, newVelocityY);
 	
 	                if (newVelocityX === 0 && newVelocityY === 0) {
 	                    // Pointer is stationary
@@ -521,7 +527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var lastX = pointer.currentX;
 	            var lastY = pointer.currentY;
 	
-	            pointer.state = _Constants.POINTER_STATE_STOPPING;
+	            pointer.state = _constants.POINTER_STATE_STOPPING;
 	
 	            pointer.rafIdInertia = requestAnimationFrame(render);
 	        }
@@ -660,7 +666,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var POINTER_TYPE_HOVER = exports.POINTER_TYPE_HOVER = Symbol('POINTER_TYPE_HOVER');
 	var POINTER_TYPE_TOUCH = exports.POINTER_TYPE_TOUCH = Symbol('POINTER_TYPE_TOUCH');
 	
-	var POINTER_STATE_PRISTINE = exports.POINTER_STATE_PRISTINE = Symbol('POINTER_STATE_PRISTINE');
+	var POINTER_STATE_NEW = exports.POINTER_STATE_NEW = Symbol('POINTER_STATE_NEW');
 	var POINTER_STATE_EXTENDING = exports.POINTER_STATE_EXTENDING = Symbol('POINTER_STATE_EXTENDING');
 	var POINTER_STATE_MOVING = exports.POINTER_STATE_MOVING = Symbol('POINTER_STATE_MOVING');
 	var POINTER_STATE_INSPECTING = exports.POINTER_STATE_INSPECTING = Symbol('POINTER_STATE_INSPECTING');
@@ -741,7 +747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Constants = __webpack_require__(2);
+	var _constants = __webpack_require__(2);
 	
 	var _State = __webpack_require__(6);
 	
@@ -767,7 +773,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.velocitiesY = [];
 	        this.type = null;
 	        this.dragster = null;
-	        this.state = _Constants.POINTER_STATE_PRISTINE;
+	        this.state = _constants.POINTER_STATE_NEW;
 	        this.intervalIdVelocity = -1;
 	        this.rafIdInertia = -1;
 	
@@ -777,28 +783,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _createClass(Pointer, [{
 	        key: 'down',
 	        value: function down() {
-	            this.dispatchEvent(_Constants.EVENT_POINTER_DOWN);
+	            this.dispatchEvent(_constants.EVENT_POINTER_DOWN);
 	        }
 	    }, {
 	        key: 'move',
 	        value: function move() {
 	            this.startMonitorVelocity();
 	
-	            this.dispatchEvent(_Constants.EVENT_POINTER_DRAG);
+	            this.dispatchEvent(_constants.EVENT_POINTER_DRAG);
 	        }
 	    }, {
 	        key: 'up',
 	        value: function up() {
 	            this.stopMonitorVelocity();
 	
-	            this.dispatchEvent(_Constants.EVENT_POINTER_UP);
+	            this.dispatchEvent(_constants.EVENT_POINTER_UP);
 	        }
 	    }, {
 	        key: 'stop',
 	        value: function stop() {
 	            this.stopMonitorVelocity();
 	
-	            this.dispatchEvent(_Constants.EVENT_POINTER_STOP);
+	            this.dispatchEvent(_constants.EVENT_POINTER_STOP);
 	        }
 	    }, {
 	        key: 'startMonitorVelocity',
@@ -821,7 +827,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                lastX = _this.currentX;
 	                lastY = _this.currentY;
-	            }, _Constants.SIXTY_FPS);
+	            }, _constants.SIXTY_FPS);
 	        }
 	    }, {
 	        key: 'stopMonitorVelocity',
@@ -849,6 +855,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            state.deltaY = this.deltaY;
 	            state.multiplierX = this.multiplierX;
 	            state.multiplierY = this.multiplierY;
+	            state.velocityX = this.velocityX;
+	            state.velocityY = this.velocityY;
+	            state.directionX = this.directionX;
+	            state.directionY = this.directionY;
+	            state.state = this.state;
 	
 	            return Object.freeze(state);
 	        }
@@ -889,32 +900,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'isMousePointer',
 	        get: function get() {
-	            return this.target === _Constants.POINTER_TYPE_MOUSE;
+	            return this.target === _constants.POINTER_TYPE_MOUSE;
 	        }
 	    }, {
 	        key: 'isTouchPointer',
 	        get: function get() {
-	            return this.target === _Constants.POINTER_TYPE_TOUCH;
+	            return this.target === _constants.POINTER_TYPE_TOUCH;
 	        }
 	    }, {
-	        key: 'isPristine',
+	        key: 'isNew',
 	        get: function get() {
-	            return this.state === _Constants.POINTER_STATE_PRISTINE;
+	            return this.state === _constants.POINTER_STATE_NEW;
 	        }
 	    }, {
 	        key: 'isExtending',
 	        get: function get() {
-	            return this.state === _Constants.POINTER_STATE_EXTENDING;
+	            return this.state === _constants.POINTER_STATE_EXTENDING;
 	        }
 	    }, {
 	        key: 'isMoving',
 	        get: function get() {
-	            return this.state === _Constants.POINTER_STATE_MOVING;
+	            return this.state === _constants.POINTER_STATE_MOVING;
 	        }
 	    }, {
 	        key: 'isStopping',
 	        get: function get() {
-	            return this.state === _Constants.POINTER_STATE_STOPPING;
+	            return this.state === _constants.POINTER_STATE_STOPPING;
+	        }
+	    }, {
+	        key: 'directionX',
+	        get: function get() {
+	            return this.velocityX < 0 ? _constants.DIRECTION_LEFT : _constants.DIRECTION_RIGHT;
+	        }
+	    }, {
+	        key: 'directionY',
+	        get: function get() {
+	            return this.velocityY < 0 ? _constants.DIRECTION_UP : _constants.DIRECTION_DOWN;
 	        }
 	    }]);
 	
@@ -942,6 +963,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.deltaY = -1;
 	    this.multiplierX = -1;
 	    this.multiplierY = -1;
+	    this.velocityX = -1;
+	    this.velocityY = -1;
+	    this.directionX = -1;
+	    this.directionY = -1;
+	    this.state = null;
 	
 	    Object.seal(this);
 	};
@@ -1128,7 +1154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Constants = __webpack_require__(2);
+	var _constants = __webpack_require__(2);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -1136,7 +1162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, ConfigBehavior);
 	
 	    this.pressDuration = 0;
-	    this.allowAxis = _Constants.AXIS_BOTH;
+	    this.allowAxis = _constants.AXIS_BOTH;
 	
 	    Object.seal(this);
 	};
