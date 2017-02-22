@@ -2,6 +2,7 @@ import {
     POINTER_TYPE_MOUSE,
     POINTER_TYPE_TOUCH,
     POINTER_STATE_PRISTINE,
+    POINTER_STATE_EXTENDING,
     POINTER_STATE_MOVING,
     POINTER_STATE_STOPPING,
     POINTER_STATE_INSPECTING,
@@ -69,6 +70,10 @@ class Pointer {
 
     get isPristine() {
         return this.state === POINTER_STATE_PRISTINE;
+    }
+
+    get isExtending() {
+        return this.state === POINTER_STATE_EXTENDING;
     }
 
     get isMoving() {

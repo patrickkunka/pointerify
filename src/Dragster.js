@@ -1,6 +1,7 @@
 import {
     POINTER_TYPE_MOUSE,
     POINTER_TYPE_HOVER,
+    POINTER_STATE_EXTENDING,
     POINTER_STATE_MOVING,
     POINTER_STATE_INSPECTING,
     POINTER_STATE_STOPPING,
@@ -161,6 +162,7 @@ class Dragster {
         const handleSelector = this.config.selectors.handle;
 
         let pointer = null;
+        let didCancel = false;
 
         if (e.button !== 0) return;
 
@@ -168,11 +170,13 @@ class Dragster {
             pointer = this.pointers[0];
 
             this.cancelPointer(pointer);
+
+            didCancel = true;
         }
 
         if (handleSelector && !Util.closestParent(target, handleSelector, true)) return;
 
-        this.pointers.push(this.createPointer(e, POINTER_TYPE_MOUSE));
+        this.pointers.push(this.createPointer(e, POINTER_TYPE_MOUSE, didCancel));
 
         e.preventDefault();
     }
@@ -250,12 +254,17 @@ class Dragster {
     /**
      * @param   {(TouchEvent|MouseEvent)}   e
      * @param   {Symbol}                    type
+     * @param   {boolean}                   isExtending
      * @return  {Pointer}
      */
 
-    createPointer({clientX, clientY}, type) {
+    createPointer({clientX, clientY}, type, isExtending) {
         const pointer  = new Pointer();
         const rect     = this.dom.root.getBoundingClientRect();
+
+        if (isExtending) {
+            pointer.state = POINTER_STATE_EXTENDING;
+        }
 
         pointer.type     = type;
         pointer.dragster = this;
@@ -295,8 +304,10 @@ class Dragster {
      */
 
     releasePointer(pointer, e) {
-        if (pointer.isPristine) {
-            this.click(e);
+        if (!pointer.isMoving) {
+            if (pointer.isPristine) {
+                this.click(e);
+            }
 
             this.deletePointer(pointer);
 
@@ -336,8 +347,6 @@ class Dragster {
             newVelocityX = directionX === DIRECTION_RIGHT ? Math.max(0, newVelocityX) : Math.min(0, newVelocityX);
             newVelocityY = directionY === DIRECTION_DOWN ? Math.max(0, newVelocityY) : Math.min(0, newVelocityY);
 
-            console.log(newVelocityX, newVelocityY);
-
             if (newVelocityX === 0 && newVelocityY === 0) {
                 // Pointer is stationary
 
@@ -372,6 +381,11 @@ class Dragster {
 
         pointer.rafIdInertia = requestAnimationFrame(render);
     }
+
+    /**
+     * @param  {Pointer}
+     * @return {void}
+     */
 
     cancelPointer(pointer) {
         cancelAnimationFrame(pointer.rafIdInertia);

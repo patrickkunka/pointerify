@@ -286,6 +286,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var handleSelector = this.config.selectors.handle;
 	
 	            var pointer = null;
+	            var didCancel = false;
 	
 	            if (e.button !== 0) return;
 	
@@ -293,11 +294,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                pointer = this.pointers[0];
 	
 	                this.cancelPointer(pointer);
+	
+	                didCancel = true;
 	            }
 	
 	            if (handleSelector && !_Util2.default.closestParent(target, handleSelector, true)) return;
 	
-	            this.pointers.push(this.createPointer(e, _Constants.POINTER_TYPE_MOUSE));
+	            this.pointers.push(this.createPointer(e, _Constants.POINTER_TYPE_MOUSE, didCancel));
 	
 	            e.preventDefault();
 	        }
@@ -380,17 +383,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * @param   {(TouchEvent|MouseEvent)}   e
 	         * @param   {Symbol}                    type
+	         * @param   {boolean}                   isExtending
 	         * @return  {Pointer}
 	         */
 	
 	    }, {
 	        key: 'createPointer',
-	        value: function createPointer(_ref, type) {
+	        value: function createPointer(_ref, type, isExtending) {
 	            var clientX = _ref.clientX,
 	                clientY = _ref.clientY;
 	
 	            var pointer = new _Pointer2.default();
 	            var rect = this.dom.root.getBoundingClientRect();
+	
+	            if (isExtending) {
+	                pointer.state = _Constants.POINTER_STATE_EXTENDING;
+	            }
 	
 	            pointer.type = type;
 	            pointer.dragster = this;
@@ -437,8 +445,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'releasePointer',
 	        value: function releasePointer(pointer, e) {
-	            if (pointer.isPristine) {
-	                this.click(e);
+	            if (!pointer.isMoving) {
+	                if (pointer.isPristine) {
+	                    this.click(e);
+	                }
 	
 	                this.deletePointer(pointer);
 	
@@ -481,8 +491,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                newVelocityX = directionX === _Constants.DIRECTION_RIGHT ? Math.max(0, newVelocityX) : Math.min(0, newVelocityX);
 	                newVelocityY = directionY === _Constants.DIRECTION_DOWN ? Math.max(0, newVelocityY) : Math.min(0, newVelocityY);
 	
-	                console.log(newVelocityX, newVelocityY);
-	
 	                if (newVelocityX === 0 && newVelocityY === 0) {
 	                    // Pointer is stationary
 	
@@ -517,6 +525,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            pointer.rafIdInertia = requestAnimationFrame(render);
 	        }
+	
+	        /**
+	         * @param  {Pointer}
+	         * @return {void}
+	         */
+	
 	    }, {
 	        key: 'cancelPointer',
 	        value: function cancelPointer(pointer) {
@@ -647,6 +661,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var POINTER_TYPE_TOUCH = exports.POINTER_TYPE_TOUCH = Symbol('POINTER_TYPE_TOUCH');
 	
 	var POINTER_STATE_PRISTINE = exports.POINTER_STATE_PRISTINE = Symbol('POINTER_STATE_PRISTINE');
+	var POINTER_STATE_EXTENDING = exports.POINTER_STATE_EXTENDING = Symbol('POINTER_STATE_EXTENDING');
 	var POINTER_STATE_MOVING = exports.POINTER_STATE_MOVING = Symbol('POINTER_STATE_MOVING');
 	var POINTER_STATE_INSPECTING = exports.POINTER_STATE_INSPECTING = Symbol('POINTER_STATE_INSPECTING');
 	var POINTER_STATE_STOPPING = exports.POINTER_STATE_STOPPING = Symbol('POINTER_STATE_STOPPING');
@@ -885,6 +900,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'isPristine',
 	        get: function get() {
 	            return this.state === _Constants.POINTER_STATE_PRISTINE;
+	        }
+	    }, {
+	        key: 'isExtending',
+	        get: function get() {
+	            return this.state === _Constants.POINTER_STATE_EXTENDING;
 	        }
 	    }, {
 	        key: 'isMoving',
