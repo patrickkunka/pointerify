@@ -114,25 +114,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _events2 = _interopRequireDefault(_events);
 	
+	var _StateInspect = __webpack_require__(13);
+	
+	var _StateInspect2 = _interopRequireDefault(_StateInspect);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var Dragster = function () {
+	var Dragster = function Dragster() {
+	    _classCallCheck(this, Dragster);
+	
+	    var _ = new (Function.prototype.bind.apply(_Dragster, [null].concat(Array.prototype.slice.call(arguments))))();
+	
+	    this.destroy = _.destroy.bind(_);
+	
+	    Object.seal(this);
+	};
+	
+	var _Dragster = function () {
 	    /**
 	     * @constructor
 	     * @param {HTMLElement} root
 	     * @param {object}      config
 	     */
 	
-	    function Dragster(root, config) {
-	        _classCallCheck(this, Dragster);
+	    function _Dragster(root, config) {
+	        _classCallCheck(this, _Dragster);
 	
-	        this.inspector = new _Pointer2.default();
-	        this.pointers = [];
+	        this.mouse = null;
+	        this.wheel = null;
+	        this.touches = [];
 	        this.bindings = [];
+	        this.rootRect = null;
 	        this.dom = new _Dom2.default();
 	        this.config = new _Config2.default();
 	        this.isClicking = false;
@@ -148,18 +164,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * @private
 	     * @param  {HTMLElement} root
+	     * @param  {object}      config
 	     * @return {void}
 	     */
 	
-	    _createClass(Dragster, [{
+	    _createClass(_Dragster, [{
 	        key: 'init',
 	        value: function init(root, config) {
+	            if (!(root instanceof HTMLElement)) {
+	                throw new TypeError('[Dragster] Invalid root element');
+	            }
+	
 	            this.dom.root = root;
 	
 	            this.configure(config);
 	
-	            this.inspector.type = _constants.POINTER_TYPE_HOVER;
-	            this.inspector.state = _constants.POINTER_STATE_INSPECTING;
+	            this.setRootGeometry();
 	
 	            this.bindEvents(_events2.default);
 	        }
@@ -173,9 +193,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'configure',
 	        value: function configure(config) {
-	            _Util2.default.extend(this.config, config, true, Dragster.handleConfigureError.bind(this));
+	            _Util2.default.extend(this.config, config, true, _Dragster.handleConfigureError.bind(this));
 	
 	            this.config.physics.friction = Math.max(0, Math.min(1, this.config.physics.friction));
+	            this.config.behavior.allowAxis = this.config.behavior.allowAxis.toUpperCase();
 	        }
 	
 	        /**
@@ -213,7 +234,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                throw new Error('No method found with name "' + binding.bind + '"');
 	            }
 	
-	            binding.fn = fn.bind(this);
+	            if (binding.throttle > 0) {
+	                binding.fn = _Util2.default.throttle(fn.bind(this), binding.throttle);
+	            } else if (binding.debounce > 0) {
+	                binding.fn = _Util2.default.debounce(fn.bind(this), binding.debounce);
+	            } else {
+	                binding.fn = fn.bind(this);
+	            }
 	
 	            if (binding.el && !((el = this.dom[binding.el]) instanceof HTMLElement)) {
 	                throw new Error('No element reference with name "' + binding.el + '"');
@@ -230,7 +257,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            binding.ref = el;
 	
 	            eventTypes.forEach(function (type) {
-	                return binding.ref.addEventListener(type, binding.fn);
+	                return binding.ref.addEventListener(type, binding.fn, {
+	                    passive: binding.passive
+	                });
 	            });
 	
 	            return binding;
@@ -291,24 +320,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var target = e.target;
 	            var handleSelector = this.config.selectors.handle;
 	
-	            var pointer = null;
 	            var didCancel = false;
 	
 	            if (e.button !== 0) return;
 	
-	            if (this.pointers.length > 0) {
-	                pointer = this.pointers[0];
-	
-	                this.cancelPointer(pointer);
+	            if (this.mouse) {
+	                this.cancelPointer(this.mouse);
 	
 	                didCancel = true;
 	            }
 	
 	            if (handleSelector && !_Util2.default.closestParent(target, handleSelector, true)) return;
 	
-	            this.pointers.push(this.createPointer(e, _constants.POINTER_TYPE_MOUSE, didCancel));
+	            this.mouse = this.createPointer(e, _constants.POINTER_TYPE_MOUSE, didCancel);
+	        }
 	
-	            e.preventDefault();
+	        /**
+	         * @param  {MouseEvent} e
+	         * @return {void}
+	         */
+	
+	    }, {
+	        key: 'handleRootMouseMove',
+	        value: function handleRootMouseMove(e) {
+	            if (this.mouse) return;
+	
+	            this.inspect(e);
 	        }
 	
 	        /**
@@ -318,21 +355,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	
 	    }, {
-	        key: 'handleMouseMove',
-	        value: function handleMouseMove(e) {
-	            var pointer = null;
+	        key: 'handleWindowMouseMove',
+	        value: function handleWindowMouseMove(e) {
+	            if (!this.mouse) return;
 	
-	            // TODO: manage inspector
+	            if (this.mouse.isStopping) return;
 	
-	            if (this.pointers.length < 1) return;
-	
-	            pointer = this.pointers[0];
-	
-	            if (pointer.isStopping) return;
-	
-	            this.movePointer(pointer, e);
-	
-	            e.preventDefault();
+	            this.movePointer(this.mouse, e, e);
 	        }
 	
 	        /**
@@ -344,13 +373,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleMouseUp',
 	        value: function handleMouseUp(e) {
-	            var pointer = null;
+	            if (!this.mouse) return;
 	
-	            if (this.pointers.length < 1) return;
-	
-	            pointer = this.pointers[0];
-	
-	            this.releasePointer(pointer, e);
+	            this.releasePointer(this.mouse, e);
 	
 	            e.preventDefault();
 	        }
@@ -364,7 +389,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleTouchStart',
 	        value: function handleTouchStart(e) {
-	            console.log('touch start', e);
+	            var target = e.target;
+	            var handleSelector = this.config.selectors.handle;
+	
+	            console.log('touch start');
+	
+	            for (var i = 0, touch; touch = e.touches[i]; i++) {
+	                var id = touch.identifier;
+	
+	                if (this.touches[id] instanceof _Pointer2.default) {
+	                    // cancel?
+	
+	                    return;
+	                }
+	
+	                if (handleSelector && !_Util2.default.closestParent(target, handleSelector, true)) break;
+	
+	                this.touches[id] = this.createPointer(touch, _constants.POINTER_TYPE_TOUCH);
+	
+	                this.touches[id].id = id;
+	
+	                e.preventDefault();
+	            }
 	        }
 	
 	        /**
@@ -374,7 +420,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    }, {
 	        key: 'handleTouchMove',
-	        value: function handleTouchMove(e) {}
+	        value: function handleTouchMove(e) {
+	            if (this.touches.length < 1) return;
+	
+	            for (var i = 0, touch; touch = e.touches[i]; i++) {
+	                var id = touch.identifier;
+	
+	                var pointer = null;
+	
+	                if (!((pointer = this.touches[id]) instanceof _Pointer2.default)) break;
+	
+	                this.movePointer(pointer, touch, e);
+	            }
+	        }
 	
 	        /**
 	         * @private
@@ -384,9 +442,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    }, {
 	        key: 'handleTouchEnd',
-	        value: function handleTouchEnd(e) {}
+	        value: function handleTouchEnd(e) {
+	            if (this.touches.length < 1) return;
+	
+	            for (var i = 0, touch; touch = e.changedTouches[i]; i++) {
+	                var id = touch.identifier;
+	
+	                var pointer = null;
+	
+	                if (!((pointer = this.touches[id]) instanceof _Pointer2.default)) break;
+	
+	                this.releasePointer(pointer, e);
+	
+	                e.preventDefault();
+	            }
+	        }
 	
 	        /**
+	         * @private
+	         * @return  {void}
+	         */
+	
+	    }, {
+	        key: 'handleResize',
+	        value: function handleResize() {
+	            this.setRootGeometry();
+	        }
+	
+	        /**
+	         * @private
+	         * @return  {void}
+	         */
+	
+	    }, {
+	        key: 'setRootGeometry',
+	        value: function setRootGeometry() {
+	            this.rootRect = this.dom.root.getBoundingClientRect();
+	        }
+	
+	        /**
+	         * @private
 	         * @param   {(TouchEvent|MouseEvent)}   e
 	         * @param   {Symbol}                    type
 	         * @param   {boolean}                   isExtending
@@ -400,7 +495,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                clientY = _ref.clientY;
 	
 	            var pointer = new _Pointer2.default();
-	            var rect = this.dom.root.getBoundingClientRect();
 	
 	            if (isExtending) {
 	                pointer.state = _constants.POINTER_STATE_EXTENDING;
@@ -412,10 +506,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            pointer.startX = pointer.currentX = clientX;
 	            pointer.startY = pointer.currentY = clientY;
 	
-	            pointer.rootWidth = rect.width;
-	            pointer.rootHeight = rect.height;
-	            pointer.rootOffsetX = clientX - rect.left;
-	            pointer.rootOffsetY = clientY - rect.top;
+	            pointer.rootWidth = this.rootRect.width;
+	            pointer.rootHeight = this.rootRect.height;
+	            pointer.rootOffsetX = clientX - this.rootRect.left;
+	            pointer.rootOffsetY = clientY - this.rootRect.top;
 	
 	            pointer.down();
 	
@@ -423,26 +517,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
+	         * @private
 	         * @param   {Pointer}
-	         * @param   {(TouchEvent|MouseEvent)}   e
+	         * @param   {(Touch|MouseEvent)}        e
+	         * @param   {(TouchEvent|MouseEvent)}   originalEvent
 	         * @return  {void}
 	         */
 	
 	    }, {
 	        key: 'movePointer',
-	        value: function movePointer(pointer, _ref2) {
+	        value: function movePointer(pointer, _ref2, originalEvent) {
 	            var clientX = _ref2.clientX,
 	                clientY = _ref2.clientY;
 	
-	            pointer.state = _constants.POINTER_STATE_MOVING;
+	            var allowAxis = this.config.behavior.allowAxis;
 	
 	            pointer.currentX = clientX;
 	            pointer.currentY = clientY;
 	
+	            if (!pointer.isMoving) {
+	                var vector = Math.abs(pointer.deltaX / pointer.deltaY);
+	
+	                if (allowAxis === _constants.AXIS_X && vector < 1 || allowAxis === _constants.AXIS_Y && vector >= 1) {
+	                    this.deletePointer(pointer);
+	
+	                    return;
+	                }
+	            }
+	
+	            if (allowAxis === _constants.AXIS_X) {
+	                pointer.currentY = pointer.startY;
+	            }if (allowAxis === _constants.AXIS_Y) {
+	                pointer.currentX = pointer.startX;
+	            }
+	
+	            pointer.state = _constants.POINTER_STATE_MOVING;
+	
 	            pointer.move();
+	
+	            originalEvent.preventDefault();
 	        }
 	
 	        /**
+	         * @private
 	         * @param   {Pointer}
 	         * @param   {(TouchEvent|MouseEvent)}   e
 	         * @return  {void}
@@ -473,6 +590,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
+	         * @private
 	         * @param   {Pointer}
 	         * @return  {void}
 	         */
@@ -533,6 +651,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
+	         * @private
 	         * @param  {Pointer}
 	         * @return {void}
 	         */
@@ -546,6 +665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
+	         * @private
 	         * @param  {Pointer}
 	         * @return {void}
 	         */
@@ -553,9 +673,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'deletePointer',
 	        value: function deletePointer(pointer) {
-	            var pointerIndex = this.pointers.indexOf(pointer);
+	            switch (pointer.type) {
+	                case _constants.POINTER_TYPE_MOUSE:
+	                    this.mouse = null;
 	
-	            this.pointers.splice(pointerIndex, 1);
+	                    break;
+	                case _constants.POINTER_TYPE_TOUCH:
+	                    delete this.touches[pointer.id];
+	
+	                    break;
+	            }
 	
 	            if (!pointer.isPristine) {
 	                pointer.stop();
@@ -563,6 +690,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
+	         * @private
+	         * @param  {MouseEvent} e
+	         * @return {void}
+	         */
+	
+	    }, {
+	        key: 'inspect',
+	        value: function inspect(_ref3) {
+	            var clientX = _ref3.clientX,
+	                clientY = _ref3.clientY;
+	
+	            var state = new _StateInspect2.default();
+	
+	            var event = new CustomEvent(_constants.EVENT_POINTER_INSPECT, {
+	                detail: state,
+	                bubbles: true
+	            });
+	
+	            var rootOffsetX = clientX - this.rootRect.left;
+	            var rootOffsetY = clientY - this.rootRect.top;
+	
+	            state.multiplierX = Math.max(0, Math.min(1, rootOffsetX / this.rootRect.width));
+	            state.multiplierY = Math.max(0, Math.min(1, rootOffsetY / this.rootRect.height));
+	
+	            this.emitEvent(event);
+	        }
+	
+	        /**
+	         * @private
 	         * @param  {CustomEvent} e
 	         * @return {void}
 	         */
@@ -574,6 +730,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
+	         * @private
 	         * @param   {(TouchEvent|MouseEvent)} el
 	         * @return  {void}
 	         */
@@ -648,7 +805,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }]);
 	
-	    return Dragster;
+	    return _Dragster;
 	}();
 	
 	exports.default = Dragster;
@@ -676,6 +833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EVENT_POINTER_DRAG = exports.EVENT_POINTER_DRAG = 'pointerDrag';
 	var EVENT_POINTER_UP = exports.EVENT_POINTER_UP = 'pointerUp';
 	var EVENT_POINTER_STOP = exports.EVENT_POINTER_STOP = 'pointerStop';
+	var EVENT_POINTER_INSPECT = exports.EVENT_POINTER_INSPECT = 'pointerInspect';
 	
 	var DIRECTION_LEFT = exports.DIRECTION_LEFT = Symbol('DIRECTION_LEFT');
 	var DIRECTION_RIGHT = exports.DIRECTION_RIGHT = Symbol('DIRECTION_RIGHT');
@@ -686,7 +844,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var AXIS_Y = exports.AXIS_Y = 'Y';
 	var AXIS_BOTH = exports.AXIS_BOTH = 'BOTH';
 	
-	var SIXTY_FPS = exports.SIXTY_FPS = 1000 / 60;
+	var SIXTY_FPS = exports.SIXTY_FPS = 1000 / 60; // eslint-disable-line no-magic-numbers
 
 /***/ },
 /* 3 */
@@ -729,6 +887,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.bind = '';
 	    this.ref = null;
 	    this.fn = null;
+	    this.throttle = -1;
+	    this.debounce = -1;
+	    this.passive = true;
 	
 	    Object.seal(this);
 	};
@@ -749,9 +910,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _constants = __webpack_require__(2);
 	
-	var _State = __webpack_require__(6);
+	var _StatePointer = __webpack_require__(6);
 	
-	var _State2 = _interopRequireDefault(_State);
+	var _StatePointer2 = _interopRequireDefault(_StatePointer);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -761,6 +922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Pointer() {
 	        _classCallCheck(this, Pointer);
 	
+	        this.id = -1;
 	        this.startX = -1;
 	        this.startY = -1;
 	        this.currentX = -1;
@@ -784,6 +946,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'down',
 	        value: function down() {
 	            this.dispatchEvent(_constants.EVENT_POINTER_DOWN);
+	
+	            console.log('down');
 	        }
 	    }, {
 	        key: 'move',
@@ -791,6 +955,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.startMonitorVelocity();
 	
 	            this.dispatchEvent(_constants.EVENT_POINTER_DRAG);
+	
+	            console.log('move');
 	        }
 	    }, {
 	        key: 'up',
@@ -798,6 +964,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.stopMonitorVelocity();
 	
 	            this.dispatchEvent(_constants.EVENT_POINTER_UP);
+	
+	            console.log('up');
 	        }
 	    }, {
 	        key: 'stop',
@@ -805,6 +973,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.stopMonitorVelocity();
 	
 	            this.dispatchEvent(_constants.EVENT_POINTER_STOP);
+	
+	            console.log('stop');
 	        }
 	    }, {
 	        key: 'startMonitorVelocity',
@@ -849,7 +1019,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getState',
 	        value: function getState() {
-	            var state = new _State2.default();
+	            var state = new _StatePointer2.default();
 	
 	            state.deltaX = this.deltaX;
 	            state.deltaY = this.deltaY;
@@ -956,8 +1126,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var State = function State() {
-	    _classCallCheck(this, State);
+	var StatePointer = function StatePointer() {
+	    _classCallCheck(this, StatePointer);
 	
 	    this.deltaX = -1;
 	    this.deltaY = -1;
@@ -972,7 +1142,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Object.seal(this);
 	};
 	
-	exports.default = State;
+	exports.default = StatePointer;
 
 /***/ },
 /* 7 */
@@ -1098,6 +1268,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            return null;
+	        }
+	
+	        /**
+	         * Returns a function which calls the provided function
+	         * only after the specified interval has elapsed between
+	         * function calls. An optional `immediate` boolean will
+	         * cause the provided function to be called once immediately
+	         * before waiting.
+	         *
+	         * @param   {function}  fn
+	         * @param   {number}    interval
+	         * @param   {boolean}   [immediate=false]
+	         * @return  {function}
+	         */
+	
+	    }, {
+	        key: 'debounce',
+	        value: function debounce(fn, interval, immediate) {
+	            var timeoutId = -1;
+	
+	            return function () {
+	                var _this = this;
+	
+	                var args = arguments;
+	
+	                var later = function later() {
+	                    timeoutId = -1;
+	
+	                    fn.apply(_this, args); // eslint-disable-line no-invalid-this
+	                };
+	
+	                if (timeoutId < 0 && immediate) {
+	                    later();
+	                } else {
+	                    clearTimeout(timeoutId);
+	
+	                    timeoutId = setTimeout(later, interval);
+	                }
+	            };
 	        }
 	    }]);
 	
@@ -1230,7 +1439,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		{
 			"el": "root",
 			"on": "touchstart",
-			"bind": "handleTouchStart"
+			"bind": "handleTouchStart",
+			"passive": false
 		},
 		{
 			"el": "root",
@@ -1238,12 +1448,18 @@ return /******/ (function(modules) { // webpackBootstrap
 			"bind": "handleClick"
 		},
 		{
+			"el": "root",
 			"on": "mousemove",
-			"bind": "handleMouseMove"
+			"bind": "handleRootMouseMove"
+		},
+		{
+			"on": "mousemove",
+			"bind": "handleWindowMouseMove"
 		},
 		{
 			"on": "touchmove",
-			"bind": "handleTouchMove"
+			"bind": "handleTouchMove",
+			"passive": false
 		},
 		{
 			"on": "mouseup",
@@ -1251,9 +1467,38 @@ return /******/ (function(modules) { // webpackBootstrap
 		},
 		{
 			"on": "touchend",
-			"bind": "handleTouchEnd"
+			"bind": "handleTouchEnd",
+			"passive": false
+		},
+		{
+			"on": "resize",
+			"bind": "handleResize",
+			"debounce": 100
 		}
 	];
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var StateInspect = function StateInspect() {
+	    _classCallCheck(this, StateInspect);
+	
+	    this.multiplierX = -1;
+	    this.multiplierY = -1;
+	
+	    Object.seal(this);
+	};
+	
+	exports.default = StateInspect;
 
 /***/ }
 /******/ ])

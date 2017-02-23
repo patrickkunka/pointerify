@@ -1,4 +1,4 @@
-class State {
+class StatePointer {
     constructor() {
         this.deltaX      = -1;
         this.deltaY      = -1;
@@ -14,4 +14,4 @@ class State {
     }
 }
 
-export default State;
+export default StatePointer;

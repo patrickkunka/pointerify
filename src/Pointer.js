@@ -9,7 +9,6 @@ import {
     POINTER_STATE_EXTENDING,
     POINTER_STATE_MOVING,
     POINTER_STATE_STOPPING,
-    POINTER_STATE_INSPECTING,
     EVENT_POINTER_DOWN,
     EVENT_POINTER_DRAG,
     EVENT_POINTER_UP,
@@ -17,10 +16,11 @@ import {
     SIXTY_FPS
 } from './constants';
 
-import State from './State';
+import StatePointer from './StatePointer';
 
 class Pointer {
     constructor() {
+        this.id          = -1;
         this.startX      = -1;
         this.startY      = -1;
         this.currentX    = -1;
@@ -98,24 +98,32 @@ class Pointer {
 
     down() {
         this.dispatchEvent(EVENT_POINTER_DOWN);
+
+        console.log('down');
     }
 
     move() {
         this.startMonitorVelocity();
 
         this.dispatchEvent(EVENT_POINTER_DRAG);
+
+        console.log('move');
     }
 
     up() {
         this.stopMonitorVelocity();
 
         this.dispatchEvent(EVENT_POINTER_UP);
+
+        console.log('up');
     }
 
     stop() {
         this.stopMonitorVelocity();
 
         this.dispatchEvent(EVENT_POINTER_STOP);
+
+        console.log('stop');
     }
 
     startMonitorVelocity() {
@@ -154,7 +162,7 @@ class Pointer {
     }
 
     getState() {
-        const state = new State();
+        const state = new StatePointer();
 
         state.deltaX      = this.deltaX;
         state.deltaY      = this.deltaY;

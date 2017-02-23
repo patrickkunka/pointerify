@@ -13,7 +13,13 @@
         <script src="../dist/dragster.js"></script>
         <script>
             const sb = document.getElementById('sandbox');
-            const drg = dragster(document.getElementById('sandbox'));
+            const drg = dragster(sb, {
+                behavior: {
+                    allowAxis: 'x'
+                }
+            });
+
+            console.log(drg);
 
             sb.addEventListener('pointerDrag', (e) => {
                 let text = '';
@@ -28,7 +34,11 @@
                 console.log(text);
             });
 
-            // window.addEventListener('click', (e) => console.log('click', e.target));
+            window.addEventListener('click', (e) => console.log('click', e.target));
+
+            sb.addEventListener('pointerInspect', (e) => {
+                console.log(e.detail.multiplierX, e.detail.multiplierY);
+            });
         </script>
     </body>
 </html>

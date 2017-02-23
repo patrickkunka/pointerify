@@ -1,14 +1,14 @@
 import {
+    AXIS_X,
+    AXIS_Y,
     POINTER_TYPE_MOUSE,
-    POINTER_TYPE_HOVER,
+    POINTER_TYPE_TOUCH,
     POINTER_STATE_EXTENDING,
     POINTER_STATE_MOVING,
-    POINTER_STATE_INSPECTING,
     POINTER_STATE_STOPPING,
-    DIRECTION_LEFT,
     DIRECTION_RIGHT,
     DIRECTION_DOWN,
-    DIRECTION_UP
+    EVENT_POINTER_INSPECT
 } from './constants';
 
 import Dom          from './Dom';
@@ -17,8 +17,19 @@ import Pointer      from './Pointer';
 import Util         from './Util';
 import Config       from './config/Config';
 import events       from './events.json';
+import StateInspect from './StateInspect';
 
 class Dragster {
+    constructor() {
+        const _ = new _Dragster(...arguments);
+
+        this.destroy = _.destroy.bind(_);
+
+        Object.seal(this);
+    }
+}
+
+class _Dragster {
     /**
      * @constructor
      * @param {HTMLElement} root
@@ -26,9 +37,11 @@ class Dragster {
      */
 
     constructor(root, config) {
-        this.inspector  = new Pointer();
-        this.pointers   = [];
+        this.mouse      = null;
+        this.wheel      = null;
+        this.touches    = [];
         this.bindings   = [];
+        this.rootRect   = null;
         this.dom        = new Dom();
         this.config     = new Config();
         this.isClicking = false;
@@ -44,16 +57,20 @@ class Dragster {
     /**
      * @private
      * @param  {HTMLElement} root
+     * @param  {object}      config
      * @return {void}
      */
 
     init(root, config) {
+        if (!(root instanceof HTMLElement)) {
+            throw new TypeError('[Dragster] Invalid root element');
+        }
+
         this.dom.root = root;
 
         this.configure(config);
 
-        this.inspector.type  = POINTER_TYPE_HOVER;
-        this.inspector.state = POINTER_STATE_INSPECTING;
+        this.setRootGeometry();
 
         this.bindEvents(events);
     }
@@ -65,9 +82,10 @@ class Dragster {
      */
 
     configure(config) {
-        Util.extend(this.config, config, true, Dragster.handleConfigureError.bind(this));
+        Util.extend(this.config, config, true, _Dragster.handleConfigureError.bind(this));
 
-        this.config.physics.friction = Math.max(0, Math.min(1, this.config.physics.friction));
+        this.config.physics.friction   = Math.max(0, Math.min(1, this.config.physics.friction));
+        this.config.behavior.allowAxis = this.config.behavior.allowAxis.toUpperCase();
     }
 
     /**
@@ -97,7 +115,13 @@ class Dragster {
             throw new Error(`No method found with name "${binding.bind}"`);
         }
 
-        binding.fn = fn.bind(this);
+        if (binding.throttle > 0) {
+            binding.fn = Util.throttle(fn.bind(this), binding.throttle);
+        } else if (binding.debounce > 0) {
+            binding.fn = Util.debounce(fn.bind(this), binding.debounce);
+        } else {
+            binding.fn = fn.bind(this);
+        }
 
         if (binding.el && !((el = this.dom[binding.el]) instanceof HTMLElement)) {
             throw new Error(`No element reference with name "${binding.el}"`);
@@ -113,7 +137,9 @@ class Dragster {
 
         binding.ref = el;
 
-        eventTypes.forEach(type => binding.ref.addEventListener(type, binding.fn));
+        eventTypes.forEach(type => binding.ref.addEventListener(type, binding.fn, {
+            passive: binding.passive
+        }));
 
         return binding;
     }
@@ -161,24 +187,30 @@ class Dragster {
         const target = e.target;
         const handleSelector = this.config.selectors.handle;
 
-        let pointer = null;
         let didCancel = false;
 
         if (e.button !== 0) return;
 
-        if (this.pointers.length > 0) {
-            pointer = this.pointers[0];
-
-            this.cancelPointer(pointer);
+        if (this.mouse) {
+            this.cancelPointer(this.mouse);
 
             didCancel = true;
         }
 
         if (handleSelector && !Util.closestParent(target, handleSelector, true)) return;
 
-        this.pointers.push(this.createPointer(e, POINTER_TYPE_MOUSE, didCancel));
+        this.mouse = this.createPointer(e, POINTER_TYPE_MOUSE, didCancel);
+    }
 
-        e.preventDefault();
+    /**
+     * @param  {MouseEvent} e
+     * @return {void}
+     */
+
+    handleRootMouseMove(e) {
+        if (this.mouse) return;
+
+        this.inspect(e);
     }
 
     /**
@@ -187,20 +219,12 @@ class Dragster {
      * @return  {void}
      */
 
-    handleMouseMove(e) {
-        let pointer = null;
+    handleWindowMouseMove(e) {
+        if (!this.mouse) return;
 
-        // TODO: manage inspector
+        if (this.mouse.isStopping) return;
 
-        if (this.pointers.length < 1) return;
-
-        pointer = this.pointers[0];
-
-        if (pointer.isStopping) return;
-
-        this.movePointer(pointer, e);
-
-        e.preventDefault();
+        this.movePointer(this.mouse, e, e);
     }
 
     /**
@@ -210,13 +234,9 @@ class Dragster {
      */
 
     handleMouseUp(e) {
-        let pointer = null;
+        if (!this.mouse) return;
 
-        if (this.pointers.length < 1) return;
-
-        pointer = this.pointers[0];
-
-        this.releasePointer(pointer, e);
+        this.releasePointer(this.mouse, e);
 
         e.preventDefault();
     }
@@ -228,9 +248,29 @@ class Dragster {
      */
 
     handleTouchStart(e) {
-        console.log('touch start', e);
-    }
+        const target = e.target;
+        const handleSelector = this.config.selectors.handle;
 
+        console.log('touch start');
+
+        for (let i = 0, touch; (touch = e.touches[i]); i++) {
+            const id = touch.identifier;
+
+            if (this.touches[id] instanceof Pointer) {
+                // cancel?
+
+                return;
+            }
+
+            if (handleSelector && !Util.closestParent(target, handleSelector, true)) break;
+
+            this.touches[id] = this.createPointer(touch, POINTER_TYPE_TOUCH);
+
+            this.touches[id].id = id;
+
+            e.preventDefault();
+        }
+    }
 
     /**
      * @private
@@ -238,7 +278,17 @@ class Dragster {
      */
 
     handleTouchMove(e) {
+        if (this.touches.length < 1) return;
 
+        for (let i = 0, touch; (touch = e.touches[i]); i++) {
+            const id = touch.identifier;
+
+            let pointer = null;
+
+            if (!((pointer = this.touches[id]) instanceof Pointer)) break;
+
+            this.movePointer(pointer, touch, e);
+        }
     }
 
     /**
@@ -248,10 +298,41 @@ class Dragster {
      */
 
     handleTouchEnd(e) {
+        if (this.touches.length < 1) return;
 
+        for (let i = 0, touch; (touch = e.changedTouches[i]); i++) {
+            const id = touch.identifier;
+
+            let pointer = null;
+
+            if (!((pointer = this.touches[id]) instanceof Pointer)) break;
+
+            this.releasePointer(pointer, e);
+
+            e.preventDefault();
+        }
     }
 
     /**
+     * @private
+     * @return  {void}
+     */
+
+    handleResize() {
+        this.setRootGeometry();
+    }
+
+    /**
+     * @private
+     * @return  {void}
+     */
+
+    setRootGeometry() {
+        this.rootRect = this.dom.root.getBoundingClientRect();
+    }
+
+    /**
+     * @private
      * @param   {(TouchEvent|MouseEvent)}   e
      * @param   {Symbol}                    type
      * @param   {boolean}                   isExtending
@@ -259,8 +340,7 @@ class Dragster {
      */
 
     createPointer({clientX, clientY}, type, isExtending) {
-        const pointer  = new Pointer();
-        const rect     = this.dom.root.getBoundingClientRect();
+        const pointer = new Pointer();
 
         if (isExtending) {
             pointer.state = POINTER_STATE_EXTENDING;
@@ -272,10 +352,10 @@ class Dragster {
         pointer.startX = pointer.currentX = clientX;
         pointer.startY = pointer.currentY = clientY;
 
-        pointer.rootWidth   = rect.width;
-        pointer.rootHeight  = rect.height;
-        pointer.rootOffsetX = clientX - rect.left;
-        pointer.rootOffsetY = clientY - rect.top;
+        pointer.rootWidth   = this.rootRect.width;
+        pointer.rootHeight  = this.rootRect.height;
+        pointer.rootOffsetX = clientX - this.rootRect.left;
+        pointer.rootOffsetY = clientY - this.rootRect.top;
 
         pointer.down();
 
@@ -283,21 +363,44 @@ class Dragster {
     }
 
     /**
+     * @private
      * @param   {Pointer}
-     * @param   {(TouchEvent|MouseEvent)}   e
+     * @param   {(Touch|MouseEvent)}        e
+     * @param   {(TouchEvent|MouseEvent)}   originalEvent
      * @return  {void}
      */
 
-    movePointer(pointer, {clientX, clientY}) {
-        pointer.state = POINTER_STATE_MOVING;
+    movePointer(pointer, {clientX, clientY}, originalEvent) {
+        const allowAxis = this.config.behavior.allowAxis;
 
         pointer.currentX = clientX;
         pointer.currentY = clientY;
 
+        if (!pointer.isMoving) {
+            const vector = Math.abs(pointer.deltaX / pointer.deltaY);
+
+            if (allowAxis === AXIS_X && vector < 1 || allowAxis === AXIS_Y && vector >= 1) {
+                this.deletePointer(pointer);
+
+                return;
+            }
+        }
+
+        if (allowAxis === AXIS_X) {
+            pointer.currentY = pointer.startY;
+        } if (allowAxis === AXIS_Y) {
+            pointer.currentX = pointer.startX;
+        }
+
+        pointer.state = POINTER_STATE_MOVING;
+
         pointer.move();
+
+        originalEvent.preventDefault();
     }
 
     /**
+     * @private
      * @param   {Pointer}
      * @param   {(TouchEvent|MouseEvent)}   e
      * @return  {void}
@@ -326,6 +429,7 @@ class Dragster {
     }
 
     /**
+     * @private
      * @param   {Pointer}
      * @return  {void}
      */
@@ -383,6 +487,7 @@ class Dragster {
     }
 
     /**
+     * @private
      * @param  {Pointer}
      * @return {void}
      */
@@ -394,14 +499,22 @@ class Dragster {
     }
 
     /**
+     * @private
      * @param  {Pointer}
      * @return {void}
      */
 
     deletePointer(pointer) {
-        const pointerIndex = this.pointers.indexOf(pointer);
+        switch (pointer.type) {
+            case POINTER_TYPE_MOUSE:
+                this.mouse = null;
 
-        this.pointers.splice(pointerIndex, 1);
+                break;
+            case POINTER_TYPE_TOUCH:
+                delete this.touches[pointer.id];
+
+                break;
+        }
 
         if (!pointer.isPristine) {
             pointer.stop();
@@ -409,6 +522,30 @@ class Dragster {
     }
 
     /**
+     * @private
+     * @param  {MouseEvent} e
+     * @return {void}
+     */
+
+    inspect({clientX, clientY}) {
+        const state = new StateInspect();
+
+        const event = new CustomEvent(EVENT_POINTER_INSPECT, {
+            detail: state,
+            bubbles: true
+        });
+
+        const rootOffsetX = clientX - this.rootRect.left;
+        const rootOffsetY = clientY - this.rootRect.top;
+
+        state.multiplierX = Math.max(0, Math.min(1, rootOffsetX / this.rootRect.width));
+        state.multiplierY = Math.max(0, Math.min(1, rootOffsetY / this.rootRect.height));
+
+        this.emitEvent(event);
+    }
+
+    /**
+     * @private
      * @param  {CustomEvent} e
      * @return {void}
      */
@@ -418,6 +555,7 @@ class Dragster {
     }
 
     /**
+     * @private
      * @param   {(TouchEvent|MouseEvent)} el
      * @return  {void}
      */
