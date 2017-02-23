@@ -269,7 +269,7 @@ class _Dragster {
 
             this.touches[id].id = id;
 
-            e.preventDefault();
+            // e.preventDefault();
         }
     }
 

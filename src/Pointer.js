@@ -105,8 +105,6 @@ class Pointer {
         if (!this.isMonitoring && !this.isStopping) this.startMonitorVelocity();
 
         this.dispatchEvent(EVENT_POINTER_DRAG);
-
-        console.log('move');
     }
 
     up() {

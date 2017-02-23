@@ -410,7 +410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                this.touches[id].id = id;
 	
-	                e.preventDefault();
+	                // e.preventDefault();
 	            }
 	        }
 	
@@ -954,8 +954,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!this.isMonitoring && !this.isStopping) this.startMonitorVelocity();
 	
 	            this.dispatchEvent(_constants.EVENT_POINTER_DRAG);
-	
-	            console.log('move');
 	        }
 	    }, {
 	        key: 'up',
