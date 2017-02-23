@@ -39,7 +39,7 @@ class _Dragster {
     constructor(root, config) {
         this.mouse      = null;
         this.wheel      = null;
-        this.touches    = [];
+        this.touches    = {};
         this.bindings   = [];
         this.rootRect   = null;
         this.dom        = new Dom();
@@ -49,6 +49,10 @@ class _Dragster {
         Object.seal(this);
 
         this.init(root, config);
+    }
+
+    get totalTouches() {
+        return Reflect.ownKeys(this.touches).length;
     }
 
     /* Private Methods
@@ -200,6 +204,8 @@ class _Dragster {
         if (handleSelector && !Util.closestParent(target, handleSelector, true)) return;
 
         this.mouse = this.createPointer(e, POINTER_TYPE_MOUSE, didCancel);
+
+        e.preventDefault();
     }
 
     /**
@@ -252,24 +258,28 @@ class _Dragster {
         const handleSelector = this.config.selectors.handle;
 
         for (let i = 0, touch; (touch = e.changedTouches[i]); i++) {
-            const id = touch.identifier;
+            const newId = touch.identifier;
 
-            let pointer = null;
             let didCancel = false;
 
-            if ((pointer = this.touches[id]) instanceof Pointer) {
-                this.cancelPointer(pointer);
+            for (let activeId in this.touches) {
+                // If any active touches in this dragster are stopping,
+                // cancel them.
 
-                didCancel = true;
+                let activePointer = null;
+
+                if ((activePointer = this.touches[activeId]).isStopping) {
+                    this.cancelPointer(activePointer);
+
+                    didCancel = true;
+                }
             }
 
             if (handleSelector && !Util.closestParent(target, handleSelector, true)) break;
 
-            this.touches[id] = this.createPointer(touch, POINTER_TYPE_TOUCH, didCancel);
+            this.touches[newId] = this.createPointer(touch, POINTER_TYPE_TOUCH, didCancel);
 
-            this.touches[id].id = id;
-
-            console.log('touch', id, 'start');
+            this.touches[newId].id = newId;
         }
     }
 
@@ -279,7 +289,7 @@ class _Dragster {
      */
 
     handleTouchMove(e) {
-        if (this.touches.length < 1) return;
+        if (this.totalTouches < 1) return;
 
         for (let i = 0, touch; (touch = e.changedTouches[i]); i++) {
             const id = touch.identifier;
@@ -299,7 +309,7 @@ class _Dragster {
      */
 
     handleTouchEnd(e) {
-        if (this.touches.length < 1) return;
+        if (this.totalTouches < 1) return;
 
         for (let i = 0, touch; (touch = e.changedTouches[i]); i++) {
             const id = touch.identifier;

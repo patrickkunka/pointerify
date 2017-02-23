@@ -146,7 +146,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        this.mouse = null;
 	        this.wheel = null;
-	        this.touches = [];
+	        this.touches = {};
 	        this.bindings = [];
 	        this.rootRect = null;
 	        this.dom = new _Dom2.default();
@@ -158,18 +158,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.init(root, config);
 	    }
 	
-	    /* Private Methods
-	    ---------------------------------------------------------------------- */
-	
-	    /**
-	     * @private
-	     * @param  {HTMLElement} root
-	     * @param  {object}      config
-	     * @return {void}
-	     */
-	
 	    _createClass(_Dragster, [{
 	        key: 'init',
+	
+	
+	        /* Private Methods
+	        ---------------------------------------------------------------------- */
+	
+	        /**
+	         * @private
+	         * @param  {HTMLElement} root
+	         * @param  {object}      config
+	         * @return {void}
+	         */
+	
 	        value: function init(root, config) {
 	            if (!(root instanceof HTMLElement)) {
 	                throw new TypeError('[Dragster] Invalid root element');
@@ -333,6 +335,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (handleSelector && !_Util2.default.closestParent(target, handleSelector, true)) return;
 	
 	            this.mouse = this.createPointer(e, _constants.POINTER_TYPE_MOUSE, didCancel);
+	
+	            e.preventDefault();
 	        }
 	
 	        /**
@@ -393,24 +397,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var handleSelector = this.config.selectors.handle;
 	
 	            for (var i = 0, touch; touch = e.changedTouches[i]; i++) {
-	                var id = touch.identifier;
+	                var newId = touch.identifier;
 	
-	                var pointer = null;
 	                var didCancel = false;
 	
-	                if ((pointer = this.touches[id]) instanceof _Pointer2.default) {
-	                    this.cancelPointer(pointer);
+	                for (var activeId in this.touches) {
+	                    // If any active touches in this dragster are stopping,
+	                    // cancel them.
 	
-	                    didCancel = true;
+	                    var activePointer = null;
+	
+	                    if ((activePointer = this.touches[activeId]).isStopping) {
+	                        this.cancelPointer(activePointer);
+	
+	                        didCancel = true;
+	                    }
 	                }
 	
 	                if (handleSelector && !_Util2.default.closestParent(target, handleSelector, true)) break;
 	
-	                this.touches[id] = this.createPointer(touch, _constants.POINTER_TYPE_TOUCH, didCancel);
+	                this.touches[newId] = this.createPointer(touch, _constants.POINTER_TYPE_TOUCH, didCancel);
 	
-	                this.touches[id].id = id;
-	
-	                console.log('touch', id, 'start');
+	                this.touches[newId].id = newId;
 	            }
 	        }
 	
@@ -422,7 +430,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleTouchMove',
 	        value: function handleTouchMove(e) {
-	            if (this.touches.length < 1) return;
+	            if (this.totalTouches < 1) return;
 	
 	            for (var i = 0, touch; touch = e.changedTouches[i]; i++) {
 	                var id = touch.identifier;
@@ -444,7 +452,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleTouchEnd',
 	        value: function handleTouchEnd(e) {
-	            if (this.touches.length < 1) return;
+	            if (this.totalTouches < 1) return;
 	
 	            for (var i = 0, touch; touch = e.changedTouches[i]; i++) {
 	                var id = touch.identifier;
@@ -771,6 +779,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        value: function destroy() {
 	            this.unbindEvents(this.bindings);
+	        }
+	    }, {
+	        key: 'totalTouches',
+	        get: function get() {
+	            return Reflect.ownKeys(this.touches).length;
 	        }
 	    }], [{
 	        key: 'handleConfigureError',
