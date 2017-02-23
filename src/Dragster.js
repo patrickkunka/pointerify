@@ -251,20 +251,21 @@ class _Dragster {
         const target = e.target;
         const handleSelector = this.config.selectors.handle;
 
-        console.log('touch start');
-
-        for (let i = 0, touch; (touch = e.touches[i]); i++) {
+        for (let i = 0, touch; (touch = e.changedTouches[i]); i++) {
             const id = touch.identifier;
 
-            if (this.touches[id] instanceof Pointer) {
-                // cancel?
+            let pointer = null;
+            let didCancel = false;
 
-                return;
+            if ((pointer = this.touches[id]) instanceof Pointer) {
+                this.cancelPointer(pointer);
+
+                didCancel = true;
             }
 
             if (handleSelector && !Util.closestParent(target, handleSelector, true)) break;
 
-            this.touches[id] = this.createPointer(touch, POINTER_TYPE_TOUCH);
+            this.touches[id] = this.createPointer(touch, POINTER_TYPE_TOUCH, didCancel);
 
             this.touches[id].id = id;
 
@@ -280,7 +281,7 @@ class _Dragster {
     handleTouchMove(e) {
         if (this.touches.length < 1) return;
 
-        for (let i = 0, touch; (touch = e.touches[i]); i++) {
+        for (let i = 0, touch; (touch = e.changedTouches[i]); i++) {
             const id = touch.identifier;
 
             let pointer = null;
@@ -371,7 +372,7 @@ class _Dragster {
      */
 
     movePointer(pointer, {clientX, clientY}, originalEvent) {
-        const allowAxis = this.config.behavior.allowAxis;
+        const allowAxis   = this.config.behavior.allowAxis;
 
         pointer.currentX = clientX;
         pointer.currentY = clientY;

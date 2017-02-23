@@ -22,5 +22,3 @@ export const DIRECTION_DOWN  = Symbol('DIRECTION_DOWN');
 export const AXIS_X    = 'X';
 export const AXIS_Y    = 'Y';
 export const AXIS_BOTH = 'BOTH';
-
-export const SIXTY_FPS = 1000 / 60; // eslint-disable-line no-magic-numbers

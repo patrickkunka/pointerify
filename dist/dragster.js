@@ -392,20 +392,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var target = e.target;
 	            var handleSelector = this.config.selectors.handle;
 	
-	            console.log('touch start');
-	
-	            for (var i = 0, touch; touch = e.touches[i]; i++) {
+	            for (var i = 0, touch; touch = e.changedTouches[i]; i++) {
 	                var id = touch.identifier;
 	
-	                if (this.touches[id] instanceof _Pointer2.default) {
-	                    // cancel?
+	                var pointer = null;
+	                var didCancel = false;
 	
-	                    return;
+	                if ((pointer = this.touches[id]) instanceof _Pointer2.default) {
+	                    this.cancelPointer(pointer);
+	
+	                    didCancel = true;
 	                }
 	
 	                if (handleSelector && !_Util2.default.closestParent(target, handleSelector, true)) break;
 	
-	                this.touches[id] = this.createPointer(touch, _constants.POINTER_TYPE_TOUCH);
+	                this.touches[id] = this.createPointer(touch, _constants.POINTER_TYPE_TOUCH, didCancel);
 	
 	                this.touches[id].id = id;
 	
@@ -423,7 +424,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function handleTouchMove(e) {
 	            if (this.touches.length < 1) return;
 	
-	            for (var i = 0, touch; touch = e.touches[i]; i++) {
+	            for (var i = 0, touch; touch = e.changedTouches[i]; i++) {
 	                var id = touch.identifier;
 	
 	                var pointer = null;
@@ -843,8 +844,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var AXIS_X = exports.AXIS_X = 'X';
 	var AXIS_Y = exports.AXIS_Y = 'Y';
 	var AXIS_BOTH = exports.AXIS_BOTH = 'BOTH';
-	
-	var SIXTY_FPS = exports.SIXTY_FPS = 1000 / 60; // eslint-disable-line no-magic-numbers
 
 /***/ },
 /* 3 */
@@ -936,7 +935,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.type = null;
 	        this.dragster = null;
 	        this.state = _constants.POINTER_STATE_NEW;
-	        this.intervalIdVelocity = -1;
+	        this.isMonitoring = false;
+	
+	        this.rafIdVelocity = -1;
 	        this.rafIdInertia = -1;
 	
 	        Object.seal(this);
@@ -946,13 +947,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'down',
 	        value: function down() {
 	            this.dispatchEvent(_constants.EVENT_POINTER_DOWN);
-	
-	            console.log('down');
 	        }
 	    }, {
 	        key: 'move',
 	        value: function move() {
-	            this.startMonitorVelocity();
+	            if (!this.isMonitoring && !this.isStopping) this.startMonitorVelocity();
 	
 	            this.dispatchEvent(_constants.EVENT_POINTER_DRAG);
 	
@@ -964,31 +963,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.stopMonitorVelocity();
 	
 	            this.dispatchEvent(_constants.EVENT_POINTER_UP);
-	
-	            console.log('up');
 	        }
 	    }, {
 	        key: 'stop',
 	        value: function stop() {
-	            this.stopMonitorVelocity();
-	
 	            this.dispatchEvent(_constants.EVENT_POINTER_STOP);
-	
-	            console.log('stop');
 	        }
 	    }, {
 	        key: 'startMonitorVelocity',
 	        value: function startMonitorVelocity() {
 	            var _this = this;
 	
-	            var SAMPLE_SIZE = 4;
+	            var SAMPLE_SIZE = 8;
 	
 	            var lastX = this.currentX;
 	            var lastY = this.currentY;
 	
-	            if (this.intervalIdVelocity > -1) return;
-	
-	            this.intervalIdVelocity = setInterval(function () {
+	            var monitor = function monitor() {
 	                if (_this.velocitiesX.length === SAMPLE_SIZE) _this.velocitiesX.shift();
 	                if (_this.velocitiesY.length === SAMPLE_SIZE) _this.velocitiesY.shift();
 	
@@ -997,14 +988,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                lastX = _this.currentX;
 	                lastY = _this.currentY;
-	            }, _constants.SIXTY_FPS);
+	
+	                if (!_this.isMonitoring) return;
+	
+	                _this.rafIdVelocity = requestAnimationFrame(monitor);
+	            };
+	
+	            this.rafIdVelocity = requestAnimationFrame(monitor);
+	
+	            this.isMonitoring = true;
 	        }
 	    }, {
 	        key: 'stopMonitorVelocity',
 	        value: function stopMonitorVelocity() {
-	            clearInterval(this.intervalIdVelocity);
+	            cancelAnimationFrame(this.rafIdVelocity);
 	
-	            this.intervalIdVelocity = -1;
+	            this.rafIdVelocity = -1;
+	
+	            this.isMonitoring = false;
 	        }
 	    }, {
 	        key: 'dispatchEvent',
@@ -1056,16 +1057,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'velocityX',
 	        get: function get() {
-	            return this.velocitiesX.reduce(function (value, sum) {
+	            return this.velocitiesX.length ? this.velocitiesX.reduce(function (value, sum) {
 	                return value + sum;
-	            }, 0) / this.velocitiesX.length;
+	            }, 0) / this.velocitiesX.length : 0;
 	        }
 	    }, {
 	        key: 'velocityY',
 	        get: function get() {
-	            return this.velocitiesY.reduce(function (value, sum) {
+	            return this.velocitiesY.length ? this.velocitiesY.reduce(function (value, sum) {
 	                return value + sum;
-	            }, 0) / this.velocitiesY.length;
+	            }, 0) / this.velocitiesY.length : 0;
 	        }
 	    }, {
 	        key: 'isMousePointer',
@@ -1434,7 +1435,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		{
 			"el": "root",
 			"on": "mousedown",
-			"bind": "handleMouseDown"
+			"bind": "handleMouseDown",
+			"passive": false
 		},
 		{
 			"el": "root",
@@ -1445,7 +1447,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		{
 			"el": "root",
 			"on": "click",
-			"bind": "handleClick"
+			"bind": "handleClick",
+			"passive": false
 		},
 		{
 			"el": "root",
@@ -1454,7 +1457,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		},
 		{
 			"on": "mousemove",
-			"bind": "handleWindowMouseMove"
+			"bind": "handleWindowMouseMove",
+			"passive": false
 		},
 		{
 			"on": "touchmove",
@@ -1463,7 +1467,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		},
 		{
 			"on": "mouseup",
-			"bind": "handleMouseUp"
+			"bind": "handleMouseUp",
+			"passive": false
 		},
 		{
 			"on": "touchend",

@@ -2,7 +2,8 @@
     {
         "el": "root",
         "on": "mousedown",
-        "bind": "handleMouseDown"
+        "bind": "handleMouseDown",
+        "passive": false
     },
     {
         "el": "root",
@@ -13,7 +14,8 @@
     {
         "el": "root",
         "on": "click",
-        "bind": "handleClick"
+        "bind": "handleClick",
+        "passive": false
     },
     {
         "el": "root",
@@ -22,7 +24,8 @@
     },
     {
         "on": "mousemove",
-        "bind": "handleWindowMouseMove"
+        "bind": "handleWindowMouseMove",
+        "passive": false
     },
     {
         "on": "touchmove",
@@ -31,7 +34,8 @@
     },
     {
         "on": "mouseup",
-        "bind": "handleMouseUp"
+        "bind": "handleMouseUp",
+        "passive": false
     },
     {
         "on": "touchend",

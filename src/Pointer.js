@@ -12,29 +12,30 @@ import {
     EVENT_POINTER_DOWN,
     EVENT_POINTER_DRAG,
     EVENT_POINTER_UP,
-    EVENT_POINTER_STOP,
-    SIXTY_FPS
+    EVENT_POINTER_STOP
 } from './constants';
 
 import StatePointer from './StatePointer';
 
 class Pointer {
     constructor() {
-        this.id          = -1;
-        this.startX      = -1;
-        this.startY      = -1;
-        this.currentX    = -1;
-        this.currentY    = -1;
-        this.rootWidth   = -1;
-        this.rootHeight  = -1;
-        this.rootOffsetX = -1;
-        this.rootOffsetY = -1;
-        this.velocitiesX = [];
-        this.velocitiesY = [];
-        this.type        = null;
-        this.dragster    = null;
-        this.state       = POINTER_STATE_NEW;
-        this.intervalIdVelocity = -1;
+        this.id                 = -1;
+        this.startX             = -1;
+        this.startY             = -1;
+        this.currentX           = -1;
+        this.currentY           = -1;
+        this.rootWidth          = -1;
+        this.rootHeight         = -1;
+        this.rootOffsetX        = -1;
+        this.rootOffsetY        = -1;
+        this.velocitiesX        = [];
+        this.velocitiesY        = [];
+        this.type               = null;
+        this.dragster           = null;
+        this.state              = POINTER_STATE_NEW;
+        this.isMonitoring       = false;
+
+        this.rafIdVelocity      = -1;
         this.rafIdInertia       = -1;
 
         Object.seal(this);
@@ -57,11 +58,11 @@ class Pointer {
     }
 
     get velocityX() {
-        return this.velocitiesX.reduce((value, sum) => value + sum, 0) / this.velocitiesX.length;
+        return this.velocitiesX.length ? this.velocitiesX.reduce((value, sum) => value + sum, 0) / this.velocitiesX.length : 0;
     }
 
     get velocityY() {
-        return this.velocitiesY.reduce((value, sum) => value + sum, 0) / this.velocitiesY.length;
+        return this.velocitiesY.length ? this.velocitiesY.reduce((value, sum) => value + sum, 0) / this.velocitiesY.length : 0;
     }
 
     get isMousePointer() {
@@ -98,12 +99,10 @@ class Pointer {
 
     down() {
         this.dispatchEvent(EVENT_POINTER_DOWN);
-
-        console.log('down');
     }
 
     move() {
-        this.startMonitorVelocity();
+        if (!this.isMonitoring && !this.isStopping) this.startMonitorVelocity();
 
         this.dispatchEvent(EVENT_POINTER_DRAG);
 
@@ -114,27 +113,19 @@ class Pointer {
         this.stopMonitorVelocity();
 
         this.dispatchEvent(EVENT_POINTER_UP);
-
-        console.log('up');
     }
 
     stop() {
-        this.stopMonitorVelocity();
-
         this.dispatchEvent(EVENT_POINTER_STOP);
-
-        console.log('stop');
     }
 
     startMonitorVelocity() {
-        const SAMPLE_SIZE = 4;
+        const SAMPLE_SIZE = 8;
 
         let lastX = this.currentX;
         let lastY = this.currentY;
 
-        if (this.intervalIdVelocity > -1) return;
-
-        this.intervalIdVelocity = setInterval(() => {
+        const monitor = () => {
             if (this.velocitiesX.length === SAMPLE_SIZE) this.velocitiesX.shift();
             if (this.velocitiesY.length === SAMPLE_SIZE) this.velocitiesY.shift();
 
@@ -143,13 +134,23 @@ class Pointer {
 
             lastX = this.currentX;
             lastY = this.currentY;
-        }, SIXTY_FPS);
+
+            if (!this.isMonitoring) return;
+
+            this.rafIdVelocity = requestAnimationFrame(monitor);
+        };
+
+        this.rafIdVelocity = requestAnimationFrame(monitor);
+
+        this.isMonitoring = true;
     }
 
     stopMonitorVelocity() {
-        clearInterval(this.intervalIdVelocity);
+        cancelAnimationFrame(this.rafIdVelocity);
 
-        this.intervalIdVelocity = -1;
+        this.rafIdVelocity = -1;
+
+        this.isMonitoring = false;
     }
 
     dispatchEvent(eventType) {

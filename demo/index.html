@@ -21,24 +21,24 @@
 
             console.log(drg);
 
-            sb.addEventListener('pointerDrag', (e) => {
-                let text = '';
-                let total = Math.abs(e.detail.deltaX);
+            // sb.addEventListener('pointerDrag', (e) => {
+            //     let text = '';
+            //     let total = Math.abs(e.detail.deltaX);
 
-                while (total) {
-                    text += '.';
+            //     while (total) {
+            //         text += '.';
 
-                    total--;
-                }
+            //         total--;
+            //     }
 
-                console.log(text);
-            });
+            //     console.log(text);
+            // });
 
             window.addEventListener('click', (e) => console.log('click', e.target));
 
-            sb.addEventListener('pointerInspect', (e) => {
-                console.log(e.detail.multiplierX, e.detail.multiplierY);
-            });
+            // sb.addEventListener('pointerInspect', (e) => {
+            //     console.log(e.detail.multiplierX, e.detail.multiplierY);
+            // });
         </script>
     </body>
 </html>
