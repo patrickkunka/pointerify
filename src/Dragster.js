@@ -269,7 +269,7 @@ class _Dragster {
 
             this.touches[id].id = id;
 
-            // e.preventDefault();
+            console.log('touch', id, 'start');
         }
     }
 
@@ -286,7 +286,7 @@ class _Dragster {
 
             let pointer = null;
 
-            if (!((pointer = this.touches[id]) instanceof Pointer)) break;
+            if (!((pointer = this.touches[id]) instanceof Pointer) || pointer.isStopping) break;
 
             this.movePointer(pointer, touch, e);
         }

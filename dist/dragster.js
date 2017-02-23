@@ -410,7 +410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                this.touches[id].id = id;
 	
-	                // e.preventDefault();
+	                console.log('touch', id, 'start');
 	            }
 	        }
 	
@@ -429,7 +429,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                var pointer = null;
 	
-	                if (!((pointer = this.touches[id]) instanceof _Pointer2.default)) break;
+	                if (!((pointer = this.touches[id]) instanceof _Pointer2.default) || pointer.isStopping) break;
 	
 	                this.movePointer(pointer, touch, e);
 	            }
@@ -1393,7 +1393,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, ConfigPhysics);
 	
 	    this.inertia = true;
-	    this.friction = 0.05;
+	    this.friction = 0.02;
 	    this.easing = function (t) {
 	        return --t * t * t + 1;
 	    };
