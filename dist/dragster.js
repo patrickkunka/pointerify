@@ -506,7 +506,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var pointer = new _Pointer2.default();
 	
 	            if (isExtending) {
-	                pointer.state = _constants.POINTER_STATE_EXTENDING;
+	                pointer.status = _constants.POINTER_STATUS_EXTENDING;
 	            }
 	
 	            pointer.type = type;
@@ -560,7 +560,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                pointer.currentX = pointer.startX;
 	            }
 	
-	            pointer.state = _constants.POINTER_STATE_MOVING;
+	            pointer.status = _constants.POINTER_STATUS_MOVING;
 	
 	            pointer.move();
 	
@@ -654,7 +654,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var lastX = pointer.currentX;
 	            var lastY = pointer.currentY;
 	
-	            pointer.state = _constants.POINTER_STATE_STOPPING;
+	            pointer.status = _constants.POINTER_STATUS_STOPPING;
 	
 	            pointer.rafIdInertia = requestAnimationFrame(render);
 	        }
@@ -837,11 +837,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var POINTER_TYPE_HOVER = exports.POINTER_TYPE_HOVER = Symbol('POINTER_TYPE_HOVER');
 	var POINTER_TYPE_TOUCH = exports.POINTER_TYPE_TOUCH = Symbol('POINTER_TYPE_TOUCH');
 	
-	var POINTER_STATE_NEW = exports.POINTER_STATE_NEW = Symbol('POINTER_STATE_NEW');
-	var POINTER_STATE_EXTENDING = exports.POINTER_STATE_EXTENDING = Symbol('POINTER_STATE_EXTENDING');
-	var POINTER_STATE_MOVING = exports.POINTER_STATE_MOVING = Symbol('POINTER_STATE_MOVING');
-	var POINTER_STATE_INSPECTING = exports.POINTER_STATE_INSPECTING = Symbol('POINTER_STATE_INSPECTING');
-	var POINTER_STATE_STOPPING = exports.POINTER_STATE_STOPPING = Symbol('POINTER_STATE_STOPPING');
+	var POINTER_STATUS_NEW = exports.POINTER_STATUS_NEW = Symbol('POINTER_STATUS_NEW');
+	var POINTER_STATUS_EXTENDING = exports.POINTER_STATUS_EXTENDING = Symbol('POINTER_STATUS_EXTENDING');
+	var POINTER_STATUS_MOVING = exports.POINTER_STATUS_MOVING = Symbol('POINTER_STATUS_MOVING');
+	var POINTER_STATUS_INSPECTING = exports.POINTER_STATUS_INSPECTING = Symbol('POINTER_STATUS_INSPECTING');
+	var POINTER_STATUS_STOPPING = exports.POINTER_STATUS_STOPPING = Symbol('POINTER_STATUS_STOPPING');
 	
 	var EVENT_POINTER_DOWN = exports.EVENT_POINTER_DOWN = 'pointerDown';
 	var EVENT_POINTER_DRAG = exports.EVENT_POINTER_DRAG = 'pointerDrag';
@@ -947,7 +947,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.velocitiesY = [];
 	        this.type = null;
 	        this.dragster = null;
-	        this.state = _constants.POINTER_STATE_NEW;
+	        this.status = _constants.POINTER_STATUS_NEW;
 	        this.isMonitoring = false;
 	
 	        this.rafIdVelocity = -1;
@@ -1035,13 +1035,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            state.deltaX = this.deltaX;
 	            state.deltaY = this.deltaY;
+	            state.deltaMultiplierX = this.deltaMultiplierX;
+	            state.deltaMultiplierY = this.deltaMultiplierY;
 	            state.multiplierX = this.multiplierX;
 	            state.multiplierY = this.multiplierY;
 	            state.velocityX = this.velocityX;
 	            state.velocityY = this.velocityY;
 	            state.directionX = this.directionX;
 	            state.directionY = this.directionY;
-	            state.state = this.state;
+	            state.status = this.status;
+	            state.type = this.type;
 	
 	            return Object.freeze(state);
 	        }
@@ -1054,6 +1057,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'deltaY',
 	        get: function get() {
 	            return this.currentY - this.startY;
+	        }
+	    }, {
+	        key: 'deltaMultiplierX',
+	        get: function get() {
+	            return this.deltaX / this.rootWidth;
+	        }
+	    }, {
+	        key: 'deltaMultiplierY',
+	        get: function get() {
+	            return this.deltaY / this.rootHeight;
 	        }
 	    }, {
 	        key: 'multiplierX',
@@ -1092,22 +1105,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'isNew',
 	        get: function get() {
-	            return this.state === _constants.POINTER_STATE_NEW;
+	            return this.status === _constants.POINTER_STATUS_NEW;
 	        }
 	    }, {
 	        key: 'isExtending',
 	        get: function get() {
-	            return this.state === _constants.POINTER_STATE_EXTENDING;
+	            return this.status === _constants.POINTER_STATUS_EXTENDING;
 	        }
 	    }, {
 	        key: 'isMoving',
 	        get: function get() {
-	            return this.state === _constants.POINTER_STATE_MOVING;
+	            return this.status === _constants.POINTER_STATUS_MOVING;
 	        }
 	    }, {
 	        key: 'isStopping',
 	        get: function get() {
-	            return this.state === _constants.POINTER_STATE_STOPPING;
+	            return this.status === _constants.POINTER_STATUS_STOPPING;
 	        }
 	    }, {
 	        key: 'directionX',
@@ -1143,13 +1156,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    this.deltaX = -1;
 	    this.deltaY = -1;
+	    this.deltaMultiplierX = -1;
+	    this.deltaMultiplierY = -1;
 	    this.multiplierX = -1;
 	    this.multiplierY = -1;
 	    this.velocityX = -1;
 	    this.velocityY = -1;
-	    this.directionX = -1;
-	    this.directionY = -1;
-	    this.state = null;
+	    this.directionX = null;
+	    this.directionY = null;
+	    this.status = null;
+	    this.type = null;
 	
 	    Object.seal(this);
 	};

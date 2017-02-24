@@ -3,9 +3,9 @@ import {
     AXIS_Y,
     POINTER_TYPE_MOUSE,
     POINTER_TYPE_TOUCH,
-    POINTER_STATE_EXTENDING,
-    POINTER_STATE_MOVING,
-    POINTER_STATE_STOPPING,
+    POINTER_STATUS_EXTENDING,
+    POINTER_STATUS_MOVING,
+    POINTER_STATUS_STOPPING,
     DIRECTION_RIGHT,
     DIRECTION_DOWN,
     EVENT_POINTER_INSPECT
@@ -354,7 +354,7 @@ class _Dragster {
         const pointer = new Pointer();
 
         if (isExtending) {
-            pointer.state = POINTER_STATE_EXTENDING;
+            pointer.status = POINTER_STATUS_EXTENDING;
         }
 
         pointer.type     = type;
@@ -403,7 +403,7 @@ class _Dragster {
             pointer.currentX = pointer.startX;
         }
 
-        pointer.state = POINTER_STATE_MOVING;
+        pointer.status = POINTER_STATUS_MOVING;
 
         pointer.move();
 
@@ -492,7 +492,7 @@ class _Dragster {
         let lastX  = pointer.currentX;
         let lastY  = pointer.currentY;
 
-        pointer.state = POINTER_STATE_STOPPING;
+        pointer.status = POINTER_STATUS_STOPPING;
 
         pointer.rafIdInertia = requestAnimationFrame(render);
     }

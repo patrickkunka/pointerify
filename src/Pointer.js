@@ -5,10 +5,10 @@ import {
     DIRECTION_DOWN,
     POINTER_TYPE_MOUSE,
     POINTER_TYPE_TOUCH,
-    POINTER_STATE_NEW,
-    POINTER_STATE_EXTENDING,
-    POINTER_STATE_MOVING,
-    POINTER_STATE_STOPPING,
+    POINTER_STATUS_NEW,
+    POINTER_STATUS_EXTENDING,
+    POINTER_STATUS_MOVING,
+    POINTER_STATUS_STOPPING,
     EVENT_POINTER_DOWN,
     EVENT_POINTER_DRAG,
     EVENT_POINTER_UP,
@@ -32,7 +32,7 @@ class Pointer {
         this.velocitiesY        = [];
         this.type               = null;
         this.dragster           = null;
-        this.state              = POINTER_STATE_NEW;
+        this.status             = POINTER_STATUS_NEW;
         this.isMonitoring       = false;
 
         this.rafIdVelocity      = -1;
@@ -47,6 +47,14 @@ class Pointer {
 
     get deltaY() {
         return this.currentY - this.startY;
+    }
+
+    get deltaMultiplierX() {
+        return this.deltaX / this.rootWidth;
+    }
+
+    get deltaMultiplierY() {
+        return this.deltaY / this.rootHeight;
     }
 
     get multiplierX() {
@@ -74,19 +82,19 @@ class Pointer {
     }
 
     get isNew() {
-        return this.state === POINTER_STATE_NEW;
+        return this.status === POINTER_STATUS_NEW;
     }
 
     get isExtending() {
-        return this.state === POINTER_STATE_EXTENDING;
+        return this.status === POINTER_STATUS_EXTENDING;
     }
 
     get isMoving() {
-        return this.state === POINTER_STATE_MOVING;
+        return this.status === POINTER_STATUS_MOVING;
     }
 
     get isStopping() {
-        return this.state === POINTER_STATE_STOPPING;
+        return this.status === POINTER_STATUS_STOPPING;
     }
 
     get directionX() {
@@ -163,15 +171,18 @@ class Pointer {
     getState() {
         const state = new StatePointer();
 
-        state.deltaX      = this.deltaX;
-        state.deltaY      = this.deltaY;
-        state.multiplierX = this.multiplierX;
-        state.multiplierY = this.multiplierY;
-        state.velocityX   = this.velocityX;
-        state.velocityY   = this.velocityY;
-        state.directionX  = this.directionX;
-        state.directionY  = this.directionY;
-        state.state       = this.state;
+        state.deltaX           = this.deltaX;
+        state.deltaY           = this.deltaY;
+        state.deltaMultiplierX = this.deltaMultiplierX;
+        state.deltaMultiplierY = this.deltaMultiplierY;
+        state.multiplierX      = this.multiplierX;
+        state.multiplierY      = this.multiplierY;
+        state.velocityX        = this.velocityX;
+        state.velocityY        = this.velocityY;
+        state.directionX       = this.directionX;
+        state.directionY       = this.directionY;
+        state.status           = this.status;
+        state.type             = this.type;
 
         return Object.freeze(state);
     }
