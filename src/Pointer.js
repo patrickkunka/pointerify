@@ -1,4 +1,5 @@
 import {
+    DIRECTION_STATIC,
     DIRECTION_LEFT,
     DIRECTION_RIGHT,
     DIRECTION_UP,
@@ -98,11 +99,23 @@ class Pointer {
     }
 
     get directionX() {
-        return this.velocityX < 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
+        if (this.velocityX < 0) {
+            return DIRECTION_LEFT;
+        } else if (this.velocityX > 0) {
+            return DIRECTION_RIGHT;
+        }
+
+        return DIRECTION_STATIC;
     }
 
     get directionY() {
-        return this.velocityY < 0 ? DIRECTION_UP : DIRECTION_DOWN;
+        if (this.velocitiesY < 0) {
+            return this.DIRECTION_UP;
+        } else if (this.velocitiesY) {
+            return this.DIRECTION_DOWN;
+        }
+
+        return DIRECTION_STATIC;
     }
 
     down() {

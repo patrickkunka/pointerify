@@ -15,10 +15,11 @@ export const EVENT_POINTER_STOP    = 'pointerStop';
 export const EVENT_POINTER_INSPECT = 'pointerInspect';
 export const EVENT_POINTER_SEEK    = 'pointerSeek';
 
-export const DIRECTION_LEFT  = Symbol('DIRECTION_LEFT');
-export const DIRECTION_RIGHT = Symbol('DIRECTION_RIGHT');
-export const DIRECTION_UP    = Symbol('DIRECTION_UP');
-export const DIRECTION_DOWN  = Symbol('DIRECTION_DOWN');
+export const DIRECTION_STATIC = Symbol('DIRECTION_STATIC');
+export const DIRECTION_LEFT   = Symbol('DIRECTION_LEFT');
+export const DIRECTION_RIGHT  = Symbol('DIRECTION_RIGHT');
+export const DIRECTION_UP     = Symbol('DIRECTION_UP');
+export const DIRECTION_DOWN   = Symbol('DIRECTION_DOWN');
 
 export const AXIS_X    = 'X';
 export const AXIS_Y    = 'Y';
@@ -35,6 +36,7 @@ export default {
     POINTER_STATUS_INSPECTING,
     POINTER_STATUS_STOPPING,
 
+    DIRECTION_STATIC,
     DIRECTION_LEFT,
     DIRECTION_RIGHT,
     DIRECTION_UP,

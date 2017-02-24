@@ -857,6 +857,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EVENT_POINTER_INSPECT = exports.EVENT_POINTER_INSPECT = 'pointerInspect';
 	var EVENT_POINTER_SEEK = exports.EVENT_POINTER_SEEK = 'pointerSeek';
 	
+	var DIRECTION_STATIC = exports.DIRECTION_STATIC = Symbol('DIRECTION_STATIC');
 	var DIRECTION_LEFT = exports.DIRECTION_LEFT = Symbol('DIRECTION_LEFT');
 	var DIRECTION_RIGHT = exports.DIRECTION_RIGHT = Symbol('DIRECTION_RIGHT');
 	var DIRECTION_UP = exports.DIRECTION_UP = Symbol('DIRECTION_UP');
@@ -877,6 +878,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    POINTER_STATUS_INSPECTING: POINTER_STATUS_INSPECTING,
 	    POINTER_STATUS_STOPPING: POINTER_STATUS_STOPPING,
 	
+	    DIRECTION_STATIC: DIRECTION_STATIC,
 	    DIRECTION_LEFT: DIRECTION_LEFT,
 	    DIRECTION_RIGHT: DIRECTION_RIGHT,
 	    DIRECTION_UP: DIRECTION_UP,
@@ -1150,12 +1152,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'directionX',
 	        get: function get() {
-	            return this.velocityX < 0 ? _constants.DIRECTION_LEFT : _constants.DIRECTION_RIGHT;
+	            if (this.velocityX < 0) {
+	                return _constants.DIRECTION_LEFT;
+	            } else if (this.velocityX > 0) {
+	                return _constants.DIRECTION_RIGHT;
+	            }
+	
+	            return _constants.DIRECTION_STATIC;
 	        }
 	    }, {
 	        key: 'directionY',
 	        get: function get() {
-	            return this.velocityY < 0 ? _constants.DIRECTION_UP : _constants.DIRECTION_DOWN;
+	            if (this.velocitiesY < 0) {
+	                return this.DIRECTION_UP;
+	            } else if (this.velocitiesY) {
+	                return this.DIRECTION_DOWN;
+	            }
+	
+	            return _constants.DIRECTION_STATIC;
 	        }
 	    }]);
 	
