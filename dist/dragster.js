@@ -334,6 +334,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (handleSelector && !_Util2.default.closestParent(target, handleSelector, true)) return;
 	
+	            this.setRootGeometry();
+	
 	            this.mouse = this.createPointer(e, _constants.POINTER_TYPE_MOUSE, didCancel);
 	
 	            e.preventDefault();
@@ -415,6 +417,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	
 	                if (handleSelector && !_Util2.default.closestParent(target, handleSelector, true)) break;
+	
+	                this.setRootGeometry();
 	
 	                this.touches[newId] = this.createPointer(touch, _constants.POINTER_TYPE_TOUCH, didCancel);
 	

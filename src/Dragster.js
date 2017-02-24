@@ -203,6 +203,8 @@ class _Dragster {
 
         if (handleSelector && !Util.closestParent(target, handleSelector, true)) return;
 
+        this.setRootGeometry();
+
         this.mouse = this.createPointer(e, POINTER_TYPE_MOUSE, didCancel);
 
         e.preventDefault();
@@ -276,6 +278,8 @@ class _Dragster {
             }
 
             if (handleSelector && !Util.closestParent(target, handleSelector, true)) break;
+
+            this.setRootGeometry();
 
             this.touches[newId] = this.createPointer(touch, POINTER_TYPE_TOUCH, didCancel);
 
