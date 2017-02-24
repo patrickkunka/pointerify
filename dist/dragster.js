@@ -838,7 +838,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 	var POINTER_TYPE_MOUSE = exports.POINTER_TYPE_MOUSE = Symbol('POINTER_TYPE_MOUSE');
 	var POINTER_TYPE_HOVER = exports.POINTER_TYPE_HOVER = Symbol('POINTER_TYPE_HOVER');
@@ -865,6 +865,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	var AXIS_X = exports.AXIS_X = 'X';
 	var AXIS_Y = exports.AXIS_Y = 'Y';
 	var AXIS_BOTH = exports.AXIS_BOTH = 'BOTH';
+	
+	exports.default = {
+	    POINTER_TYPE_MOUSE: POINTER_TYPE_MOUSE,
+	    POINTER_TYPE_HOVER: POINTER_TYPE_HOVER,
+	    POINTER_TYPE_TOUCH: POINTER_TYPE_TOUCH,
+	
+	    POINTER_STATUS_NEW: POINTER_STATUS_NEW,
+	    POINTER_STATUS_EXTENDING: POINTER_STATUS_EXTENDING,
+	    POINTER_STATUS_MOVING: POINTER_STATUS_MOVING,
+	    POINTER_STATUS_INSPECTING: POINTER_STATUS_INSPECTING,
+	    POINTER_STATUS_STOPPING: POINTER_STATUS_STOPPING,
+	
+	    DIRECTION_LEFT: DIRECTION_LEFT,
+	    DIRECTION_RIGHT: DIRECTION_RIGHT,
+	    DIRECTION_UP: DIRECTION_UP,
+	    DIRECTION_DOWN: DIRECTION_DOWN
+	};
 
 /***/ },
 /* 3 */
