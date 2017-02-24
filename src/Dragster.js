@@ -8,7 +8,8 @@ import {
     POINTER_STATUS_STOPPING,
     DIRECTION_RIGHT,
     DIRECTION_DOWN,
-    EVENT_POINTER_INSPECT
+    EVENT_POINTER_INSPECT,
+    EVENT_POINTER_SEEK
 } from './constants';
 
 import Dom          from './Dom';
@@ -17,7 +18,7 @@ import Pointer      from './Pointer';
 import Util         from './Util';
 import Config       from './config/Config';
 import events       from './events.json';
-import StateInspect from './StateInspect';
+import StateStatic  from './StateStatic';
 
 class Dragster {
     constructor() {
@@ -218,7 +219,7 @@ class _Dragster {
     handleRootMouseMove(e) {
         if (this.mouse) return;
 
-        this.inspect(e);
+        this.emitStatic(e, this.dom.root, EVENT_POINTER_INSPECT);
     }
 
     /**
@@ -538,14 +539,15 @@ class _Dragster {
 
     /**
      * @private
-     * @param  {MouseEvent} e
+     * @param  {MouseEvent}  e
+     * @param  {string}      type
      * @return {void}
      */
 
-    inspect({clientX, clientY}) {
-        const state = new StateInspect();
+    emitStatic({clientX, clientY}, type) {
+        const state = new StateStatic();
 
-        const event = new CustomEvent(EVENT_POINTER_INSPECT, {
+        const event = new CustomEvent(type, {
             detail: state,
             bubbles: true
         });
@@ -577,6 +579,8 @@ class _Dragster {
 
     click(e) {
         this.isClicking = true;
+
+        this.emitStatic(e, EVENT_POINTER_SEEK);
 
         e.target.click();
 

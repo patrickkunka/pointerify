@@ -36,7 +36,7 @@
 
             sb.addEventListener('pointerDrag', (e) => console.log(e.detail));
 
-            window.addEventListener('click', (e) => console.log('click', e.target));
+            window.addEventListener('pointerSeek', (e) => console.log('seek', e.detail));
 
             // sb.addEventListener('pointerInspect', (e) => {
             //     console.log(e.detail.multiplierX, e.detail.multiplierY);

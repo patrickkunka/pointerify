@@ -114,9 +114,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _events2 = _interopRequireDefault(_events);
 	
-	var _StateInspect = __webpack_require__(13);
+	var _StateStatic = __webpack_require__(13);
 	
-	var _StateInspect2 = _interopRequireDefault(_StateInspect);
+	var _StateStatic2 = _interopRequireDefault(_StateStatic);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -351,7 +351,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function handleRootMouseMove(e) {
 	            if (this.mouse) return;
 	
-	            this.inspect(e);
+	            this.emitStatic(e, this.dom.root, _constants.EVENT_POINTER_INSPECT);
 	        }
 	
 	        /**
@@ -704,19 +704,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        /**
 	         * @private
-	         * @param  {MouseEvent} e
+	         * @param  {MouseEvent}  e
+	         * @param  {string}      type
 	         * @return {void}
 	         */
 	
 	    }, {
-	        key: 'inspect',
-	        value: function inspect(_ref3) {
+	        key: 'emitStatic',
+	        value: function emitStatic(_ref3, type) {
 	            var clientX = _ref3.clientX,
 	                clientY = _ref3.clientY;
 	
-	            var state = new _StateInspect2.default();
+	            var state = new _StateStatic2.default();
 	
-	            var event = new CustomEvent(_constants.EVENT_POINTER_INSPECT, {
+	            var event = new CustomEvent(type, {
 	                detail: state,
 	                bubbles: true
 	            });
@@ -752,6 +753,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'click',
 	        value: function click(e) {
 	            this.isClicking = true;
+	
+	            this.emitStatic(e, _constants.EVENT_POINTER_SEEK);
 	
 	            e.target.click();
 	
@@ -852,6 +855,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EVENT_POINTER_UP = exports.EVENT_POINTER_UP = 'pointerUp';
 	var EVENT_POINTER_STOP = exports.EVENT_POINTER_STOP = 'pointerStop';
 	var EVENT_POINTER_INSPECT = exports.EVENT_POINTER_INSPECT = 'pointerInspect';
+	var EVENT_POINTER_SEEK = exports.EVENT_POINTER_SEEK = 'pointerSeek';
 	
 	var DIRECTION_LEFT = exports.DIRECTION_LEFT = Symbol('DIRECTION_LEFT');
 	var DIRECTION_RIGHT = exports.DIRECTION_RIGHT = Symbol('DIRECTION_RIGHT');
@@ -1525,8 +1529,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var StateInspect = function StateInspect() {
-	    _classCallCheck(this, StateInspect);
+	var StateStatic = function StateStatic() {
+	    _classCallCheck(this, StateStatic);
 	
 	    this.multiplierX = -1;
 	    this.multiplierY = -1;
@@ -1534,7 +1538,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Object.seal(this);
 	};
 	
-	exports.default = StateInspect;
+	exports.default = StateStatic;
 
 /***/ }
 /******/ ])

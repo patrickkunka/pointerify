@@ -1,4 +1,4 @@
-class StateInspect {
+class StateStatic {
     constructor() {
         this.multiplierX = -1;
         this.multiplierY = -1;
@@ -7,4 +7,4 @@ class StateInspect {
     }
 }
 
-export default StateInspect;
+export default StateStatic;
