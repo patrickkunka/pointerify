@@ -423,6 +423,8 @@ class _Dragster {
      */
 
     releasePointer(pointer, e) {
+        pointer.up();
+
         if (pointer.isNew) {
             this.click(e);
         }
@@ -432,8 +434,6 @@ class _Dragster {
 
             return;
         }
-
-        pointer.up();
 
         if (this.config.physics.inertia) {
             this.stopPointer(pointer);

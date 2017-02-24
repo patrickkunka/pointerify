@@ -581,6 +581,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'releasePointer',
 	        value: function releasePointer(pointer, e) {
+	            pointer.up();
+	
 	            if (pointer.isNew) {
 	                this.click(e);
 	            }
@@ -590,8 +592,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                return;
 	            }
-	
-	            pointer.up();
 	
 	            if (this.config.physics.inertia) {
 	                this.stopPointer(pointer);
