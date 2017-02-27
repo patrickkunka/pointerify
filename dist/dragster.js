@@ -752,11 +752,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'click',
 	        value: function click(e) {
+	            var target = e.target;
+	
 	            this.isClicking = true;
 	
 	            this.emitStatic(e, _constants.EVENT_POINTER_SEEK);
 	
-	            e.target.click();
+	            while (typeof target.click !== 'function') {
+	                target = target.parentElement;
+	            }
+	
+	            target.click();
 	
 	            this.isClicking = false;
 	        }

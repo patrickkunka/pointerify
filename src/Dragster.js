@@ -578,11 +578,17 @@ class _Dragster {
      */
 
     click(e) {
+        let target = e.target;
+
         this.isClicking = true;
 
         this.emitStatic(e, EVENT_POINTER_SEEK);
 
-        e.target.click();
+        while (typeof target.click !== 'function') {
+            target = target.parentElement;
+        }
+
+        target.click();
 
         this.isClicking = false;
     }
