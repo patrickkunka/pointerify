@@ -1,8 +1,12 @@
+import Util from '../Util';
+
 class ConfigPhysics {
     constructor() {
-        this.inertia  = true;
-        this.friction = 0.02;
-        this.easing   = (t) => (--t) * t * t +1;
+        Object.defineProperties(this, Util.strictProps({
+            inertia: [Boolean, true],
+            friction: [Number, 0.02], // eslint-disable-line no-magic-numbers
+            easing: [Function, (t) => (--t) * t * t +1]
+        }));
 
         Object.seal(this);
     }

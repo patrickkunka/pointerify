@@ -8,7 +8,7 @@ class Config {
         this.physics   = new ConfigPhysics();
         this.selectors = new ConfigSelectors();
 
-        Object.seal(this);
+        Object.freeze(this);
     }
 }
 

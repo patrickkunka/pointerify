@@ -87,10 +87,21 @@ class _Dragster {
      */
 
     configure(config) {
+        let behavior = null;
+
+        if ((behavior = config.behavior)) {
+            // Uppercase enum values if present
+
+            let allowAxis = '';
+            let clampAxis = '';
+
+            if ((allowAxis = behavior.allowAxis)) behavior.allowAxis = allowAxis.toUpperCase();
+            if ((clampAxis = behavior.clampAxis)) behavior.clampAxis = clampAxis.toUpperCase();
+        }
+
         Util.extend(this.config, config, true, _Dragster.handleConfigureError.bind(this));
 
-        this.config.physics.friction   = Math.max(0, Math.min(1, this.config.physics.friction));
-        this.config.behavior.allowAxis = this.config.behavior.allowAxis.toUpperCase();
+        this.config.physics.friction = Util.clamp(this.config.physics.friction, 0, 1);
     }
 
     /**

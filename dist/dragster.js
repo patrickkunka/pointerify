@@ -102,7 +102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Pointer2 = _interopRequireDefault(_Pointer);
 	
-	var _Util = __webpack_require__(7);
+	var _Util = __webpack_require__(6);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
@@ -195,10 +195,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'configure',
 	        value: function configure(config) {
+	            var behavior = null;
+	
+	            if (behavior = config.behavior) {
+	                // Uppercase enum values if present
+	
+	                var allowAxis = '';
+	                var clampAxis = '';
+	
+	                if (allowAxis = behavior.allowAxis) behavior.allowAxis = allowAxis.toUpperCase();
+	                if (clampAxis = behavior.clampAxis) behavior.clampAxis = clampAxis.toUpperCase();
+	            }
+	
 	            _Util2.default.extend(this.config, config, true, _Dragster.handleConfigureError.bind(this));
 	
-	            this.config.physics.friction = Math.max(0, Math.min(1, this.config.physics.friction));
-	            this.config.behavior.allowAxis = this.config.behavior.allowAxis.toUpperCase();
+	            this.config.physics.friction = _Util2.default.clamp(this.config.physics.friction, 0, 1);
 	        }
 	
 	        /**
@@ -872,6 +883,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var AXIS_X = exports.AXIS_X = 'X';
 	var AXIS_Y = exports.AXIS_Y = 'Y';
 	var AXIS_BOTH = exports.AXIS_BOTH = 'BOTH';
+	var AXIS_NONE = exports.AXIS_NONE = 'NONE';
 	
 	exports.default = {
 	    POINTER_TYPE_MOUSE: POINTER_TYPE_MOUSE,
@@ -953,9 +965,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _Util = __webpack_require__(6);
+	
+	var _Util2 = _interopRequireDefault(_Util);
+	
 	var _constants = __webpack_require__(2);
 	
-	var _StatePointer = __webpack_require__(6);
+	var _StatePointer = __webpack_require__(7);
 	
 	var _StatePointer2 = _interopRequireDefault(_StatePointer);
 	
@@ -1070,8 +1086,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            state.deltaY = this.deltaY;
 	            state.deltaMultiplierX = this.deltaMultiplierX;
 	            state.deltaMultiplierY = this.deltaMultiplierY;
-	            state.multiplierX = this.multiplierX;
-	            state.multiplierY = this.multiplierY;
+	            state.multiplierX = this.dragster.config.behavior.clampX ? _Util2.default.clamp(this.multiplierX, 0, 1) : this.multiplierX;
+	            state.multiplierY = this.dragster.config.behavior.clampY ? _Util2.default.clamp(this.multiplierY, 0, 1) : this.multiplierY;
 	            state.velocityX = this.velocityX;
 	            state.velocityY = this.velocityY;
 	            state.directionX = this.directionX;
@@ -1170,9 +1186,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'directionY',
 	        get: function get() {
 	            if (this.velocitiesY < 0) {
-	                return this.DIRECTION_UP;
+	                return _constants.DIRECTION_UP;
 	            } else if (this.velocitiesY) {
-	                return this.DIRECTION_DOWN;
+	                return _constants.DIRECTION_DOWN;
 	            }
 	
 	            return _constants.DIRECTION_STATIC;
@@ -1188,44 +1204,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports) {
 
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var StatePointer = function StatePointer() {
-	    _classCallCheck(this, StatePointer);
-	
-	    this.deltaX = -1;
-	    this.deltaY = -1;
-	    this.deltaMultiplierX = -1;
-	    this.deltaMultiplierY = -1;
-	    this.multiplierX = -1;
-	    this.multiplierY = -1;
-	    this.velocityX = -1;
-	    this.velocityY = -1;
-	    this.directionX = null;
-	    this.directionY = null;
-	    this.status = null;
-	    this.type = null;
-	
-	    Object.seal(this);
-	};
-	
-	exports.default = StatePointer;
-
-/***/ },
-/* 7 */
-/***/ function(module, exports) {
-
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
@@ -1381,12 +1366,161 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            };
 	        }
+	
+	        /**
+	         * Clamps a floating point number to within a provided range.
+	         *
+	         * @param   {number} float
+	         * @param   {number} [min]
+	         * @param   {number} [max]
+	         * @return  {number}
+	         */
+	
+	    }, {
+	        key: 'clamp',
+	        value: function clamp(float, min, max) {
+	            min = typeof min === 'number' ? min : 0;
+	            max = typeof max === 'number' ? max : 1;
+	
+	            return Math.max(min, Math.min(max, float));
+	        }
+	
+	        /**
+	         * @param  {object} props
+	         * @return {object}
+	         */
+	
+	    }, {
+	        key: 'strictProps',
+	        value: function strictProps(props) {
+	            var descriptors = {};
+	
+	            var keys = Reflect.ownKeys(props);
+	
+	            keys.forEach(function (key) {
+	                var _props$key = _slicedToArray(props[key], 3),
+	                    type = _props$key[0],
+	                    init = _props$key[1],
+	                    _props$key$ = _props$key[2],
+	                    cb = _props$key$ === undefined ? null : _props$key$;
+	
+	                switch (type) {
+	                    case 'enum':
+	                        descriptors[key] = Util.enumProp(key, init, cb);
+	
+	                        break;
+	                    default:
+	                        descriptors[key] = Util.typedProp(key, type, init, cb);
+	                }
+	            });
+	
+	            return descriptors;
+	        }
+	
+	        /**
+	         * @param  {string}   key
+	         * @param  {function} type
+	         * @param  {*} init
+	         * @param  {function} [cb=null]
+	         * @return {object}
+	         */
+	
+	    }, {
+	        key: 'typedProp',
+	        value: function typedProp(key, type, init) {
+	            var cb = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+	
+	            var _value = init;
+	
+	            return {
+	                get: function get() {
+	                    return _value;
+	                },
+	                set: function set(value) {
+	                    var typeOf = type.name.toLowerCase();
+	
+	                    if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== typeOf) {
+	                        throw new TypeError('Value "' + value.toString() + '" on property "' + key + '" is not a ' + typeOf);
+	                    }
+	
+	                    if (typeof cb === 'function') cb(value);
+	
+	                    _value = value;
+	                }
+	            };
+	        }
+	
+	        /**
+	         * Returns a property descriptor definine a string property
+	         * with a finite set of possible string values.
+	         *
+	         * @param   {string} key
+	         * @param   {Array.<string>} values
+	         * @param   {function}       [cb=null]
+	         * @return  {object}
+	         */
+	
+	    }, {
+	        key: 'enumProp',
+	        value: function enumProp(key, values) {
+	            var cb = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+	
+	            var _value = values[0];
+	
+	            return {
+	                get: function get() {
+	                    return _value;
+	                },
+	                set: function set(value) {
+	                    if (values.indexOf(value) < 0) {
+	                        throw new Error('Value "' + value.toString() + '" not allowed for property "' + key + '"');
+	                    }
+	
+	                    if (typeof cb === 'function') cb(value);
+	
+	                    _value = value;
+	                }
+	            };
+	        }
 	    }]);
 	
 	    return Util;
 	}();
 	
 	exports.default = Util;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var StatePointer = function StatePointer() {
+	    _classCallCheck(this, StatePointer);
+	
+	    this.deltaX = -1;
+	    this.deltaY = -1;
+	    this.deltaMultiplierX = -1;
+	    this.deltaMultiplierY = -1;
+	    this.multiplierX = -1;
+	    this.multiplierY = -1;
+	    this.velocityX = -1;
+	    this.velocityY = -1;
+	    this.directionX = null;
+	    this.directionY = null;
+	    this.status = null;
+	    this.type = null;
+	
+	    Object.seal(this);
+	};
+	
+	exports.default = StatePointer;
 
 /***/ },
 /* 8 */
@@ -1421,7 +1555,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.physics = new _ConfigPhysics2.default();
 	    this.selectors = new _ConfigSelectors2.default();
 	
-	    Object.seal(this);
+	    Object.freeze(this);
 	};
 	
 	exports.default = Config;
@@ -1436,41 +1570,86 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _Util = __webpack_require__(6);
+	
+	var _Util2 = _interopRequireDefault(_Util);
+	
 	var _constants = __webpack_require__(2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var ConfigBehavior = function ConfigBehavior() {
-	    _classCallCheck(this, ConfigBehavior);
+	var ConfigBehavior = function () {
+	    function ConfigBehavior() {
+	        _classCallCheck(this, ConfigBehavior);
 	
-	    this.pressDuration = 0;
-	    this.allowAxis = _constants.AXIS_BOTH;
+	        Object.defineProperties(this, _Util2.default.strictProps({
+	            pressDuration: [Number, 0],
+	            allowAxis: ['enum', [_constants.AXIS_BOTH, _constants.AXIS_X, _constants.AXIS_Y]],
+	            clampAxis: ['enum', [_constants.AXIS_NONE, _constants.AXIS_BOTH, _constants.AXIS_X, _constants.AXIS_Y]]
+	        }));
 	
-	    Object.seal(this);
-	};
+	        Object.seal(this);
+	    }
+	
+	    _createClass(ConfigBehavior, [{
+	        key: 'allowX',
+	        get: function get() {
+	            return this.allowAxis === _constants.AXIS_X || this.allowAxis === _constants.AXIS_BOTH;
+	        }
+	    }, {
+	        key: 'allowY',
+	        get: function get() {
+	            return this.allowAxis === _constants.AXIS_Y || this.allowAxis === _constants.AXIS_BOTH;
+	        }
+	    }, {
+	        key: 'clampX',
+	        get: function get() {
+	            return this.clampAxis === _constants.AXIS_X || this.clampAxis === _constants.AXIS_BOTH;
+	        }
+	    }, {
+	        key: 'clampY',
+	        get: function get() {
+	            return this.clampAxis === _constants.AXIS_Y || this.clampAxis === _constants.AXIS_BOTH;
+	        }
+	    }]);
+	
+	    return ConfigBehavior;
+	}();
 	
 	exports.default = ConfigBehavior;
 
 /***/ },
 /* 10 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	
+	var _Util = __webpack_require__(6);
+	
+	var _Util2 = _interopRequireDefault(_Util);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var ConfigPhysics = function ConfigPhysics() {
 	    _classCallCheck(this, ConfigPhysics);
 	
-	    this.inertia = true;
-	    this.friction = 0.02;
-	    this.easing = function (t) {
-	        return --t * t * t + 1;
-	    };
+	    Object.defineProperties(this, _Util2.default.strictProps({
+	        inertia: [Boolean, true],
+	        friction: [Number, 0.02], // eslint-disable-line no-magic-numbers
+	        easing: [Function, function (t) {
+	            return --t * t * t + 1;
+	        }]
+	    }));
 	
 	    Object.seal(this);
 	};
@@ -1479,7 +1658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 11 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1487,12 +1666,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _Util = __webpack_require__(6);
+	
+	var _Util2 = _interopRequireDefault(_Util);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var ConfigSelectors = function ConfigSelectors() {
 	    _classCallCheck(this, ConfigSelectors);
 	
-	    this.handle = '';
+	    Object.defineProperties(this, _Util2.default.strictProps({
+	        handle: [String, '']
+	    }));
 	
 	    Object.seal(this);
 	};

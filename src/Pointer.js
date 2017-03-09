@@ -1,3 +1,5 @@
+import Util from './Util';
+
 import {
     DIRECTION_STATIC,
     DIRECTION_LEFT,
@@ -110,9 +112,9 @@ class Pointer {
 
     get directionY() {
         if (this.velocitiesY < 0) {
-            return this.DIRECTION_UP;
+            return DIRECTION_UP;
         } else if (this.velocitiesY) {
-            return this.DIRECTION_DOWN;
+            return DIRECTION_DOWN;
         }
 
         return DIRECTION_STATIC;
@@ -188,8 +190,8 @@ class Pointer {
         state.deltaY           = this.deltaY;
         state.deltaMultiplierX = this.deltaMultiplierX;
         state.deltaMultiplierY = this.deltaMultiplierY;
-        state.multiplierX      = this.multiplierX;
-        state.multiplierY      = this.multiplierY;
+        state.multiplierX      = this.dragster.config.behavior.clampX ? Util.clamp(this.multiplierX, 0, 1) : this.multiplierX;
+        state.multiplierY      = this.dragster.config.behavior.clampY ? Util.clamp(this.multiplierY, 0, 1) : this.multiplierY;
         state.velocityX        = this.velocityX;
         state.velocityY        = this.velocityY;
         state.directionX       = this.directionX;

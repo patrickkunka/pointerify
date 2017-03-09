@@ -130,6 +130,102 @@ class Util {
             }
         };
     }
+
+    /**
+     * Clamps a floating point number to within a provided range.
+     *
+     * @param   {number} float
+     * @param   {number} [min]
+     * @param   {number} [max]
+     * @return  {number}
+     */
+
+    static clamp(float, min, max) {
+        min = typeof min === 'number' ? min : 0;
+        max = typeof max === 'number' ? max : 1;
+
+        return Math.max(min, Math.min(max, float));
+    }
+
+    /**
+     * @param  {object} props
+     * @return {object}
+     */
+
+    static strictProps(props) {
+        const descriptors = {};
+
+        const keys = Reflect.ownKeys(props);
+
+        keys.forEach(key => {
+            const [type, init, cb=null] = props[key];
+
+            switch (type) {
+                case 'enum':
+                    descriptors[key] = Util.enumProp(key, init, cb);
+
+                    break;
+                default:
+                    descriptors[key] = Util.typedProp(key, type, init, cb);
+            }
+        });
+
+        return descriptors;
+    }
+
+    /**
+     * @param  {string}   key
+     * @param  {function} type
+     * @param  {*} init
+     * @param  {function} [cb=null]
+     * @return {object}
+     */
+
+    static typedProp(key, type, init, cb=null) {
+        let _value = init;
+
+        return {
+            get: () => _value,
+            set(value) {
+                const typeOf = type.name.toLowerCase();
+
+                if (typeof value !== typeOf) {
+                    throw new TypeError(`Value "${value.toString()}" on property "${key}" is not a ${typeOf}`);
+                }
+
+                if (typeof cb === 'function') cb(value);
+
+                _value = value;
+            }
+        };
+    }
+
+    /**
+     * Returns a property descriptor definine a string property
+     * with a finite set of possible string values.
+     *
+     * @param   {string} key
+     * @param   {Array.<string>} values
+     * @param   {function}       [cb=null]
+     * @return  {object}
+     */
+
+    static enumProp(key, values, cb=null) {
+        let _value = values[0];
+
+        return {
+            get: () => _value,
+            set(value) {
+                if (values.indexOf(value) < 0) {
+                    throw new Error(`Value "${value.toString()}" not allowed for property "${key}"`);
+                }
+
+                if (typeof cb === 'function') cb(value);
+
+                _value = value;
+            }
+        };
+    }
 }
 
 export default Util;
