@@ -362,7 +362,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function handleRootMouseMove(e) {
 	            if (this.mouse) return;
 	
-	            this.emitStatic(e, this.dom.root, _constants.EVENT_POINTER_INSPECT);
+	            this.emitStatic(e, _constants.EVENT_POINTER_INSPECT);
 	        }
 	
 	        /**

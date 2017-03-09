@@ -230,7 +230,7 @@ class _Dragster {
     handleRootMouseMove(e) {
         if (this.mouse) return;
 
-        this.emitStatic(e, this.dom.root, EVENT_POINTER_INSPECT);
+        this.emitStatic(e, EVENT_POINTER_INSPECT);
     }
 
     /**
