@@ -6,14 +6,19 @@ import {
     DIRECTION_RIGHT,
     DIRECTION_UP,
     DIRECTION_DOWN,
+    DIRECTION_CONVERGE,
+    DIRECTION_DIVERGE,
     POINTER_TYPE_MOUSE,
     POINTER_TYPE_TOUCH,
+    POINTER_TYPE_VIRTUAL,
     POINTER_STATUS_NEW,
     POINTER_STATUS_EXTENDING,
     POINTER_STATUS_MOVING,
+    POINTER_STATUS_PINCHING,
     POINTER_STATUS_STOPPING,
     EVENT_POINTER_DOWN,
     EVENT_POINTER_DRAG,
+    EVENT_POINTER_PINCH,
     EVENT_POINTER_UP,
     EVENT_POINTER_STOP
 } from './constants';
@@ -25,8 +30,10 @@ class Pointer {
         this.id                 = -1;
         this.startX             = -1;
         this.startY             = -1;
+        this.startDistance      = -1;
         this.currentX           = -1;
         this.currentY           = -1;
+        this.currentDistance    = -1;
         this.rootWidth          = -1;
         this.rootHeight         = -1;
         this.rootOffsetX        = -1;
@@ -52,12 +59,20 @@ class Pointer {
         return this.currentY - this.startY;
     }
 
+    get deltaDistance() {
+        return this.currentDistance - this.startDistance;
+    }
+
     get deltaMultiplierX() {
         return this.deltaX / this.rootWidth;
     }
 
     get deltaMultiplierY() {
         return this.deltaY / this.rootHeight;
+    }
+
+    get deltaMultiplierDistance() {
+        return (this.deltaDistance + this.startDistance) / this.startDistance;
     }
 
     get multiplierX() {
@@ -77,11 +92,15 @@ class Pointer {
     }
 
     get isMousePointer() {
-        return this.target === POINTER_TYPE_MOUSE;
+        return this.type === POINTER_TYPE_MOUSE;
     }
 
     get isTouchPointer() {
-        return this.target === POINTER_TYPE_TOUCH;
+        return this.type === POINTER_TYPE_TOUCH;
+    }
+
+    get isVirtualPointer() {
+        return this.type === POINTER_TYPE_VIRTUAL;
     }
 
     get isNew() {
@@ -94,6 +113,10 @@ class Pointer {
 
     get isMoving() {
         return this.status === POINTER_STATUS_MOVING;
+    }
+
+    get isPinching() {
+        return this.status === POINTER_STATUS_PINCHING;
     }
 
     get isStopping() {
@@ -120,6 +143,16 @@ class Pointer {
         return DIRECTION_STATIC;
     }
 
+    get directionPinch() {
+        if (this.velocitiesPinch < 0) {
+            return DIRECTION_CONVERGE;
+        } else if (this.velocitiesY) {
+            return DIRECTION_DIVERGE;
+        } else {
+            return DIRECTION_STATIC;
+        }
+    }
+
     down() {
         this.dispatchEvent(EVENT_POINTER_DOWN);
     }
@@ -128,6 +161,12 @@ class Pointer {
         if (!this.isMonitoring && !this.isStopping) this.startMonitorVelocity();
 
         this.dispatchEvent(EVENT_POINTER_DRAG);
+    }
+
+    pinch() {
+        // TODO:
+
+        // this.dispatchEvent(EVENT_POINTER_PINCH);
     }
 
     up() {
@@ -185,19 +224,24 @@ class Pointer {
 
     getState() {
         const state = new StatePointer();
+        const {clampX, clampY} = this.dragster.config.behavior;
 
-        state.deltaX           = this.deltaX;
-        state.deltaY           = this.deltaY;
-        state.deltaMultiplierX = this.deltaMultiplierX;
-        state.deltaMultiplierY = this.deltaMultiplierY;
-        state.multiplierX      = this.dragster.config.behavior.clampX ? Util.clamp(this.multiplierX, 0, 1) : this.multiplierX;
-        state.multiplierY      = this.dragster.config.behavior.clampY ? Util.clamp(this.multiplierY, 0, 1) : this.multiplierY;
-        state.velocityX        = this.velocityX;
-        state.velocityY        = this.velocityY;
-        state.directionX       = this.directionX;
-        state.directionY       = this.directionY;
-        state.status           = this.status;
-        state.type             = this.type;
+        state.deltaX                  = this.deltaX;
+        state.deltaY                  = this.deltaY;
+        state.deltaDistance           = this.deltaDistance;
+        state.deltaMultiplierX        = this.deltaMultiplierX;
+        state.deltaMultiplierY        = this.deltaMultiplierY;
+        state.deltaMultiplierDistance = this.deltaMultiplierDistance;
+        state.multiplierX             = clampX ? Util.clamp(this.multiplierX, 0, 1): this.multiplierX;
+        state.multiplierY             = clampY ? Util.clamp(this.multiplierY, 0, 1): this.multiplierY;
+        state.velocityX               = this.velocityX;
+        state.velocityY               = this.velocityY;
+        state.velocityPinch           = this.velocityPinch;
+        state.directionX              = this.directionX;
+        state.directionY              = this.directionY;
+        state.directionPinch          = this.directionPinch;
+        state.status                  = this.status;
+        state.type                    = this.type;
 
         return Object.freeze(state);
     }

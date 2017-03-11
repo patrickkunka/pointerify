@@ -391,6 +391,17 @@ class _Dragster {
 
     /**
      * @private
+     * @param  {Pointer} pointer1
+     * @param  {Pointer} pointer2
+     * @return {Pointer}
+     */
+
+    createVirtualPointer(pointer1, pointer2) {
+        // TODO
+    }
+
+    /**
+     * @private
      * @param   {Pointer}
      * @param   {(Touch|MouseEvent)}        e
      * @param   {(TouchEvent|MouseEvent)}   originalEvent
@@ -424,6 +435,17 @@ class _Dragster {
         pointer.move();
 
         originalEvent.preventDefault();
+    }
+
+    /**
+     * @private
+     * @return {void}
+     */
+
+    pinchPointer() {
+        // TODO
+
+        // pointer.pinch()
     }
 
     /**

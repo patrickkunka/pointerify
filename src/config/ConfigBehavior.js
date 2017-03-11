@@ -12,7 +12,8 @@ class ConfigBehavior {
         Object.defineProperties(this, Util.strictProps({
             pressDuration: [Number, 0],
             allowAxis: ['enum', [AXIS_BOTH, AXIS_X, AXIS_Y]],
-            clampAxis: ['enum', [AXIS_NONE, AXIS_BOTH, AXIS_X, AXIS_Y]]
+            clampAxis: ['enum', [AXIS_NONE, AXIS_BOTH, AXIS_X, AXIS_Y]],
+            pinch: [Boolean, true]
         }));
 
         Object.seal(this);

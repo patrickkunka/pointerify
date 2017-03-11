@@ -542,6 +542,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        /**
 	         * @private
+	         * @param  {Pointer} pointer1
+	         * @param  {Pointer} pointer2
+	         * @return {Pointer}
+	         */
+	
+	    }, {
+	        key: 'createVirtualPointer',
+	        value: function createVirtualPointer(pointer1, pointer2) {}
+	        // TODO
+	
+	
+	        /**
+	         * @private
 	         * @param   {Pointer}
 	         * @param   {(Touch|MouseEvent)}        e
 	         * @param   {(TouchEvent|MouseEvent)}   originalEvent
@@ -581,6 +594,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            originalEvent.preventDefault();
 	        }
+	
+	        /**
+	         * @private
+	         * @return {void}
+	         */
+	
+	    }, {
+	        key: 'pinchPointer',
+	        value: function pinchPointer() {}
+	        // TODO
+	
+	        // pointer.pinch()
+	
 	
 	        /**
 	         * @private
@@ -860,12 +886,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var POINTER_TYPE_MOUSE = exports.POINTER_TYPE_MOUSE = Symbol('POINTER_TYPE_MOUSE');
 	var POINTER_TYPE_HOVER = exports.POINTER_TYPE_HOVER = Symbol('POINTER_TYPE_HOVER');
 	var POINTER_TYPE_TOUCH = exports.POINTER_TYPE_TOUCH = Symbol('POINTER_TYPE_TOUCH');
+	var POINTER_TYPE_VIRTUAL = exports.POINTER_TYPE_VIRTUAL = Symbol('POINTER_TYPE_VIRTUAL');
 	
 	var POINTER_STATUS_NEW = exports.POINTER_STATUS_NEW = Symbol('POINTER_STATUS_NEW');
 	var POINTER_STATUS_EXTENDING = exports.POINTER_STATUS_EXTENDING = Symbol('POINTER_STATUS_EXTENDING');
 	var POINTER_STATUS_MOVING = exports.POINTER_STATUS_MOVING = Symbol('POINTER_STATUS_MOVING');
 	var POINTER_STATUS_INSPECTING = exports.POINTER_STATUS_INSPECTING = Symbol('POINTER_STATUS_INSPECTING');
 	var POINTER_STATUS_STOPPING = exports.POINTER_STATUS_STOPPING = Symbol('POINTER_STATUS_STOPPING');
+	var POINTER_STATUS_PINCHING = exports.POINTER_STATUS_PINCHING = Symbol('POINTER_STATUS_PINCHING');
 	
 	var EVENT_POINTER_DOWN = exports.EVENT_POINTER_DOWN = 'pointerDown';
 	var EVENT_POINTER_DRAG = exports.EVENT_POINTER_DRAG = 'pointerDrag';
@@ -873,12 +901,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EVENT_POINTER_STOP = exports.EVENT_POINTER_STOP = 'pointerStop';
 	var EVENT_POINTER_INSPECT = exports.EVENT_POINTER_INSPECT = 'pointerInspect';
 	var EVENT_POINTER_SEEK = exports.EVENT_POINTER_SEEK = 'pointerSeek';
+	var EVENT_POINTER_PINCH = exports.EVENT_POINTER_PINCH = 'pointerPinch';
 	
 	var DIRECTION_STATIC = exports.DIRECTION_STATIC = Symbol('DIRECTION_STATIC');
 	var DIRECTION_LEFT = exports.DIRECTION_LEFT = Symbol('DIRECTION_LEFT');
 	var DIRECTION_RIGHT = exports.DIRECTION_RIGHT = Symbol('DIRECTION_RIGHT');
 	var DIRECTION_UP = exports.DIRECTION_UP = Symbol('DIRECTION_UP');
 	var DIRECTION_DOWN = exports.DIRECTION_DOWN = Symbol('DIRECTION_DOWN');
+	var DIRECTION_CONVERGE = exports.DIRECTION_CONVERGE = Symbol('DIRECTION_CONVERGE');
+	var DIRECTION_DIVERGE = exports.DIRECTION_DIVERGE = Symbol('DIRECTION_DIVERGE');
 	
 	var AXIS_X = exports.AXIS_X = 'X';
 	var AXIS_Y = exports.AXIS_Y = 'Y';
@@ -889,10 +920,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    POINTER_TYPE_MOUSE: POINTER_TYPE_MOUSE,
 	    POINTER_TYPE_HOVER: POINTER_TYPE_HOVER,
 	    POINTER_TYPE_TOUCH: POINTER_TYPE_TOUCH,
+	    POINTER_TYPE_VIRTUAL: POINTER_TYPE_VIRTUAL,
 	
 	    POINTER_STATUS_NEW: POINTER_STATUS_NEW,
 	    POINTER_STATUS_EXTENDING: POINTER_STATUS_EXTENDING,
 	    POINTER_STATUS_MOVING: POINTER_STATUS_MOVING,
+	    POINTER_STATUS_PINCHING: POINTER_STATUS_PINCHING,
 	    POINTER_STATUS_INSPECTING: POINTER_STATUS_INSPECTING,
 	    POINTER_STATUS_STOPPING: POINTER_STATUS_STOPPING,
 	
@@ -900,7 +933,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    DIRECTION_LEFT: DIRECTION_LEFT,
 	    DIRECTION_RIGHT: DIRECTION_RIGHT,
 	    DIRECTION_UP: DIRECTION_UP,
-	    DIRECTION_DOWN: DIRECTION_DOWN
+	    DIRECTION_DOWN: DIRECTION_DOWN,
+	    DIRECTION_CONVERGE: DIRECTION_CONVERGE,
+	    DIRECTION_DIVERGE: DIRECTION_DIVERGE
 	};
 
 /***/ },
@@ -986,8 +1021,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.id = -1;
 	        this.startX = -1;
 	        this.startY = -1;
+	        this.startDistance = -1;
 	        this.currentX = -1;
 	        this.currentY = -1;
+	        this.currentDistance = -1;
 	        this.rootWidth = -1;
 	        this.rootHeight = -1;
 	        this.rootOffsetX = -1;
@@ -1016,6 +1053,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!this.isMonitoring && !this.isStopping) this.startMonitorVelocity();
 	
 	            this.dispatchEvent(_constants.EVENT_POINTER_DRAG);
+	        }
+	    }, {
+	        key: 'pinch',
+	        value: function pinch() {
+	            // TODO:
+	
+	            // this.dispatchEvent(EVENT_POINTER_PINCH);
 	        }
 	    }, {
 	        key: 'up',
@@ -1081,17 +1125,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'getState',
 	        value: function getState() {
 	            var state = new _StatePointer2.default();
+	            var _dragster$config$beha = this.dragster.config.behavior,
+	                clampX = _dragster$config$beha.clampX,
+	                clampY = _dragster$config$beha.clampY;
+	
 	
 	            state.deltaX = this.deltaX;
 	            state.deltaY = this.deltaY;
+	            state.deltaDistance = this.deltaDistance;
 	            state.deltaMultiplierX = this.deltaMultiplierX;
 	            state.deltaMultiplierY = this.deltaMultiplierY;
-	            state.multiplierX = this.dragster.config.behavior.clampX ? _Util2.default.clamp(this.multiplierX, 0, 1) : this.multiplierX;
-	            state.multiplierY = this.dragster.config.behavior.clampY ? _Util2.default.clamp(this.multiplierY, 0, 1) : this.multiplierY;
+	            state.deltaMultiplierDistance = this.deltaMultiplierDistance;
+	            state.multiplierX = clampX ? _Util2.default.clamp(this.multiplierX, 0, 1) : this.multiplierX;
+	            state.multiplierY = clampY ? _Util2.default.clamp(this.multiplierY, 0, 1) : this.multiplierY;
 	            state.velocityX = this.velocityX;
 	            state.velocityY = this.velocityY;
+	            state.velocityPinch = this.velocityPinch;
 	            state.directionX = this.directionX;
 	            state.directionY = this.directionY;
+	            state.directionPinch = this.directionPinch;
 	            state.status = this.status;
 	            state.type = this.type;
 	
@@ -1108,6 +1160,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.currentY - this.startY;
 	        }
 	    }, {
+	        key: 'deltaDistance',
+	        get: function get() {
+	            return this.currentDistance - this.startDistance;
+	        }
+	    }, {
 	        key: 'deltaMultiplierX',
 	        get: function get() {
 	            return this.deltaX / this.rootWidth;
@@ -1116,6 +1173,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'deltaMultiplierY',
 	        get: function get() {
 	            return this.deltaY / this.rootHeight;
+	        }
+	    }, {
+	        key: 'deltaMultiplierDistance',
+	        get: function get() {
+	            return (this.deltaDistance + this.startDistance) / this.startDistance;
 	        }
 	    }, {
 	        key: 'multiplierX',
@@ -1144,12 +1206,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'isMousePointer',
 	        get: function get() {
-	            return this.target === _constants.POINTER_TYPE_MOUSE;
+	            return this.type === _constants.POINTER_TYPE_MOUSE;
 	        }
 	    }, {
 	        key: 'isTouchPointer',
 	        get: function get() {
-	            return this.target === _constants.POINTER_TYPE_TOUCH;
+	            return this.type === _constants.POINTER_TYPE_TOUCH;
+	        }
+	    }, {
+	        key: 'isVirtualPointer',
+	        get: function get() {
+	            return this.type === _constants.POINTER_TYPE_VIRTUAL;
 	        }
 	    }, {
 	        key: 'isNew',
@@ -1165,6 +1232,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'isMoving',
 	        get: function get() {
 	            return this.status === _constants.POINTER_STATUS_MOVING;
+	        }
+	    }, {
+	        key: 'isPinching',
+	        get: function get() {
+	            return this.status === _constants.POINTER_STATUS_PINCHING;
 	        }
 	    }, {
 	        key: 'isStopping',
@@ -1192,6 +1264,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            return _constants.DIRECTION_STATIC;
+	        }
+	    }, {
+	        key: 'directionPinch',
+	        get: function get() {
+	            if (this.velocitiesPinch < 0) {
+	                return _constants.DIRECTION_CONVERGE;
+	            } else if (this.velocitiesY) {
+	                return _constants.DIRECTION_DIVERGE;
+	            } else {
+	                return _constants.DIRECTION_STATIC;
+	            }
 	        }
 	    }]);
 	
@@ -1506,14 +1589,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    this.deltaX = -1;
 	    this.deltaY = -1;
+	    this.deltaDistance = -1;
 	    this.deltaMultiplierX = -1;
 	    this.deltaMultiplierY = -1;
+	    this.deltaMultiplierDistance = -1;
 	    this.multiplierX = -1;
 	    this.multiplierY = -1;
 	    this.velocityX = -1;
 	    this.velocityY = -1;
+	    this.velocityPinch = -1;
 	    this.directionX = null;
 	    this.directionY = null;
+	    this.directionPinch = null;
 	    this.status = null;
 	    this.type = null;
 	
@@ -1589,7 +1676,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        Object.defineProperties(this, _Util2.default.strictProps({
 	            pressDuration: [Number, 0],
 	            allowAxis: ['enum', [_constants.AXIS_BOTH, _constants.AXIS_X, _constants.AXIS_Y]],
-	            clampAxis: ['enum', [_constants.AXIS_NONE, _constants.AXIS_BOTH, _constants.AXIS_X, _constants.AXIS_Y]]
+	            clampAxis: ['enum', [_constants.AXIS_NONE, _constants.AXIS_BOTH, _constants.AXIS_X, _constants.AXIS_Y]],
+	            pinch: [Boolean, true]
 	        }));
 	
 	        Object.seal(this);
