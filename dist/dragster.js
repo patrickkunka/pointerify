@@ -476,7 +476,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                if (!((pointer = this.touches[id]) instanceof _Pointer2.default)) break;
 	
-	                this.releasePointer(pointer, e);
+	                this.releasePointer(pointer, touch, e);
 	
 	                e.preventDefault();
 	            }

@@ -334,7 +334,7 @@ class _Dragster {
 
             if (!((pointer = this.touches[id]) instanceof Pointer)) break;
 
-            this.releasePointer(pointer, e);
+            this.releasePointer(pointer, touch, e);
 
             e.preventDefault();
         }
