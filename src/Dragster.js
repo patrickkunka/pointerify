@@ -53,7 +53,7 @@ class _Dragster {
     }
 
     get totalTouches() {
-        return Reflect.ownKeys(this.touches).length;
+        return Object.keys(this.touches).length;
     }
 
     /* Private Methods

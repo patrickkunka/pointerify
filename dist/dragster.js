@@ -833,7 +833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'totalTouches',
 	        get: function get() {
-	            return Reflect.ownKeys(this.touches).length;
+	            return Object.keys(this.touches).length;
 	        }
 	    }], [{
 	        key: 'handleConfigureError',
@@ -1478,7 +1478,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function strictProps(props) {
 	            var descriptors = {};
 	
-	            var keys = Reflect.ownKeys(props);
+	            var keys = Object.keys(props);
 	
 	            keys.forEach(function (key) {
 	                var _props$key = _slicedToArray(props[key], 3),
