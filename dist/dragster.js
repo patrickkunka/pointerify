@@ -1437,7 +1437,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return _value;
 	                },
 	                set: function set(value) {
-	                    var typeOf = type.name.toLowerCase();
+	                    var fnName = type.name;
+	
+	                    var typeOf = '';
+	
+	                    if (typeof fnName === 'undefined') {
+	                        // No function.name support
+	
+	                        _value = value;
+	
+	                        return;
+	                    }
+	
+	                    typeOf = fnName.toLowerCase();
 	
 	                    if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== typeOf) {
 	                        throw new TypeError('Value "' + value.toString() + '" on property "' + key + '" is not a ' + typeOf);

@@ -187,7 +187,19 @@ class Util {
         return {
             get: () => _value,
             set(value) {
-                const typeOf = type.name.toLowerCase();
+                const fnName = type.name;
+
+                let typeOf = '';
+
+                if (typeof fnName === 'undefined') {
+                    // No function.name support
+
+                    _value = value;
+
+                    return;
+                }
+
+                typeOf = fnName.toLowerCase();
 
                 if (typeof value !== typeOf) {
                     throw new TypeError(`Value "${value.toString()}" on property "${key}" is not a ${typeOf}`);
