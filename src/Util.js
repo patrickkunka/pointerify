@@ -155,7 +155,7 @@ class Util {
     static strictProps(props) {
         const descriptors = {};
 
-        const keys = Reflect.ownKeys(props);
+        const keys = Object.keys(props);
 
         keys.forEach(key => {
             const [type, init, cb=null] = props[key];

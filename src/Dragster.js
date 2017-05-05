@@ -53,7 +53,7 @@ class _Dragster {
     }
 
     get totalTouches() {
-        return Reflect.ownKeys(this.touches).length;
+        return Object.keys(this.touches).length;
     }
 
     /* Private Methods
@@ -334,7 +334,7 @@ class _Dragster {
 
             if (!((pointer = this.touches[id]) instanceof Pointer)) break;
 
-            this.releasePointer(pointer, e);
+            this.releasePointer(pointer, touch, e);
 
             e.preventDefault();
         }
@@ -391,6 +391,17 @@ class _Dragster {
 
     /**
      * @private
+     * @param  {Pointer} pointer1
+     * @param  {Pointer} pointer2
+     * @return {Pointer}
+     */
+
+    createVirtualPointer(pointer1, pointer2) {
+        // TODO
+    }
+
+    /**
+     * @private
      * @param   {Pointer}
      * @param   {(Touch|MouseEvent)}        e
      * @param   {(TouchEvent|MouseEvent)}   originalEvent
@@ -424,6 +435,17 @@ class _Dragster {
         pointer.move();
 
         originalEvent.preventDefault();
+    }
+
+    /**
+     * @private
+     * @return {void}
+     */
+
+    pinchPointer() {
+        // TODO
+
+        // pointer.pinch()
     }
 
     /**
