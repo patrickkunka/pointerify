@@ -130,6 +130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _ = new (Function.prototype.bind.apply(_Dragster, [null].concat(Array.prototype.slice.call(arguments))))();
 	
 	    this.destroy = _.destroy.bind(_);
+	    this.refresh = _.refresh.bind(_);
 	
 	    Object.seal(this);
 	};
@@ -490,6 +491,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleResize',
 	        value: function handleResize() {
+	            this.setRootGeometry();
+	        }
+	
+	        /**
+	         * @public
+	         * @return {void}
+	         */
+	
+	    }, {
+	        key: 'refresh',
+	        value: function refresh() {
 	            this.setRootGeometry();
 	        }
 	

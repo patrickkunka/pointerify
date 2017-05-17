@@ -25,6 +25,7 @@ class Dragster {
         const _ = new _Dragster(...arguments);
 
         this.destroy = _.destroy.bind(_);
+        this.refresh = _.refresh.bind(_);
 
         Object.seal(this);
     }
@@ -346,6 +347,15 @@ class _Dragster {
      */
 
     handleResize() {
+        this.setRootGeometry();
+    }
+
+    /**
+     * @public
+     * @return {void}
+     */
+
+    refresh() {
         this.setRootGeometry();
     }
 
