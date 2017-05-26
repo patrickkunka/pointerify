@@ -4,6 +4,30 @@
 
         <link rel="stylesheet" href="./reset.css"/>
         <link rel="stylesheet" href="./style.css"/>
+
+        <style>
+            .pointer {
+                position: absolute;
+                border-radius: 999px;
+                height: 30px;
+                width: 30px;
+                background: rgba(255, 0, 0, .5);
+                transition: transform 300ms;
+                transform: scale(0);
+            }
+
+            .pointer__shown {
+                transform: scale(1);
+            }
+
+            .pointer__mouse {
+                background: rgba(0, 255, 0, .5);
+            }
+
+            .pointer__inertial {
+                transform: rgba(0, 255, 0, .25);
+            }
+         </style>
     </head>
     <body>
         <div id="sandbox">
@@ -15,34 +39,65 @@
             const sb = document.getElementById('sandbox');
             const drg = dragster(sb, {
                 behavior: {
-                    allowAxis: 'x'
+                    // allowAxis: 'x'
+                },
+                physics: {
+                    // friction: 0.05
                 }
             });
 
-            console.log(drg);
+            function renderPointer(state) {
+                const el = document.createElement('div');
 
-            // sb.addEventListener('pointerDrag', (e) => {
-            //     let text = '';
-            //     let total = Math.abs(e.detail.deltaX);
+                el.style.left = (state.multiplierX * 100).toString() + '%';
+                el.style.top = (state.multiplierY * 100).toString() + '%';
 
-            //     while (total) {
-            //         text += '.';
+                el.id = state.id;
+                el.className = 'pointer';
 
-            //         total--;
-            //     }
+                if (state.isMousePointer) {
+                    el.classList.add('pointer__mouse');
+                } else if (state.isTouchPointer) {
+                    el.classList.add('pointer__touch');
+                } else if (state.isVirtualPointer) {
+                    el.classList.add('pointer__virtual');
+                }
 
-            //     console.log(text);
-            // });
+                sb.appendChild(el);
 
-            sb.addEventListener('pointerDrag', (e) => console.log(e.detail));
+                requestAnimationFrame(() => el.classList.add('pointer__shown'));
+            }
 
-            sb.addEventListener('pointerInspect', (e) => console.log(e.detail));
+            function movePointer(state) {
+                const el = document.getElementById(state.id);
 
-            window.addEventListener('pointerSeek', (e) => console.log('seek', e.detail));
+                el.style.left = (state.multiplierX * 100).toString() + '%';
+                el.style.top = (state.multiplierY * 100).toString() + '%';
+            }
 
-            // sb.addEventListener('pointerInspect', (e) => {
-            //     console.log(e.detail.multiplierX, e.detail.multiplierY);
-            // });
+            function flickPointer(state) {
+                const el = document.getElementById(state.id);
+
+                el.classList.add('pointer__inertial');
+            }
+
+            function killPointer(state) {
+                const el = document.getElementById(state.id);
+
+                el.classList.remove('pointer__shown');
+
+                el.addEventListener('transitionend', e => {
+                    if (e.target === el && e.propertyName === 'transform') sb.removeChild(el);
+                });
+            }
+
+            sb.addEventListener('pointerDown', ({detail}) => renderPointer(detail));
+
+            sb.addEventListener('pointerDrag', ({detail}) => movePointer(detail));
+
+            window.addEventListener('pointerUp', ({detail}) => flickPointer(detail));
+
+            window.addEventListener('pointerStop', ({detail}) => killPointer(detail));
         </script>
     </body>
 </html>

@@ -11,7 +11,7 @@ import {
     DIRECTION_DOWN,
     EVENT_POINTER_INSPECT,
     EVENT_POINTER_SEEK
-} from './constants';
+} from './Constants';
 
 import Dom          from './Dom';
 import EventBinding from './EventBinding';

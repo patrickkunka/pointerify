@@ -5,7 +5,7 @@ import {
     AXIS_NONE,
     AXIS_Y,
     AXIS_X
-} from '../constants';
+} from '../Constants';
 
 class ConfigBehavior {
     constructor() {

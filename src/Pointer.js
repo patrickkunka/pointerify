@@ -21,13 +21,13 @@ import {
     EVENT_POINTER_PINCH,
     EVENT_POINTER_UP,
     EVENT_POINTER_STOP
-} from './constants';
+} from './Constants';
 
 import StatePointer from './StatePointer';
 
 class Pointer {
     constructor() {
-        this.id                 = -1;
+        this.id                 = Util.randomHex();
         this.startX             = -1;
         this.startY             = -1;
         this.startDistance      = -1;
@@ -40,6 +40,7 @@ class Pointer {
         this.rootOffsetY        = -1;
         this.velocitiesX        = [];
         this.velocitiesY        = [];
+        this.velocitiesPinch    = [];
         this.type               = null;
         this.dragster           = null;
         this.yinPointer         = null;
@@ -93,6 +94,11 @@ class Pointer {
         return this.velocitiesY.length ? this.velocitiesY.reduce((value, sum) => value + sum, 0) / this.velocitiesY.length : 0;
     }
 
+    get velocityPinch() {
+        return this.velocitiesPinch.length ?
+            this.velocitiesPinch.reduce((value, sum) => value + sum, 0) / this.velocitiesPinch.length : 0;
+    }
+
     get isMousePointer() {
         return this.type === POINTER_TYPE_MOUSE;
     }
@@ -136,9 +142,9 @@ class Pointer {
     }
 
     get directionY() {
-        if (this.velocitiesY < 0) {
+        if (this.velocityY < 0) {
             return DIRECTION_UP;
-        } else if (this.velocitiesY) {
+        } else if (this.velocityY) {
             return DIRECTION_DOWN;
         }
 
@@ -146,9 +152,9 @@ class Pointer {
     }
 
     get directionPinch() {
-        if (this.velocitiesPinch < 0) {
+        if (this.velocityPinch < 0) {
             return DIRECTION_CONVERGE;
-        } else if (this.velocitiesY) {
+        } else if (this.velocityPinch) {
             return DIRECTION_DIVERGE;
         }
 
@@ -226,6 +232,7 @@ class Pointer {
         const state = new StatePointer();
         const {clampX, clampY} = this.dragster.config.behavior;
 
+        state.id                      = this.id;
         state.deltaX                  = this.deltaX;
         state.deltaY                  = this.deltaY;
         state.deltaDistance           = this.deltaDistance;

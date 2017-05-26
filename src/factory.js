@@ -1,10 +1,14 @@
 import Dragster     from './Dragster';
-import constants    from './constants';
+import Constants    from './Constants';
 
 function dragster(root, config={}) {
     return new Dragster(root, config);
 }
 
-dragster.constants = constants;
+dragster.CONSTANTS = Constants;
+
+// deprecated
+
+dragster.constants = Constants;
 
 module.exports = dragster;

@@ -18,6 +18,7 @@ body:after {
     display: inline-block;
     background: #eee;
     vertical-align: middle;
+    position: relative;
     width: 500px;
     height: 500px;
 }
