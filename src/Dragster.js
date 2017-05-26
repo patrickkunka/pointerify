@@ -3,6 +3,7 @@ import {
     AXIS_Y,
     POINTER_TYPE_MOUSE,
     POINTER_TYPE_TOUCH,
+    POINTER_TYPE_VIRTUAL,
     POINTER_STATUS_EXTENDING,
     POINTER_STATUS_MOVING,
     POINTER_STATUS_STOPPING,
@@ -41,6 +42,7 @@ class _Dragster {
     constructor(root, config) {
         this.mouse      = null;
         this.wheel      = null;
+        this.virtual    = null;
         this.touches    = {};
         this.bindings   = [];
         this.rootRect   = null;
@@ -272,14 +274,16 @@ class _Dragster {
         const target = e.target;
         const handleSelector = this.config.selectors.handle;
 
+        let touchIds = null;
+
         for (let i = 0, touch; (touch = e.changedTouches[i]); i++) {
             const newId = touch.identifier;
 
             let didCancel = false;
 
             for (let activeId in this.touches) {
-                // If any active touches in this dragster are stopping,
-                // cancel them.
+                // If any active touches in this dragster are stopping (i.e.
+                // already released but moving through inertia), cancel them.
 
                 let activePointer = null;
 
@@ -297,6 +301,17 @@ class _Dragster {
             this.touches[newId] = this.createPointer(touch, POINTER_TYPE_TOUCH, didCancel);
 
             this.touches[newId].id = newId;
+        }
+
+        if (!this.config.behavior.pinch) return;
+
+        touchIds = Object.keys(this.touches);
+
+        if (touchIds.length > 1) {
+            // Multiple touches exist, create a "virtual" pointer at the
+            // midpoint
+
+            this.virtual = this.createVirtualPointer(this.touches[touchIds[0]], this.touches[touchIds[1]]);
         }
     }
 
@@ -401,13 +416,24 @@ class _Dragster {
 
     /**
      * @private
-     * @param  {Pointer} pointer1
-     * @param  {Pointer} pointer2
+     * @param  {Pointer} yinPointer
+     * @param  {Pointer} yangPointer
      * @return {Pointer}
      */
 
-    createVirtualPointer(pointer1, pointer2) {
-        // TODO
+    createVirtualPointer(yinPointer, yangPointer) {
+        const pointer = new Pointer();
+
+        pointer.type = POINTER_TYPE_VIRTUAL;
+        pointer.dragster = this;
+
+        pointer.yinPointer = yinPointer;
+        pointer.yangPointer = yangPointer;
+
+        // TODO: calculate mid point using pythagorean theorum, then activate
+        // pointer
+
+        return pointer;
     }
 
     /**
@@ -461,7 +487,7 @@ class _Dragster {
     /**
      * @private
      * @param   {Pointer}
-     * @param   {(TouchEvent|MouseEvent)}   e
+     * @param   {(TouchEvent|MouseEvent)} e
      * @return  {void}
      */
 
@@ -485,6 +511,10 @@ class _Dragster {
         }
 
         this.deletePointer(pointer);
+
+        if (this.totalTouches < 2 && this.virtual) {
+            this.releasePointer(this.virtual, e);
+        }
     }
 
     /**
@@ -616,7 +646,7 @@ class _Dragster {
 
     /**
      * @private
-     * @param   {(TouchEvent|MouseEvent)} el
+     * @param   {(TouchEvent|MouseEvent)} e
      * @return  {void}
      */
 

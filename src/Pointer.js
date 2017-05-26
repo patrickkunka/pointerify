@@ -42,6 +42,8 @@ class Pointer {
         this.velocitiesY        = [];
         this.type               = null;
         this.dragster           = null;
+        this.yinPointer         = null;
+        this.yangPointer        = null;
         this.status             = POINTER_STATUS_NEW;
         this.isMonitoring       = false;
 
@@ -148,9 +150,9 @@ class Pointer {
             return DIRECTION_CONVERGE;
         } else if (this.velocitiesY) {
             return DIRECTION_DIVERGE;
-        } else {
-            return DIRECTION_STATIC;
         }
+
+        return DIRECTION_STATIC;
     }
 
     down() {
@@ -164,9 +166,7 @@ class Pointer {
     }
 
     pinch() {
-        // TODO:
-
-        // this.dispatchEvent(EVENT_POINTER_PINCH);
+        this.dispatchEvent(EVENT_POINTER_PINCH);
     }
 
     up() {
