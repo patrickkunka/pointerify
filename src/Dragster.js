@@ -22,17 +22,6 @@ import events       from './events.json';
 import StateStatic  from './StateStatic';
 
 class Dragster {
-    constructor() {
-        const _ = new _Dragster(...arguments);
-
-        this.destroy = _.destroy.bind(_);
-        this.refresh = _.refresh.bind(_);
-
-        Object.seal(this);
-    }
-}
-
-class _Dragster {
     /**
      * @constructor
      * @param {HTMLElement} root
@@ -102,7 +91,7 @@ class _Dragster {
             if ((clampAxis = behavior.clampAxis)) behavior.clampAxis = clampAxis.toUpperCase();
         }
 
-        Util.extend(this.config, config, true, _Dragster.handleConfigureError.bind(this));
+        Util.extend(this.config, config, true, Dragster.handleConfigureError.bind(this));
 
         this.config.physics.friction = Util.clamp(this.config.physics.friction, 0, 1);
     }
@@ -298,14 +287,16 @@ class _Dragster {
 
             this.setRootGeometry();
 
-            this.touches[newId] = this.createPointer(touch, POINTER_TYPE_TOUCH, didCancel);
+            if (this.totalTouches < 2) {
+                this.touches[newId] = this.createPointer(touch, POINTER_TYPE_TOUCH, didCancel);
+            }
         }
 
         if (!this.config.behavior.pinch) return;
 
         touchIds = Object.keys(this.touches);
 
-        if (touchIds.length > 1) {
+        if (touchIds.length > 1 && !this.virtual) {
             // Multiple touches exist, create a "virtual" pointer at the
             // midpoint
 

@@ -1,11 +1,11 @@
-import Dragster     from './Dragster';
+import Facade       from './Facade';
 import Constants    from './Constants';
 
 function dragster(root, config={}) {
-    return new Dragster(root, config);
+    return new Facade(root, config);
 }
 
-dragster.CONSTANTS = Constants;
+dragster.Constants = Constants;
 
 // deprecated
 

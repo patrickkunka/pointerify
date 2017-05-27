@@ -56,9 +56,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var _Dragster = __webpack_require__(1);
+	var _Facade = __webpack_require__(14);
 	
-	var _Dragster2 = _interopRequireDefault(_Dragster);
+	var _Facade2 = _interopRequireDefault(_Facade);
 	
 	var _Constants = __webpack_require__(2);
 	
@@ -69,10 +69,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	function dragster(root) {
 	    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
-	    return new _Dragster2.default(root, config);
+	    return new _Facade2.default(root, config);
 	}
 	
-	dragster.CONSTANTS = _Constants2.default;
+	dragster.Constants = _Constants2.default;
 	
 	// deprecated
 	
@@ -128,26 +128,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var Dragster = function Dragster() {
-	    _classCallCheck(this, Dragster);
-	
-	    var _ = new (Function.prototype.bind.apply(_Dragster, [null].concat(Array.prototype.slice.call(arguments))))();
-	
-	    this.destroy = _.destroy.bind(_);
-	    this.refresh = _.refresh.bind(_);
-	
-	    Object.seal(this);
-	};
-	
-	var _Dragster = function () {
+	var Dragster = function () {
 	    /**
 	     * @constructor
 	     * @param {HTMLElement} root
 	     * @param {object}      config
 	     */
 	
-	    function _Dragster(root, config) {
-	        _classCallCheck(this, _Dragster);
+	    function Dragster(root, config) {
+	        _classCallCheck(this, Dragster);
 	
 	        this.mouse = null;
 	        this.wheel = null;
@@ -164,7 +153,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.init(root, config);
 	    }
 	
-	    _createClass(_Dragster, [{
+	    _createClass(Dragster, [{
 	        key: 'init',
 	
 	
@@ -213,7 +202,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (clampAxis = behavior.clampAxis) behavior.clampAxis = clampAxis.toUpperCase();
 	            }
 	
-	            _Util2.default.extend(this.config, config, true, _Dragster.handleConfigureError.bind(this));
+	            _Util2.default.extend(this.config, config, true, Dragster.handleConfigureError.bind(this));
 	
 	            this.config.physics.friction = _Util2.default.clamp(this.config.physics.friction, 0, 1);
 	        }
@@ -439,14 +428,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                this.setRootGeometry();
 	
-	                this.touches[newId] = this.createPointer(touch, _Constants.POINTER_TYPE_TOUCH, didCancel);
+	                if (this.totalTouches < 2) {
+	                    this.touches[newId] = this.createPointer(touch, _Constants.POINTER_TYPE_TOUCH, didCancel);
+	                }
 	            }
 	
 	            if (!this.config.behavior.pinch) return;
 	
 	            touchIds = Object.keys(this.touches);
 	
-	            if (touchIds.length > 1) {
+	            if (touchIds.length > 1 && !this.virtual) {
 	                // Multiple touches exist, create a "virtual" pointer at the
 	                // midpoint
 	
@@ -962,7 +953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }]);
 	
-	    return _Dragster;
+	    return Dragster;
 	}();
 	
 	exports.default = Dragster;
@@ -2020,6 +2011,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	exports.default = StateStatic;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Dragster2 = __webpack_require__(1);
+	
+	var _Dragster3 = _interopRequireDefault(_Dragster2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Facade = function Dragster() {
+	    _classCallCheck(this, Dragster);
+	
+	    var _ = new (Function.prototype.bind.apply(_Dragster3.default, [null].concat(Array.prototype.slice.call(arguments))))();
+	
+	    this.destroy = _.destroy.bind(_);
+	    this.refresh = _.refresh.bind(_);
+	
+	    Object.seal(this);
+	};
+	
+	exports.default = Facade;
 
 /***/ }
 /******/ ])
