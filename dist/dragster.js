@@ -60,7 +60,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Dragster2 = _interopRequireDefault(_Dragster);
 	
-	var _Constants = __webpack_require__(14);
+	var _Constants = __webpack_require__(2);
 	
 	var _Constants2 = _interopRequireDefault(_Constants);
 	
@@ -92,7 +92,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Constants = __webpack_require__(14);
+	var _Constants = __webpack_require__(2);
 	
 	var _Dom = __webpack_require__(3);
 	
@@ -440,8 +440,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.setRootGeometry();
 	
 	                this.touches[newId] = this.createPointer(touch, _Constants.POINTER_TYPE_TOUCH, didCancel);
-	
-	                this.touches[newId].id = newId;
 	            }
 	
 	            if (!this.config.behavior.pinch) return;
@@ -546,12 +544,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'createPointer',
 	        value: function createPointer(_ref, type, isExtending) {
 	            var clientX = _ref.clientX,
-	                clientY = _ref.clientY;
+	                clientY = _ref.clientY,
+	                identifier = _ref.identifier;
 	
 	            var pointer = new _Pointer2.default();
 	
 	            if (isExtending) {
 	                pointer.status = _Constants.POINTER_STATUS_EXTENDING;
+	            }
+	
+	            if (identifier) {
+	                pointer.id = identifier;
 	            }
 	
 	            pointer.type = type;
@@ -582,14 +585,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function createVirtualPointer(yinPointer, yangPointer) {
 	            var pointer = new _Pointer2.default();
 	
+	            var startX = (yinPointer.startX + yangPointer.startX) / 2;
+	            var startY = (yinPointer.startY + yangPointer.startY) / 2;
+	
 	            pointer.type = _Constants.POINTER_TYPE_VIRTUAL;
 	            pointer.dragster = this;
 	
 	            pointer.yinPointer = yinPointer;
 	            pointer.yangPointer = yangPointer;
 	
-	            // TODO: calculate mid point using pythagorean theorum, then activate
-	            // pointer
+	            pointer.startX = pointer.currentX = startX;
+	            pointer.startY = pointer.currentY = startY;
+	
+	            pointer.rootWidth = this.rootRect.width;
+	            pointer.rootHeight = this.rootRect.height;
+	            pointer.rootOffsetX = startX - this.rootRect.left;
+	            pointer.rootOffsetY = startY - this.rootRect.top;
+	
+	            pointer.down();
 	
 	            return pointer;
 	        }
@@ -604,14 +617,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    }, {
 	        key: 'movePointer',
-	        value: function movePointer(pointer, _ref2, originalEvent) {
-	            var clientX = _ref2.clientX,
-	                clientY = _ref2.clientY;
-	
+	        value: function movePointer(pointer, e, originalEvent) {
 	            var allowAxis = this.config.behavior.allowAxis;
+	            var clientX = e.clientX,
+	                clientY = e.clientY;
 	
-	            pointer.currentX = clientX;
-	            pointer.currentY = clientY;
+	
+	            if (pointer.isVirtualPointer) {
+	                pointer.currentX = (pointer.yinPointer.currentX + pointer.yangPointer.currentX) / 2;
+	                pointer.currentY = (pointer.yinPointer.currentY + pointer.yangPointer.currentY) / 2;
+	            } else {
+	                pointer.currentX = clientX;
+	                pointer.currentY = clientY;
+	            }
 	
 	            if (!pointer.isMoving) {
 	                var vector = Math.abs(pointer.deltaX / pointer.deltaY);
@@ -634,6 +652,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            pointer.move();
 	
 	            originalEvent.preventDefault();
+	
+	            if (pointer.isTouchPointer && this.virtual !== null) {
+	                this.movePointer(this.virtual, e, originalEvent);
+	            }
 	        }
 	
 	        /**
@@ -793,9 +815,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    }, {
 	        key: 'emitStatic',
-	        value: function emitStatic(_ref3, type) {
-	            var clientX = _ref3.clientX,
-	                clientY = _ref3.clientY;
+	        value: function emitStatic(_ref2, type) {
+	            var clientX = _ref2.clientX,
+	                clientY = _ref2.clientY;
 	
 	            var state = new _StateStatic2.default();
 	
@@ -920,7 +942,70 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Dragster;
 
 /***/ },
-/* 2 */,
+/* 2 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var POINTER_TYPE_MOUSE = exports.POINTER_TYPE_MOUSE = Symbol('POINTER_TYPE_MOUSE');
+	var POINTER_TYPE_HOVER = exports.POINTER_TYPE_HOVER = Symbol('POINTER_TYPE_HOVER');
+	var POINTER_TYPE_TOUCH = exports.POINTER_TYPE_TOUCH = Symbol('POINTER_TYPE_TOUCH');
+	var POINTER_TYPE_VIRTUAL = exports.POINTER_TYPE_VIRTUAL = Symbol('POINTER_TYPE_VIRTUAL');
+	
+	var POINTER_STATUS_NEW = exports.POINTER_STATUS_NEW = Symbol('POINTER_STATUS_NEW');
+	var POINTER_STATUS_EXTENDING = exports.POINTER_STATUS_EXTENDING = Symbol('POINTER_STATUS_EXTENDING');
+	var POINTER_STATUS_MOVING = exports.POINTER_STATUS_MOVING = Symbol('POINTER_STATUS_MOVING');
+	var POINTER_STATUS_INSPECTING = exports.POINTER_STATUS_INSPECTING = Symbol('POINTER_STATUS_INSPECTING');
+	var POINTER_STATUS_STOPPING = exports.POINTER_STATUS_STOPPING = Symbol('POINTER_STATUS_STOPPING');
+	var POINTER_STATUS_PINCHING = exports.POINTER_STATUS_PINCHING = Symbol('POINTER_STATUS_PINCHING');
+	
+	var EVENT_POINTER_DOWN = exports.EVENT_POINTER_DOWN = 'pointerDown';
+	var EVENT_POINTER_DRAG = exports.EVENT_POINTER_DRAG = 'pointerDrag';
+	var EVENT_POINTER_UP = exports.EVENT_POINTER_UP = 'pointerUp';
+	var EVENT_POINTER_STOP = exports.EVENT_POINTER_STOP = 'pointerStop';
+	var EVENT_POINTER_INSPECT = exports.EVENT_POINTER_INSPECT = 'pointerInspect';
+	var EVENT_POINTER_SEEK = exports.EVENT_POINTER_SEEK = 'pointerSeek';
+	var EVENT_POINTER_PINCH = exports.EVENT_POINTER_PINCH = 'pointerPinch';
+	
+	var DIRECTION_STATIC = exports.DIRECTION_STATIC = Symbol('DIRECTION_STATIC');
+	var DIRECTION_LEFT = exports.DIRECTION_LEFT = Symbol('DIRECTION_LEFT');
+	var DIRECTION_RIGHT = exports.DIRECTION_RIGHT = Symbol('DIRECTION_RIGHT');
+	var DIRECTION_UP = exports.DIRECTION_UP = Symbol('DIRECTION_UP');
+	var DIRECTION_DOWN = exports.DIRECTION_DOWN = Symbol('DIRECTION_DOWN');
+	var DIRECTION_CONVERGE = exports.DIRECTION_CONVERGE = Symbol('DIRECTION_CONVERGE');
+	var DIRECTION_DIVERGE = exports.DIRECTION_DIVERGE = Symbol('DIRECTION_DIVERGE');
+	
+	var AXIS_X = exports.AXIS_X = 'X';
+	var AXIS_Y = exports.AXIS_Y = 'Y';
+	var AXIS_BOTH = exports.AXIS_BOTH = 'BOTH';
+	var AXIS_NONE = exports.AXIS_NONE = 'NONE';
+	
+	exports.default = {
+	    POINTER_TYPE_MOUSE: POINTER_TYPE_MOUSE,
+	    POINTER_TYPE_HOVER: POINTER_TYPE_HOVER,
+	    POINTER_TYPE_TOUCH: POINTER_TYPE_TOUCH,
+	    POINTER_TYPE_VIRTUAL: POINTER_TYPE_VIRTUAL,
+	
+	    POINTER_STATUS_NEW: POINTER_STATUS_NEW,
+	    POINTER_STATUS_EXTENDING: POINTER_STATUS_EXTENDING,
+	    POINTER_STATUS_MOVING: POINTER_STATUS_MOVING,
+	    POINTER_STATUS_PINCHING: POINTER_STATUS_PINCHING,
+	    POINTER_STATUS_INSPECTING: POINTER_STATUS_INSPECTING,
+	    POINTER_STATUS_STOPPING: POINTER_STATUS_STOPPING,
+	
+	    DIRECTION_STATIC: DIRECTION_STATIC,
+	    DIRECTION_LEFT: DIRECTION_LEFT,
+	    DIRECTION_RIGHT: DIRECTION_RIGHT,
+	    DIRECTION_UP: DIRECTION_UP,
+	    DIRECTION_DOWN: DIRECTION_DOWN,
+	    DIRECTION_CONVERGE: DIRECTION_CONVERGE,
+	    DIRECTION_DIVERGE: DIRECTION_DIVERGE
+	};
+
+/***/ },
 /* 3 */
 /***/ function(module, exports) {
 
@@ -986,7 +1071,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _Constants = __webpack_require__(14);
+	var _Constants = __webpack_require__(2);
 	
 	var _StatePointer = __webpack_require__(7);
 	
@@ -1113,7 +1198,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                clampY = _dragster$config$beha.clampY;
 	
 	
-	            state.id = this.id;
+	            state.id = 'pointer-' + this.id;
 	            state.deltaX = this.deltaX;
 	            state.deltaY = this.deltaY;
 	            state.deltaDistance = this.deltaDistance;
@@ -1578,7 +1663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'randomHex',
 	        value: function randomHex() {
-	            return ('00000' + (Math.random() * 16777216 << 0).toString(16)).substr(-6).toUpperCase(); // eslint-disable-line no-magic-numbers, no-bitwise
+	            return ('00000' + (Math.random() * 16777216 << 0).toString(16)).substr(-6); // eslint-disable-line no-magic-numbers, no-bitwise
 	        }
 	    }]);
 	
@@ -1599,7 +1684,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Constants = __webpack_require__(14);
+	var _Constants = __webpack_require__(2);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -1704,7 +1789,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _Constants = __webpack_require__(14);
+	var _Constants = __webpack_require__(2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1892,70 +1977,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	exports.default = StateStatic;
-
-/***/ },
-/* 14 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var POINTER_TYPE_MOUSE = exports.POINTER_TYPE_MOUSE = Symbol('POINTER_TYPE_MOUSE');
-	var POINTER_TYPE_HOVER = exports.POINTER_TYPE_HOVER = Symbol('POINTER_TYPE_HOVER');
-	var POINTER_TYPE_TOUCH = exports.POINTER_TYPE_TOUCH = Symbol('POINTER_TYPE_TOUCH');
-	var POINTER_TYPE_VIRTUAL = exports.POINTER_TYPE_VIRTUAL = Symbol('POINTER_TYPE_VIRTUAL');
-	
-	var POINTER_STATUS_NEW = exports.POINTER_STATUS_NEW = Symbol('POINTER_STATUS_NEW');
-	var POINTER_STATUS_EXTENDING = exports.POINTER_STATUS_EXTENDING = Symbol('POINTER_STATUS_EXTENDING');
-	var POINTER_STATUS_MOVING = exports.POINTER_STATUS_MOVING = Symbol('POINTER_STATUS_MOVING');
-	var POINTER_STATUS_INSPECTING = exports.POINTER_STATUS_INSPECTING = Symbol('POINTER_STATUS_INSPECTING');
-	var POINTER_STATUS_STOPPING = exports.POINTER_STATUS_STOPPING = Symbol('POINTER_STATUS_STOPPING');
-	var POINTER_STATUS_PINCHING = exports.POINTER_STATUS_PINCHING = Symbol('POINTER_STATUS_PINCHING');
-	
-	var EVENT_POINTER_DOWN = exports.EVENT_POINTER_DOWN = 'pointerDown';
-	var EVENT_POINTER_DRAG = exports.EVENT_POINTER_DRAG = 'pointerDrag';
-	var EVENT_POINTER_UP = exports.EVENT_POINTER_UP = 'pointerUp';
-	var EVENT_POINTER_STOP = exports.EVENT_POINTER_STOP = 'pointerStop';
-	var EVENT_POINTER_INSPECT = exports.EVENT_POINTER_INSPECT = 'pointerInspect';
-	var EVENT_POINTER_SEEK = exports.EVENT_POINTER_SEEK = 'pointerSeek';
-	var EVENT_POINTER_PINCH = exports.EVENT_POINTER_PINCH = 'pointerPinch';
-	
-	var DIRECTION_STATIC = exports.DIRECTION_STATIC = Symbol('DIRECTION_STATIC');
-	var DIRECTION_LEFT = exports.DIRECTION_LEFT = Symbol('DIRECTION_LEFT');
-	var DIRECTION_RIGHT = exports.DIRECTION_RIGHT = Symbol('DIRECTION_RIGHT');
-	var DIRECTION_UP = exports.DIRECTION_UP = Symbol('DIRECTION_UP');
-	var DIRECTION_DOWN = exports.DIRECTION_DOWN = Symbol('DIRECTION_DOWN');
-	var DIRECTION_CONVERGE = exports.DIRECTION_CONVERGE = Symbol('DIRECTION_CONVERGE');
-	var DIRECTION_DIVERGE = exports.DIRECTION_DIVERGE = Symbol('DIRECTION_DIVERGE');
-	
-	var AXIS_X = exports.AXIS_X = 'X';
-	var AXIS_Y = exports.AXIS_Y = 'Y';
-	var AXIS_BOTH = exports.AXIS_BOTH = 'BOTH';
-	var AXIS_NONE = exports.AXIS_NONE = 'NONE';
-	
-	exports.default = {
-	    POINTER_TYPE_MOUSE: POINTER_TYPE_MOUSE,
-	    POINTER_TYPE_HOVER: POINTER_TYPE_HOVER,
-	    POINTER_TYPE_TOUCH: POINTER_TYPE_TOUCH,
-	    POINTER_TYPE_VIRTUAL: POINTER_TYPE_VIRTUAL,
-	
-	    POINTER_STATUS_NEW: POINTER_STATUS_NEW,
-	    POINTER_STATUS_EXTENDING: POINTER_STATUS_EXTENDING,
-	    POINTER_STATUS_MOVING: POINTER_STATUS_MOVING,
-	    POINTER_STATUS_PINCHING: POINTER_STATUS_PINCHING,
-	    POINTER_STATUS_INSPECTING: POINTER_STATUS_INSPECTING,
-	    POINTER_STATUS_STOPPING: POINTER_STATUS_STOPPING,
-	
-	    DIRECTION_STATIC: DIRECTION_STATIC,
-	    DIRECTION_LEFT: DIRECTION_LEFT,
-	    DIRECTION_RIGHT: DIRECTION_RIGHT,
-	    DIRECTION_UP: DIRECTION_UP,
-	    DIRECTION_DOWN: DIRECTION_DOWN,
-	    DIRECTION_CONVERGE: DIRECTION_CONVERGE,
-	    DIRECTION_DIVERGE: DIRECTION_DIVERGE
-	};
 
 /***/ }
 /******/ ])

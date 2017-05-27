@@ -232,7 +232,7 @@ class Pointer {
         const state = new StatePointer();
         const {clampX, clampY} = this.dragster.config.behavior;
 
-        state.id                      = this.id;
+        state.id                      = `pointer-${this.id}`;
         state.deltaX                  = this.deltaX;
         state.deltaY                  = this.deltaY;
         state.deltaDistance           = this.deltaDistance;

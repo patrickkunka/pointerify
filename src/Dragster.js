@@ -299,8 +299,6 @@ class _Dragster {
             this.setRootGeometry();
 
             this.touches[newId] = this.createPointer(touch, POINTER_TYPE_TOUCH, didCancel);
-
-            this.touches[newId].id = newId;
         }
 
         if (!this.config.behavior.pinch) return;
@@ -391,11 +389,15 @@ class _Dragster {
      * @return  {Pointer}
      */
 
-    createPointer({clientX, clientY}, type, isExtending) {
+    createPointer({clientX, clientY, identifier}, type, isExtending) {
         const pointer = new Pointer();
 
         if (isExtending) {
             pointer.status = POINTER_STATUS_EXTENDING;
+        }
+
+        if (identifier) {
+            pointer.id = identifier;
         }
 
         pointer.type     = type;
@@ -424,14 +426,24 @@ class _Dragster {
     createVirtualPointer(yinPointer, yangPointer) {
         const pointer = new Pointer();
 
+        const startX = (yinPointer.startX + yangPointer.startX) / 2;
+        const startY = (yinPointer.startY + yangPointer.startY) / 2;
+
         pointer.type = POINTER_TYPE_VIRTUAL;
         pointer.dragster = this;
 
         pointer.yinPointer = yinPointer;
         pointer.yangPointer = yangPointer;
 
-        // TODO: calculate mid point using pythagorean theorum, then activate
-        // pointer
+        pointer.startX = pointer.currentX = startX;
+        pointer.startY = pointer.currentY = startY;
+
+        pointer.rootWidth   = this.rootRect.width;
+        pointer.rootHeight  = this.rootRect.height;
+        pointer.rootOffsetX = startX - this.rootRect.left;
+        pointer.rootOffsetY = startY - this.rootRect.top;
+
+        pointer.down();
 
         return pointer;
     }
@@ -444,11 +456,17 @@ class _Dragster {
      * @return  {void}
      */
 
-    movePointer(pointer, {clientX, clientY}, originalEvent) {
-        const allowAxis   = this.config.behavior.allowAxis;
+    movePointer(pointer, e, originalEvent) {
+        const allowAxis = this.config.behavior.allowAxis;
+        const {clientX, clientY} = e;
 
-        pointer.currentX = clientX;
-        pointer.currentY = clientY;
+        if (pointer.isVirtualPointer) {
+            pointer.currentX = (pointer.yinPointer.currentX + pointer.yangPointer.currentX) / 2;
+            pointer.currentY = (pointer.yinPointer.currentY + pointer.yangPointer.currentY) / 2;
+        } else {
+            pointer.currentX = clientX;
+            pointer.currentY = clientY;
+        }
 
         if (!pointer.isMoving) {
             const vector = Math.abs(pointer.deltaX / pointer.deltaY);
@@ -471,6 +489,10 @@ class _Dragster {
         pointer.move();
 
         originalEvent.preventDefault();
+
+        if (pointer.isTouchPointer && this.virtual !== null) {
+            this.movePointer(this.virtual, e, originalEvent);
+        }
     }
 
     /**
