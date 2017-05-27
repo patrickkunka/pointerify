@@ -18,6 +18,10 @@
                 transform: scale(0);
             }
 
+            .pointer__pinching {
+                transition: none;
+            }
+
             .pointer__shown {
                 transform: scale(1);
             }
@@ -31,7 +35,15 @@
             }
 
             .pointer__inertial {
-                transform: rgba(0, 255, 0, .25);
+                background: rgba(255, 0, 0, .25);
+            }
+
+            .pointer__mouse.pointer__inertial {
+                background: rgba(0, 255, 0, .25);
+            }
+
+            .pointer__virtual.pointer__inertial {
+                background: rgba(0, 0, 255, .25);
             }
          </style>
     </head>
@@ -90,20 +102,32 @@
             function killPointer(state) {
                 const el = document.getElementById(state.id);
 
-                el.classList.remove('pointer__shown');
+                el.style.transform = '';
+
+                el.classList.remove('pointer__pinching', 'pointer__shown');
 
                 el.addEventListener('transitionend', e => {
                     if (e.target === el && e.propertyName === 'transform') sb.removeChild(el);
                 });
             }
 
+            function scalePointer(state) {
+                const el = document.getElementById(state.id);
+
+                el.classList.add('pointer__pinching');
+
+                el.style.transform = `scale(${state.deltaMultiplierDistance})`;
+            }
+
             sb.addEventListener('pointerDown', ({detail}) => renderPointer(detail));
 
             sb.addEventListener('pointerDrag', ({detail}) => movePointer(detail));
 
-            window.addEventListener('pointerUp', ({detail}) => flickPointer(detail));
+            sb.addEventListener('pointerPinch', ({detail}) => scalePointer(detail));
 
-            window.addEventListener('pointerStop', ({detail}) => killPointer(detail));
+            sb.addEventListener('pointerUp', ({detail}) => flickPointer(detail));
+
+            sb.addEventListener('pointerStop', ({detail}) => killPointer(detail));
         </script>
     </body>
 </html>

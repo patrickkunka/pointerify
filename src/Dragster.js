@@ -429,6 +429,11 @@ class _Dragster {
         const startX = (yinPointer.startX + yangPointer.startX) / 2;
         const startY = (yinPointer.startY + yangPointer.startY) / 2;
 
+        const hypotenuse = Util.hypotenuse(
+            {x: yinPointer.startX, y: yinPointer.startY},
+            {x: yangPointer.startX, y: yangPointer.startY}
+        );
+
         pointer.type = POINTER_TYPE_VIRTUAL;
         pointer.dragster = this;
 
@@ -437,6 +442,7 @@ class _Dragster {
 
         pointer.startX = pointer.currentX = startX;
         pointer.startY = pointer.currentY = startY;
+        pointer.startDistance = hypotenuse;
 
         pointer.rootWidth   = this.rootRect.width;
         pointer.rootHeight  = this.rootRect.height;
@@ -451,21 +457,33 @@ class _Dragster {
     /**
      * @private
      * @param   {Pointer}
-     * @param   {(Touch|MouseEvent)}        e
-     * @param   {(TouchEvent|MouseEvent)}   originalEvent
+     * @param   {(Touch|MouseEvent|null)}        e
+     * @param   {(TouchEvent|MouseEvent|null)}   originalEvent
      * @return  {void}
      */
 
-    movePointer(pointer, e, originalEvent) {
+    movePointer(pointer, e=null, originalEvent=null) {
         const allowAxis = this.config.behavior.allowAxis;
-        const {clientX, clientY} = e;
 
         if (pointer.isVirtualPointer) {
+            const hypotenuse = Util.hypotenuse(
+                {x: pointer.yinPointer.currentX, y: pointer.yinPointer.currentY},
+                {x: pointer.yangPointer.currentX, y: pointer.yangPointer.currentY}
+            );
+
             pointer.currentX = (pointer.yinPointer.currentX + pointer.yangPointer.currentX) / 2;
             pointer.currentY = (pointer.yinPointer.currentY + pointer.yangPointer.currentY) / 2;
+
+            if (hypotenuse !== pointer.currentDistance) {
+                // Hypotenuse has changed, user is pinching
+
+                pointer.currentDistance = hypotenuse;
+
+                this.pinchPointer(pointer);
+            }
         } else {
-            pointer.currentX = clientX;
-            pointer.currentY = clientY;
+            pointer.currentX = e.clientX;
+            pointer.currentY = e.clientY;
         }
 
         if (!pointer.isMoving) {
@@ -484,11 +502,17 @@ class _Dragster {
             pointer.currentX = pointer.startX;
         }
 
-        pointer.status = POINTER_STATUS_MOVING;
+        if (pointer.isVirtualPointer && e === null) {
+            pointer.status = POINTER_STATUS_STOPPING;
+        } else {
+            pointer.status = POINTER_STATUS_MOVING;
+        }
 
         pointer.move();
 
-        originalEvent.preventDefault();
+        if (!pointer.isVirtualPointer) {
+            originalEvent.preventDefault();
+        }
 
         if (pointer.isTouchPointer && this.virtual !== null) {
             this.movePointer(this.virtual, e, originalEvent);
@@ -497,13 +521,12 @@ class _Dragster {
 
     /**
      * @private
+     * @param  {Pointer} pointer
      * @return {void}
      */
 
-    pinchPointer() {
-        // TODO
-
-        // pointer.pinch()
+    pinchPointer(pointer) {
+        pointer.pinch();
     }
 
     /**
@@ -533,10 +556,6 @@ class _Dragster {
         }
 
         this.deletePointer(pointer);
-
-        if (this.totalTouches < 2 && this.virtual) {
-            this.releasePointer(this.virtual, e);
-        }
     }
 
     /**
@@ -580,6 +599,10 @@ class _Dragster {
 
             if (pointer.currentX !== lastX || pointer.currentY !== lastY) {
                 pointer.move();
+
+                if (pointer.isTouchPointer && this.virtual !== null) {
+                    this.movePointer(this.virtual);
+                }
             }
 
             lastX = pointer.currentX;
@@ -625,6 +648,14 @@ class _Dragster {
                 delete this.touches[pointer.id];
 
                 break;
+            case POINTER_TYPE_VIRTUAL:
+                this.virtual = null;
+
+                break;
+        }
+
+        if (this.totalTouches < 2 && this.virtual) {
+            this.deletePointer(this.virtual);
         }
 
         if (!pointer.isPristine) {

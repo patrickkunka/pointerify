@@ -588,6 +588,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var startX = (yinPointer.startX + yangPointer.startX) / 2;
 	            var startY = (yinPointer.startY + yangPointer.startY) / 2;
 	
+	            var hypotenuse = _Util2.default.hypotenuse({ x: yinPointer.startX, y: yinPointer.startY }, { x: yangPointer.startX, y: yangPointer.startY });
+	
 	            pointer.type = _Constants.POINTER_TYPE_VIRTUAL;
 	            pointer.dragster = this;
 	
@@ -596,6 +598,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            pointer.startX = pointer.currentX = startX;
 	            pointer.startY = pointer.currentY = startY;
+	            pointer.startDistance = hypotenuse;
 	
 	            pointer.rootWidth = this.rootRect.width;
 	            pointer.rootHeight = this.rootRect.height;
@@ -610,25 +613,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * @private
 	         * @param   {Pointer}
-	         * @param   {(Touch|MouseEvent)}        e
-	         * @param   {(TouchEvent|MouseEvent)}   originalEvent
+	         * @param   {(Touch|MouseEvent|null)}        e
+	         * @param   {(TouchEvent|MouseEvent|null)}   originalEvent
 	         * @return  {void}
 	         */
 	
 	    }, {
 	        key: 'movePointer',
-	        value: function movePointer(pointer, e, originalEvent) {
-	            var allowAxis = this.config.behavior.allowAxis;
-	            var clientX = e.clientX,
-	                clientY = e.clientY;
+	        value: function movePointer(pointer) {
+	            var e = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+	            var originalEvent = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 	
+	            var allowAxis = this.config.behavior.allowAxis;
 	
 	            if (pointer.isVirtualPointer) {
+	                var hypotenuse = _Util2.default.hypotenuse({ x: pointer.yinPointer.currentX, y: pointer.yinPointer.currentY }, { x: pointer.yangPointer.currentX, y: pointer.yangPointer.currentY });
+	
 	                pointer.currentX = (pointer.yinPointer.currentX + pointer.yangPointer.currentX) / 2;
 	                pointer.currentY = (pointer.yinPointer.currentY + pointer.yangPointer.currentY) / 2;
+	
+	                if (hypotenuse !== pointer.currentDistance) {
+	                    // Hypotenuse has changed, user is pinching
+	
+	                    pointer.currentDistance = hypotenuse;
+	
+	                    this.pinchPointer(pointer);
+	                }
 	            } else {
-	                pointer.currentX = clientX;
-	                pointer.currentY = clientY;
+	                pointer.currentX = e.clientX;
+	                pointer.currentY = e.clientY;
 	            }
 	
 	            if (!pointer.isMoving) {
@@ -647,11 +660,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                pointer.currentX = pointer.startX;
 	            }
 	
-	            pointer.status = _Constants.POINTER_STATUS_MOVING;
+	            if (pointer.isVirtualPointer && e === null) {
+	                pointer.status = _Constants.POINTER_STATUS_STOPPING;
+	            } else {
+	                pointer.status = _Constants.POINTER_STATUS_MOVING;
+	            }
 	
 	            pointer.move();
 	
-	            originalEvent.preventDefault();
+	            if (!pointer.isVirtualPointer) {
+	                originalEvent.preventDefault();
+	            }
 	
 	            if (pointer.isTouchPointer && this.virtual !== null) {
 	                this.movePointer(this.virtual, e, originalEvent);
@@ -660,16 +679,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        /**
 	         * @private
+	         * @param  {Pointer} pointer
 	         * @return {void}
 	         */
 	
 	    }, {
 	        key: 'pinchPointer',
-	        value: function pinchPointer() {}
-	        // TODO
-	
-	        // pointer.pinch()
-	
+	        value: function pinchPointer(pointer) {
+	            pointer.pinch();
+	        }
 	
 	        /**
 	         * @private
@@ -700,10 +718,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            this.deletePointer(pointer);
-	
-	            if (this.totalTouches < 2 && this.virtual) {
-	                this.releasePointer(this.virtual, e);
-	            }
 	        }
 	
 	        /**
@@ -750,6 +764,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                if (pointer.currentX !== lastX || pointer.currentY !== lastY) {
 	                    pointer.move();
+	
+	                    if (pointer.isTouchPointer && _this2.virtual !== null) {
+	                        _this2.movePointer(_this2.virtual);
+	                    }
 	                }
 	
 	                lastX = pointer.currentX;
@@ -799,6 +817,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    delete this.touches[pointer.id];
 	
 	                    break;
+	                case _Constants.POINTER_TYPE_VIRTUAL:
+	                    this.virtual = null;
+	
+	                    break;
+	            }
+	
+	            if (this.totalTouches < 2 && this.virtual) {
+	                this.deletePointer(this.virtual);
 	            }
 	
 	            if (!pointer.isPristine) {
@@ -1664,6 +1690,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'randomHex',
 	        value: function randomHex() {
 	            return ('00000' + (Math.random() * 16777216 << 0).toString(16)).substr(-6); // eslint-disable-line no-magic-numbers, no-bitwise
+	        }
+	
+	        /**
+	         * Returns the distance between two grid coordindates.
+	         *
+	         * @param   {object} nodeA
+	         * @param   {object} nodeB
+	         * @return  {number}
+	         */
+	
+	    }, {
+	        key: 'hypotenuse',
+	        value: function hypotenuse(nodeA, nodeB) {
+	            var squareOfsideX = Math.pow(Math.abs(nodeA.x - nodeB.x), 2);
+	            var squareOfSideY = Math.pow(Math.abs(nodeA.y - nodeB.y), 2);
+	
+	            return Math.sqrt(squareOfsideX + squareOfSideY);
 	        }
 	    }]);
 	

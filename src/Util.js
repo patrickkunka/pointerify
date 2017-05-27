@@ -248,6 +248,21 @@ class Util {
     static randomHex() {
         return ('00000' + (Math.random() * 16777216 << 0).toString(16)).substr(-6); // eslint-disable-line no-magic-numbers, no-bitwise
     }
+
+    /**
+     * Returns the distance between two grid coordindates.
+     *
+     * @param   {object} nodeA
+     * @param   {object} nodeB
+     * @return  {number}
+     */
+
+    static hypotenuse(nodeA, nodeB) {
+        const squareOfsideX = Math.pow(Math.abs(nodeA.x - nodeB.x), 2);
+        const squareOfSideY = Math.pow(Math.abs(nodeA.y - nodeB.y), 2);
+
+        return Math.sqrt(squareOfsideX + squareOfSideY);
+    }
 }
 
 export default Util;
