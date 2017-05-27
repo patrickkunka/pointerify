@@ -56,11 +56,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var _Facade = __webpack_require__(14);
+	var _Facade = __webpack_require__(1);
 	
 	var _Facade2 = _interopRequireDefault(_Facade);
 	
-	var _Constants = __webpack_require__(2);
+	var _Constants = __webpack_require__(3);
 	
 	var _Constants2 = _interopRequireDefault(_Constants);
 	
@@ -90,35 +90,66 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _Dragster2 = __webpack_require__(2);
+	
+	var _Dragster3 = _interopRequireDefault(_Dragster2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Facade = function Dragster() {
+	    _classCallCheck(this, Dragster);
+	
+	    var _ = new (Function.prototype.bind.apply(_Dragster3.default, [null].concat(Array.prototype.slice.call(arguments))))();
+	
+	    this.destroy = _.destroy.bind(_);
+	    this.refresh = _.refresh.bind(_);
+	
+	    Object.seal(this);
+	};
+	
+	exports.default = Facade;
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Constants = __webpack_require__(2);
+	var _Constants = __webpack_require__(3);
 	
-	var _Dom = __webpack_require__(3);
+	var _Dom = __webpack_require__(4);
 	
 	var _Dom2 = _interopRequireDefault(_Dom);
 	
-	var _EventBinding = __webpack_require__(4);
+	var _EventBinding = __webpack_require__(5);
 	
 	var _EventBinding2 = _interopRequireDefault(_EventBinding);
 	
-	var _Pointer = __webpack_require__(5);
+	var _Pointer = __webpack_require__(6);
 	
 	var _Pointer2 = _interopRequireDefault(_Pointer);
 	
-	var _Util = __webpack_require__(6);
+	var _Util = __webpack_require__(7);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _Config = __webpack_require__(8);
+	var _Config = __webpack_require__(9);
 	
 	var _Config2 = _interopRequireDefault(_Config);
 	
-	var _events = __webpack_require__(12);
+	var _events = __webpack_require__(13);
 	
 	var _events2 = _interopRequireDefault(_events);
 	
-	var _StateStatic = __webpack_require__(13);
+	var _StateStatic = __webpack_require__(14);
 	
 	var _StateStatic2 = _interopRequireDefault(_StateStatic);
 	
@@ -202,7 +233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (clampAxis = behavior.clampAxis) behavior.clampAxis = clampAxis.toUpperCase();
 	            }
 	
-	            _Util2.default.extend(this.config, config, true, Dragster.handleConfigureError.bind(this));
+	            _Util2.default.extend(this.config, config, true, Dragster.handleMergeError.bind(this));
 	
 	            this.config.physics.friction = _Util2.default.clamp(this.config.physics.friction, 0, 1);
 	        }
@@ -920,36 +951,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return Object.keys(this.touches).length;
 	        }
 	    }], [{
-	        key: 'handleConfigureError',
-	        value: function handleConfigureError(err, target) {
+	        key: 'handleMergeError',
+	        value: function handleMergeError(err, target) {
 	            var re = /property "?(\w*)"?[,:] object/i;
 	
 	            var matches = null;
-	            var illegalPropName = '';
-	            var bestMatch = '';
-	            var suggestion = '';
 	
 	            if (!(err instanceof TypeError) || !(matches = re.exec(err.message))) throw err;
 	
-	            illegalPropName = matches[1];
+	            var keys = Reflect.ownKeys(target);
+	            var offender = matches[1].toLowerCase();
 	
-	            for (var key in target) {
-	                var i = 0;
+	            var bestMatch = keys.reduce(function (bestMatch, key) {
+	                var charIndex = 0;
 	
-	                while (i < illegalPropName.length && illegalPropName.charAt(i).toLowerCase() === key.charAt(i).toLowerCase()) {
-	                    i++;
-	                }
+	                while (charIndex < offender.length && offender.charAt(charIndex) === key.charAt(charIndex).toLowerCase()) {
+	                    charIndex++;
+	                }return charIndex > bestMatch.length ? key : bestMatch;
+	            }, '');
 	
-	                if (i > bestMatch.length) {
-	                    bestMatch = key;
-	                }
-	            }
+	            var suggestion = bestMatch ? '. Did you mean "' + bestMatch + '"?' : '';
 	
-	            if (bestMatch) {
-	                suggestion = '. Did you mean "' + bestMatch + '"?';
-	            }
-	
-	            throw new TypeError('[Datepicker] Invalid configuration property "' + illegalPropName + '"' + suggestion);
+	            throw new TypeError('[Dragster] Invalid configuration option "' + matches[1] + '"' + suggestion);
 	        }
 	    }]);
 	
@@ -959,7 +982,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Dragster;
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1023,7 +1046,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1044,7 +1067,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Dom;
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1073,7 +1096,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = EventBinding;
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1084,13 +1107,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Util = __webpack_require__(6);
+	var _Util = __webpack_require__(7);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _Constants = __webpack_require__(2);
+	var _Constants = __webpack_require__(3);
 	
-	var _StatePointer = __webpack_require__(7);
+	var _StatePointer = __webpack_require__(8);
 	
 	var _StatePointer2 = _interopRequireDefault(_StatePointer);
 	
@@ -1377,7 +1400,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Pointer;
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1707,7 +1730,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Util;
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1718,7 +1741,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Constants = __webpack_require__(2);
+	var _Constants = __webpack_require__(3);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -1770,7 +1793,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = StatePointer;
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1779,15 +1802,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _ConfigBehavior = __webpack_require__(9);
+	var _ConfigBehavior = __webpack_require__(10);
 	
 	var _ConfigBehavior2 = _interopRequireDefault(_ConfigBehavior);
 	
-	var _ConfigPhysics = __webpack_require__(10);
+	var _ConfigPhysics = __webpack_require__(11);
 	
 	var _ConfigPhysics2 = _interopRequireDefault(_ConfigPhysics);
 	
-	var _ConfigSelectors = __webpack_require__(11);
+	var _ConfigSelectors = __webpack_require__(12);
 	
 	var _ConfigSelectors2 = _interopRequireDefault(_ConfigSelectors);
 	
@@ -1808,7 +1831,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Config;
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1819,11 +1842,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Util = __webpack_require__(6);
+	var _Util = __webpack_require__(7);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _Constants = __webpack_require__(2);
+	var _Constants = __webpack_require__(3);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1871,7 +1894,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ConfigBehavior;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1880,7 +1903,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Util = __webpack_require__(6);
+	var _Util = __webpack_require__(7);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
@@ -1905,7 +1928,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ConfigPhysics;
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1914,7 +1937,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Util = __webpack_require__(6);
+	var _Util = __webpack_require__(7);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
@@ -1935,7 +1958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = ConfigSelectors;
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -1990,7 +2013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	];
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2011,37 +2034,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	exports.default = StateStatic;
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _Dragster2 = __webpack_require__(1);
-	
-	var _Dragster3 = _interopRequireDefault(_Dragster2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Facade = function Dragster() {
-	    _classCallCheck(this, Dragster);
-	
-	    var _ = new (Function.prototype.bind.apply(_Dragster3.default, [null].concat(Array.prototype.slice.call(arguments))))();
-	
-	    this.destroy = _.destroy.bind(_);
-	    this.refresh = _.refresh.bind(_);
-	
-	    Object.seal(this);
-	};
-	
-	exports.default = Facade;
 
 /***/ }
 /******/ ])

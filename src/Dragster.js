@@ -91,7 +91,7 @@ class Dragster {
             if ((clampAxis = behavior.clampAxis)) behavior.clampAxis = clampAxis.toUpperCase();
         }
 
-        Util.extend(this.config, config, true, Dragster.handleConfigureError.bind(this));
+        Util.extend(this.config, config, true, Dragster.handleMergeError.bind(this));
 
         this.config.physics.friction = Util.clamp(this.config.physics.friction, 0, 1);
     }
@@ -720,35 +720,30 @@ class Dragster {
      * @param {object}  target
      */
 
-    static handleConfigureError(err, target) {
+    static handleMergeError(err, target) {
         const re = /property "?(\w*)"?[,:] object/i;
 
-        let matches         = null;
-        let illegalPropName = '';
-        let bestMatch       = '';
-        let suggestion      = '';
+        let matches = null;
 
         if (!(err instanceof TypeError) || !(matches = re.exec(err.message))) throw err;
 
-        illegalPropName = matches[1];
+        const keys = Reflect.ownKeys(target);
+        const offender = matches[1].toLowerCase();
 
-        for (let key in target) {
-            let i = 0;
+        const bestMatch = keys.reduce((bestMatch, key) => {
+            let charIndex = 0;
 
-            while (i < illegalPropName.length && illegalPropName.charAt(i).toLowerCase() === key.charAt(i).toLowerCase()) {
-                i++;
-            }
+            while (
+                charIndex < offender.length &&
+                offender.charAt(charIndex) === key.charAt(charIndex).toLowerCase()
+            ) charIndex++;
 
-            if (i > bestMatch.length) {
-                bestMatch = key;
-            }
-        }
+            return charIndex > bestMatch.length ? key : bestMatch;
+        }, '');
 
-        if (bestMatch) {
-            suggestion = `. Did you mean "${bestMatch}"?`;
-        }
+        const suggestion = bestMatch ? `. Did you mean "${bestMatch}"?` : '';
 
-        throw new TypeError(`[Datepicker] Invalid configuration property "${illegalPropName}"${suggestion}`);
+        throw new TypeError(`[Dragster] Invalid configuration option "${matches[1]}"${suggestion}`);
     }
 
     /* Public Methods
