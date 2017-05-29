@@ -14,67 +14,111 @@ Dragster also features a lightweight, built-in physics engine to simulate inerti
 
 All of Dragster's features are designed to reduce the amount of repetitive integration code we have to write when building cross-platform swipe, flick, tap and pinch gesture-based UI, and can be used to rapidly develop UI such as carousels, sliders, image galleries, and media timeline/volume controls.
 
+### Contents
+- [Installation](#installation)
+- [Instantiation](#instantiation)
+- [Events](#events)
+
+## Installation
+
+Firstly, install the package from github using your package manager of choice.
+
+npm install dragster --save-dev
+
+You may then import the dragster factory function into your project's modules.
+
+```js
+import dragster from 'dragster';
+```
+
+You may also load Dragster via a `<script>` tag, and the `dragster` factory function will be added to the global namespace.
+
+```html
+        ...
+        <script src="/path/to/dragster.js"></script>
+    </body>
+</html>
+```
+
+## Instantiation
+
+The `dragster` factory function then can be used to create a discrete dragster instance on a provided "root" element.
+
+```js
+const drg = dragster(input);
+```
+
+A reference to the dragster is returned and can be used to destroy the instance (and unbind its event handlers) later on.
+
+#### Dragster "Root" Elements
+
+The element on which the dragster is instantiated will be used to determine all geometry data contained in the events dispatched by the dragster.
+
+For example, if the root element is `500px` wide and a user performs a mouse down at `50px` from its left edge, the `multiplierX` property in the resulting `PointerState` would be `0.1`, meaning the event ocurred at 10% of the element's width.
+
 ## Events
 
-`dragsterpointerdown`
+Each dragster instance dispatches the following DOM events from the ("root") element on which it is instantiated on. Each event contains a reference to a `PointerState` object via the event `detail` property, containing various geometry data points.
 
-Dispatched from the dragster root element when the primary mouse button is depressed, or when a finger makes contact with the device glass.
+### `dragsterpointerdown`
+
+Dispatched when the primary mouse button is depressed, or when a finger makes contact with the device glass.
 
 This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_DOWN` constant.
 
-`dragsterpointerdrag`
+### `dragsterpointerdrag`
 
-Dispatched from the dragster root element when the mouse is moved while its primary button is depressed, or when a finger is moved across the device screen while in contact with the glass.
+Dispatched when the mouse is moved while its primary button is depressed, or when a finger is moved across the device screen while in contact with the glass.
 
 When `physics.inertia` is enabled, drag events will continue to be dispatched after the pointer is released, for an amount of time determined by the drag velocity at the time of release, and the specified `physics.friction` value.
 
 This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_DRAG` constant.
 
-`dragsterpointerup`
+### `dragsterpointerup`
 
-Dispatched from the dragster root element when the primary mouse button is released after being depressed while within the root element, or when a finger leaves contact with the device glass after having made contact while within the root element.
+Dispatched when the primary mouse button is released after being depressed while within the root element, or when a finger leaves contact with the device glass after having made contact while within the root element.
 
 This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_UP` constant.
 
-`dragsterpointerstop`
+### `dragsterpointerstop`
 
-Dispatched from the dragster root element after the pointer is released (when inertia is disabled), or after the inertial phase of a "swipe" gesture, when the pointer comes to a complete stop as inertia is depleted due to friction (when inertia is enabled).
+Dispatched after the pointer is released (when inertia is disabled), or after the inertial phase of a "swipe" gesture, when the pointer comes to a complete stop as inertia is depleted due to friction (when inertia is enabled).
 
 This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_STOP` constant.
 
-`dragsterpointerinspect`
+### `dragsterpointerinspect`
 
-Dispatched from the dragster root element when the mouse moves across the root element without any buttons depressed. Similar to a "hover" event.
+Dispatched when the mouse moves across the root element without any buttons depressed. Similar to a "hover" event.
 
 This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_INSPECT` constant.
 
-`dragsterpointertap`
+### `dragsterpointertap`
 
-Dispatched from the dragster root element when the primary mouse button is depressed and immediately released without any lateral movement taking place, or when a finger makes contact with the device glass and then leaves contact without any lateral movement taking place.
+Dispatched when the primary mouse button is depressed and immediately released without any lateral movement taking place, or when a finger makes contact with the device glass and then leaves contact without any lateral movement taking place.
 
 This event can be used as a substitute for `click` events in gesture-enabled UI where a swipe might cause unintended click events to be dispatched.
 
 This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_TAP` constant.
 
-`dragstervirtualpointerdown`
+### `dragstervirtualpointerdown`
 
-Dispatched from the dragster root element when two fingers come into contact with the device glass. A "virtual pointer" is created at the exact midpoint of the two touch points and forms the origin of any resulting "pinch" gestures.
+Dispatched when two fingers come into contact with the device glass. A "virtual pointer" is created at the exact midpoint of the two touch points and forms the origin of any resulting "pinch" gestures.
 
 This event name can also be accessed via the `dragster.Constants.EVENT_VIRTUAL_POINTER_DOWN` constant.
 
-`dragstervirtualpointerdrag`
+### `dragstervirtualpointerdrag`
 
 See above. The virtual pointer equivalent of `dragsterpointermove`.
 
 This event name can also be accessed via the `dragster.Constants.EVENT_VIRTUAL_POINTER_DRAG` constant.
 
-`dragstervirtualpointpinch`
+### `dragstervirtualpointpinch`
 
-Dispatched form the dragster root element when two fingers that are both in contact with the device glass converge or diverge from a midpoint, forming a "pinch" gesture.
+Dispatched when two fingers that are both in contact with the device glass converge or diverge from a midpoint, forming a "pinch" gesture.
 
 This event name can also be accessed via the `dragster.Constants.EVENT_VIRTUAL_POINTER_PINCH` constant.
 
-`dragstervirtualpointerstop`
+### `dragstervirtualpointerstop`
 
 See above. The virtual pointer equivalent of `dragsterpointerstop`. Dispatched when the either one of the two physical touch points is stopped (either due to a pointer release, or the depletion of inertia).
 
