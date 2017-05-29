@@ -1,5 +1,5 @@
 {
-  "name": "dragster",
+  "name": "dragster-js",
   "version": "0.3.0",
   "main": "./dist/dragster.js",
   "scripts": {

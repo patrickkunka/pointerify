@@ -1,4 +1,4 @@
-# Dragster
+# DragsterJS
 
 A unified events-based API for mouse and multi-touch with built-in geometry and physics.
 
@@ -23,12 +23,14 @@ All of Dragster's features are designed to reduce the amount of repetitive integ
 
 Firstly, install the package from github using your package manager of choice.
 
-npm install dragster --save-dev
+```
+npm install dragster-js --save-dev
+```
 
 You may then import the dragster factory function into your project's modules.
 
 ```js
-import dragster from 'dragster';
+import dragster from 'dragster-js';
 ```
 
 You may also load Dragster via a `<script>` tag, and the `dragster` factory function will be added to the global namespace.
