@@ -26,7 +26,7 @@ This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_D
 
 Dispatched from the dragster root element when the mouse is moved while its primary button is depressed, or when a finger is moved across the device screen while in contact with the glass.
 
-When `physics.intertia` is enabled, drag events will continue to be dispatched after the pointer is released, for an amount of time determined by the drag velocity at the time of release, and the specified `physics.friction` value.
+When `physics.inertia` is enabled, drag events will continue to be dispatched after the pointer is released, for an amount of time determined by the drag velocity at the time of release, and the specified `physics.friction` value.
 
 This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_DRAG` constant.
 
