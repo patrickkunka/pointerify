@@ -10,13 +10,16 @@ export const POINTER_STATUS_INSPECTING = Symbol('POINTER_STATUS_INSPECTING');
 export const POINTER_STATUS_STOPPING   = Symbol('POINTER_STATUS_STOPPING');
 export const POINTER_STATUS_PINCHING   = Symbol('POINTER_STATUS_PINCHING');
 
-export const EVENT_POINTER_DOWN    = 'pointerDown';
-export const EVENT_POINTER_DRAG    = 'pointerDrag';
-export const EVENT_POINTER_UP      = 'pointerUp';
-export const EVENT_POINTER_STOP    = 'pointerStop';
-export const EVENT_POINTER_INSPECT = 'pointerInspect';
-export const EVENT_POINTER_SEEK    = 'pointerSeek';
-export const EVENT_POINTER_PINCH   = 'pointerPinch';
+export const EVENT_POINTER_DOWN          = 'dragsterpointerdown';
+export const EVENT_POINTER_DRAG          = 'dragsterpointerdrag';
+export const EVENT_POINTER_UP            = 'dragsterpointerup';
+export const EVENT_POINTER_STOP          = 'dragsterpointerstop';
+export const EVENT_POINTER_INSPECT       = 'dragsterpointerinspect';
+export const EVENT_POINTER_TAP           = 'dragsterpointertap';
+export const EVENT_VIRTUAL_POINTER_DOWN  = 'dragstervirtualpointerdown';
+export const EVENT_VIRTUAL_POINTER_DRAG  = 'dragstervirtualpointerdrag';
+export const EVENT_VIRTUAL_POINTER_PINCH = 'dragsterpointerpinch';
+export const EVENT_VIRTUAL_POINTER_STOP  = 'dragstervirtualpointerstop';
 
 export const DIRECTION_STATIC   = Symbol('DIRECTION_STATIC');
 export const DIRECTION_LEFT     = Symbol('DIRECTION_LEFT');
@@ -50,5 +53,16 @@ export default {
     DIRECTION_UP,
     DIRECTION_DOWN,
     DIRECTION_CONVERGE,
-    DIRECTION_DIVERGE
+    DIRECTION_DIVERGE,
+
+    EVENT_POINTER_DOWN,
+    EVENT_POINTER_DRAG,
+    EVENT_POINTER_UP,
+    EVENT_POINTER_STOP,
+    EVENT_POINTER_INSPECT,
+    EVENT_POINTER_TAP,
+    EVENT_VIRTUAL_POINTER_DOWN,
+    EVENT_VIRTUAL_POINTER_DRAG,
+    EVENT_VIRTUAL_POINTER_PINCH,
+    EVENT_VIRTUAL_POINTER_STOP
 };

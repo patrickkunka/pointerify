@@ -10,7 +10,7 @@ import {
     DIRECTION_RIGHT,
     DIRECTION_DOWN,
     EVENT_POINTER_INSPECT,
-    EVENT_POINTER_SEEK
+    EVENT_POINTER_TAP
 } from './Constants';
 
 import Dom          from './Dom';
@@ -699,7 +699,7 @@ class Dragster {
 
         this.isClicking = true;
 
-        this.emitStatic(e, EVENT_POINTER_SEEK);
+        this.emitStatic(e, EVENT_POINTER_TAP);
 
         while (typeof target.click !== 'function') {
             target = target.parentElement;

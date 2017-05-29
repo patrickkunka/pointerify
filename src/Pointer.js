@@ -18,9 +18,12 @@ import {
     POINTER_STATUS_STOPPING,
     EVENT_POINTER_DOWN,
     EVENT_POINTER_DRAG,
-    EVENT_POINTER_PINCH,
     EVENT_POINTER_UP,
-    EVENT_POINTER_STOP
+    EVENT_POINTER_STOP,
+    EVENT_VIRTUAL_POINTER_DOWN,
+    EVENT_VIRTUAL_POINTER_DRAG,
+    EVENT_VIRTUAL_POINTER_PINCH,
+    EVENT_VIRTUAL_POINTER_STOP
 } from './Constants';
 
 import StatePointer from './StatePointer';
@@ -162,17 +165,25 @@ class Pointer {
     }
 
     down() {
-        this.dispatchEvent(EVENT_POINTER_DOWN);
+        if (this.isVirtualPointer) {
+            this.dispatchEvent(EVENT_VIRTUAL_POINTER_DOWN);
+        } else {
+            this.dispatchEvent(EVENT_POINTER_DOWN);
+        }
     }
 
     move() {
         if (!this.isMonitoring && !this.isStopping) this.startMonitorVelocity();
 
-        this.dispatchEvent(EVENT_POINTER_DRAG);
+        if (this.isVirtualPointer) {
+            this.dispatchEvent(EVENT_VIRTUAL_POINTER_DRAG);
+        } else {
+            this.dispatchEvent(EVENT_POINTER_DRAG);
+        }
     }
 
     pinch() {
-        this.dispatchEvent(EVENT_POINTER_PINCH);
+        this.dispatchEvent(EVENT_VIRTUAL_POINTER_PINCH);
     }
 
     up() {
@@ -182,7 +193,11 @@ class Pointer {
     }
 
     stop() {
-        this.dispatchEvent(EVENT_POINTER_STOP);
+        if (this.isVirtualPointer) {
+            this.dispatchEvent(EVENT_VIRTUAL_POINTER_STOP);
+        } else {
+            this.dispatchEvent(EVENT_POINTER_STOP);
+        }
     }
 
     startMonitorVelocity() {

@@ -98,6 +98,8 @@
                 const el = document.getElementById(state.id);
 
                 el.classList.add('pointer__inertial');
+
+                console.log('flick', state);
             }
 
             function killPointer(state) {
@@ -120,15 +122,18 @@
                 el.style.transform = `scale(${state.deltaMultiplierDistance})`;
             }
 
-            sb.addEventListener('pointerDown', ({detail}) => renderPointer(detail));
+            sb.addEventListener('dragsterpointerdown', ({detail}) => renderPointer(detail));
+            sb.addEventListener('dragstervirtualpointerdown', ({detail}) => renderPointer(detail));
 
-            sb.addEventListener('pointerDrag', ({detail}) => movePointer(detail));
+            sb.addEventListener('dragsterpointerdrag', ({detail}) => movePointer(detail));
+            sb.addEventListener('dragstervirtualpointerdrag', ({detail}) => movePointer(detail));
 
-            sb.addEventListener('pointerPinch', ({detail}) => scalePointer(detail));
+            sb.addEventListener('dragsterpointerpinch', ({detail}) => scalePointer(detail));
 
-            sb.addEventListener('pointerUp', ({detail}) => flickPointer(detail));
+            sb.addEventListener('dragsterpointerup', ({detail}) => flickPointer(detail));
 
-            sb.addEventListener('pointerStop', ({detail}) => killPointer(detail));
+            sb.addEventListener('dragsterpointerstop', ({detail}) => killPointer(detail));
+            sb.addEventListener('dragstervirtualpointerstop', ({detail}) => killPointer(detail));
         </script>
     </body>
 </html>

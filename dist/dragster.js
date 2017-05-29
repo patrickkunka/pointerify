@@ -908,7 +908,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.isClicking = true;
 	
-	            this.emitStatic(e, _Constants.EVENT_POINTER_SEEK);
+	            this.emitStatic(e, _Constants.EVENT_POINTER_TAP);
 	
 	            while (typeof target.click !== 'function') {
 	                target = target.parentElement;
@@ -1002,13 +1002,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	var POINTER_STATUS_STOPPING = exports.POINTER_STATUS_STOPPING = Symbol('POINTER_STATUS_STOPPING');
 	var POINTER_STATUS_PINCHING = exports.POINTER_STATUS_PINCHING = Symbol('POINTER_STATUS_PINCHING');
 	
-	var EVENT_POINTER_DOWN = exports.EVENT_POINTER_DOWN = 'pointerDown';
-	var EVENT_POINTER_DRAG = exports.EVENT_POINTER_DRAG = 'pointerDrag';
-	var EVENT_POINTER_UP = exports.EVENT_POINTER_UP = 'pointerUp';
-	var EVENT_POINTER_STOP = exports.EVENT_POINTER_STOP = 'pointerStop';
-	var EVENT_POINTER_INSPECT = exports.EVENT_POINTER_INSPECT = 'pointerInspect';
-	var EVENT_POINTER_SEEK = exports.EVENT_POINTER_SEEK = 'pointerSeek';
-	var EVENT_POINTER_PINCH = exports.EVENT_POINTER_PINCH = 'pointerPinch';
+	var EVENT_POINTER_DOWN = exports.EVENT_POINTER_DOWN = 'dragsterpointerdown';
+	var EVENT_POINTER_DRAG = exports.EVENT_POINTER_DRAG = 'dragsterpointerdrag';
+	var EVENT_POINTER_UP = exports.EVENT_POINTER_UP = 'dragsterpointerup';
+	var EVENT_POINTER_STOP = exports.EVENT_POINTER_STOP = 'dragsterpointerstop';
+	var EVENT_POINTER_INSPECT = exports.EVENT_POINTER_INSPECT = 'dragsterpointerinspect';
+	var EVENT_POINTER_TAP = exports.EVENT_POINTER_TAP = 'dragsterpointertap';
+	var EVENT_VIRTUAL_POINTER_DOWN = exports.EVENT_VIRTUAL_POINTER_DOWN = 'dragstervirtualpointerdown';
+	var EVENT_VIRTUAL_POINTER_DRAG = exports.EVENT_VIRTUAL_POINTER_DRAG = 'dragstervirtualpointerdrag';
+	var EVENT_VIRTUAL_POINTER_PINCH = exports.EVENT_VIRTUAL_POINTER_PINCH = 'dragsterpointerpinch';
+	var EVENT_VIRTUAL_POINTER_STOP = exports.EVENT_VIRTUAL_POINTER_STOP = 'dragstervirtualpointerstop';
 	
 	var DIRECTION_STATIC = exports.DIRECTION_STATIC = Symbol('DIRECTION_STATIC');
 	var DIRECTION_LEFT = exports.DIRECTION_LEFT = Symbol('DIRECTION_LEFT');
@@ -1042,7 +1045,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    DIRECTION_UP: DIRECTION_UP,
 	    DIRECTION_DOWN: DIRECTION_DOWN,
 	    DIRECTION_CONVERGE: DIRECTION_CONVERGE,
-	    DIRECTION_DIVERGE: DIRECTION_DIVERGE
+	    DIRECTION_DIVERGE: DIRECTION_DIVERGE,
+	
+	    EVENT_POINTER_DOWN: EVENT_POINTER_DOWN,
+	    EVENT_POINTER_DRAG: EVENT_POINTER_DRAG,
+	    EVENT_POINTER_UP: EVENT_POINTER_UP,
+	    EVENT_POINTER_STOP: EVENT_POINTER_STOP,
+	    EVENT_POINTER_INSPECT: EVENT_POINTER_INSPECT,
+	    EVENT_POINTER_TAP: EVENT_POINTER_TAP,
+	    EVENT_VIRTUAL_POINTER_DOWN: EVENT_VIRTUAL_POINTER_DOWN,
+	    EVENT_VIRTUAL_POINTER_DRAG: EVENT_VIRTUAL_POINTER_DRAG,
+	    EVENT_VIRTUAL_POINTER_PINCH: EVENT_VIRTUAL_POINTER_PINCH,
+	    EVENT_VIRTUAL_POINTER_STOP: EVENT_VIRTUAL_POINTER_STOP
 	};
 
 /***/ },
@@ -1155,19 +1169,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _createClass(Pointer, [{
 	        key: 'down',
 	        value: function down() {
-	            this.dispatchEvent(_Constants.EVENT_POINTER_DOWN);
+	            if (this.isVirtualPointer) {
+	                this.dispatchEvent(_Constants.EVENT_VIRTUAL_POINTER_DOWN);
+	            } else {
+	                this.dispatchEvent(_Constants.EVENT_POINTER_DOWN);
+	            }
 	        }
 	    }, {
 	        key: 'move',
 	        value: function move() {
 	            if (!this.isMonitoring && !this.isStopping) this.startMonitorVelocity();
 	
-	            this.dispatchEvent(_Constants.EVENT_POINTER_DRAG);
+	            if (this.isVirtualPointer) {
+	                this.dispatchEvent(_Constants.EVENT_VIRTUAL_POINTER_DRAG);
+	            } else {
+	                this.dispatchEvent(_Constants.EVENT_POINTER_DRAG);
+	            }
 	        }
 	    }, {
 	        key: 'pinch',
 	        value: function pinch() {
-	            this.dispatchEvent(_Constants.EVENT_POINTER_PINCH);
+	            this.dispatchEvent(_Constants.EVENT_VIRTUAL_POINTER_PINCH);
 	        }
 	    }, {
 	        key: 'up',
@@ -1179,7 +1201,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'stop',
 	        value: function stop() {
-	            this.dispatchEvent(_Constants.EVENT_POINTER_STOP);
+	            if (this.isVirtualPointer) {
+	                this.dispatchEvent(_Constants.EVENT_VIRTUAL_POINTER_STOP);
+	            } else {
+	                this.dispatchEvent(_Constants.EVENT_POINTER_STOP);
+	            }
 	        }
 	    }, {
 	        key: 'startMonitorVelocity',
