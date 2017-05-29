@@ -20,7 +20,7 @@ All of Dragster's features are designed to reduce the amount of repetitive integ
 
 Dispatched from the dragster root element when the primary mouse button is depressed, or when a finger makes contact with the device glass.
 
-This event name can also be referenced via the `dragster.Constants.EVENT_POINTER_DOWN` constant.
+This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_DOWN` constant.
 
 `dragsterpointerdrag`
 
@@ -28,25 +28,25 @@ Dispatched from the dragster root element when the mouse is moved while its prim
 
 When `physics.intertia` is enabled, drag events will continue to be dispatched after the pointer is released, for an amount of time determined by the drag velocity at the time of release, and the specified `physics.friction` value.
 
-This event name can also be referenced via the `dragster.Constants.EVENT_POINTER_DRAG` constant.
+This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_DRAG` constant.
 
 `dragsterpointerup`
 
 Dispatched from the dragster root element when the primary mouse button is released after being depressed while within the root element, or when a finger leaves contact with the device glass after having made contact while within the root element.
 
-This event name can also be referenced via the `dragster.Constants.EVENT_POINTER_UP` constant.
+This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_UP` constant.
 
 `dragsterpointerstop`
 
 Dispatched from the dragster root element after the pointer is released (when inertia is disabled), or after the inertial phase of a "swipe" gesture, when the pointer comes to a complete stop as inertia is depleted due to friction (when inertia is enabled).
 
-This event name can also be referenced via the `dragster.Constants.EVENT_POINTER_STOP` constant.
+This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_STOP` constant.
 
 `dragsterpointerinspect`
 
 Dispatched from the dragster root element when the mouse moves across the root element without any buttons depressed. Similar to a "hover" event.
 
-This event name can also be referenced via the `dragster.Constants.EVENT_POINTER_INSPECT` constant.
+This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_INSPECT` constant.
 
 `dragsterpointertap`
 
@@ -54,31 +54,31 @@ Dispatched from the dragster root element when the primary mouse button is depre
 
 This event can be used as a substitute for `click` events in gesture-enabled UI where a swipe might cause unintended click events to be dispatched.
 
-This event name can also be referenced via the `dragster.Constants.EVENT_POINTER_TAP` constant.
+This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_TAP` constant.
 
 `dragstervirtualpointerdown`
 
 Dispatched from the dragster root element when two fingers come into contact with the device glass. A "virtual pointer" is created at the exact midpoint of the two touch points and forms the origin of any resulting "pinch" gestures.
 
-This event name can also be referenced via the `dragster.Constants.EVENT_VIRTUAL_POINTER_DOWN` constant.
+This event name can also be accessed via the `dragster.Constants.EVENT_VIRTUAL_POINTER_DOWN` constant.
 
 `dragstervirtualpointerdrag`
 
 See above. The virtual pointer equivalent of `dragsterpointermove`.
 
-This event name can also be referenced via the `dragster.Constants.EVENT_VIRTUAL_POINTER_DRAG` constant.
+This event name can also be accessed via the `dragster.Constants.EVENT_VIRTUAL_POINTER_DRAG` constant.
 
 `dragstervirtualpointpinch`
 
 Dispatched form the dragster root element when two fingers that are both in contact with the device glass converge or diverge from a midpoint, forming a "pinch" gesture.
 
-This event name can also be referenced via the `dragster.Constants.EVENT_VIRTUAL_POINTER_PINCH` constant.
+This event name can also be accessed via the `dragster.Constants.EVENT_VIRTUAL_POINTER_PINCH` constant.
 
 `dragstervirtualpointerstop`
 
 See above. The virtual pointer equivalent of `dragsterpointerstop`. Dispatched when the either one of the two physical touch points is stopped (either due to a pointer release, or the depletion of inertia).
 
-This event name can also be referenced via the `dragster.Constants.EVENT_POINTER_STOP` constant.
+This event name can also be accessed via the `dragster.Constants.EVENT_POINTER_STOP` constant.
 
 ---
 *&copy; 2017 Patrick Kunka / KunkaLabs Ltd*
