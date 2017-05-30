@@ -127,7 +127,7 @@ This event name can also be accessed via the `pointerify.Constants.EVENT_VIRTUAL
 
 #### `virtualPointerDestroy`
 
-Dispatched when a virtual pointer is destroyed in response to either one of its physical touch points stopping (either due to a pointer release, or the depletion of inertia).
+Dispatched when a virtual pointer is destroyed in response to the termination of either one of its physical touch points (either due to a pointer release, or the depletion of inertia).
 
 This event name can also be accessed via the `pointerify.Constants.EVENT_VIRTUAL_POINTER_DESTROY` constant.
 
