@@ -2,8 +2,16 @@
 
 A unified events-based API for mouse and multi-touch with built-in geometry and physics.
 
-Pointerify provides a simple, common set of intuitive DOM events for dealing with pointer interactions across mouse and touch platforms. As well as abstracting away the idiosyncrasies of the underlying mouse/touch events into one robust API, Pointerify also provides rich geometry data – in the form of pointer "state" objects – which include:
+### Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Instantiation](#instantiation)
+- [Events](#events)
 
+## Features
+Pointerify provides a simple, common set of intuitive DOM events for dealing with pointer interactions across mouse and touch platforms.
+
+As well as abstracting away the idiosyncrasies of the underlying mouse/touch events into one robust API, Pointerify also provides rich geometry data – in the form of pointer "state" objects – which include:
 - Element-centric X/Y positioning (as percentage-friendly multipliers)
 - X/Y deltas (as px and percentage-friendly multipliers)
 - X/Y velocities (in px/f)
@@ -13,11 +21,6 @@ Pointerify provides a simple, common set of intuitive DOM events for dealing wit
 Pointerify also features a lightweight, built-in physics engine to simulate inertia. This means that with inertia enabled, Pointerify will continue to dispatch "drag" events along the appropriate vector, after the mouse or touch pointer has been released, and until the specified friction coefficient has reduced the velocity to 0.
 
 All of Pointerify's features are designed to reduce the amount of repetitive integration code we have to write when building cross-platform swipe, flick, tap and pinch gesture-based UI, and can be used to rapidly develop UI such as carousels, sliders, image galleries, and media timeline/volume controls.
-
-### Contents
-- [Installation](#installation)
-- [Instantiation](#instantiation)
-- [Events](#events)
 
 ## Installation
 
@@ -124,7 +127,7 @@ This event name can also be accessed via the `pointerify.Constants.EVENT_VIRTUAL
 
 #### `virtualPointerDestroy`
 
-Dispatched when a virtual pointer is destroyed in response to either one of its physical touch points stopping (either due to a pointer release, or the depletion of inertia).
+Dispatched when a virtual pointer is destroyed in response to the termination of either one of its physical touch points (either due to a pointer release, or the depletion of inertia).
 
 This event name can also be accessed via the `pointerify.Constants.EVENT_VIRTUAL_POINTER_DESTROY` constant.
 
