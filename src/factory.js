@@ -1,14 +1,14 @@
 import Facade       from './Facade';
 import Constants    from './Constants';
 
-function dragster(root, config={}) {
+function pointerify(root, config={}) {
     return new Facade(root, config);
 }
 
-dragster.Constants = Constants;
+pointerify.Constants = Constants;
 
 // deprecated
 
-dragster.constants = Constants;
+pointerify.constants = Constants;
 
-module.exports = dragster;
+module.exports = pointerify;

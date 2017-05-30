@@ -21,7 +21,7 @@ import Config       from './config/Config';
 import events       from './events.json';
 import StateStatic  from './StateStatic';
 
-class Dragster {
+class Pointerify {
     /**
      * @constructor
      * @param {HTMLElement} root
@@ -60,7 +60,7 @@ class Dragster {
 
     init(root, config) {
         if (!(root instanceof HTMLElement)) {
-            throw new TypeError('[Dragster] Invalid root element');
+            throw new TypeError('[Pointerify] Invalid root element');
         }
 
         this.dom.root = root;
@@ -91,7 +91,7 @@ class Dragster {
             if ((clampAxis = behavior.clampAxis)) behavior.clampAxis = clampAxis.toUpperCase();
         }
 
-        Util.extend(this.config, config, true, Dragster.handleMergeError.bind(this));
+        Util.extend(this.config, config, true, Pointerify.handleMergeError.bind(this));
 
         this.config.physics.friction = Util.clamp(this.config.physics.friction, 0, 1);
     }
@@ -271,8 +271,8 @@ class Dragster {
             let didCancel = false;
 
             for (let activeId in this.touches) {
-                // If any active touches in this dragster are stopping (i.e.
-                // already released but moving through inertia), cancel them.
+                // If any active touches in this instance are stopping (i.e.
+                // already released but moving via inertia), cancel them.
 
                 let activePointer = null;
 
@@ -287,7 +287,7 @@ class Dragster {
 
             this.setRootGeometry();
 
-            if (this.totalTouches < 2) {
+            if (this.totalTouches < 2 && !this.touches[newId]) {
                 this.touches[newId] = this.createPointer(touch, POINTER_TYPE_TOUCH, didCancel);
             }
         }
@@ -387,12 +387,12 @@ class Dragster {
             pointer.status = POINTER_STATUS_EXTENDING;
         }
 
-        if (identifier) {
+        if (typeof identifier !== 'undefined') {
             pointer.id = identifier;
         }
 
-        pointer.type     = type;
-        pointer.dragster = this;
+        pointer.type      = type;
+        pointer.pointerify = this;
 
         pointer.startX = pointer.currentX = clientX;
         pointer.startY = pointer.currentY = clientY;
@@ -426,7 +426,7 @@ class Dragster {
         );
 
         pointer.type = POINTER_TYPE_VIRTUAL;
-        pointer.dragster = this;
+        pointer.pointerify = this;
 
         pointer.yinPointer = yinPointer;
         pointer.yangPointer = yangPointer;
@@ -530,7 +530,7 @@ class Dragster {
     releasePointer(pointer, e) {
         pointer.up();
 
-        if (pointer.isNew) {
+        if (pointer.isNew && !pointer.isVirtualPointer) {
             this.click(e);
         }
 
@@ -557,6 +557,7 @@ class Dragster {
 
 
     stopPointer(pointer) {
+        const STOPPED_PXPF = 0.5;
         const initialVelocityX = pointer.velocityX;
         const initialVelocityY = pointer.velocityY;
         const directionX = pointer.directionX;
@@ -572,7 +573,7 @@ class Dragster {
             newVelocityX = directionX === DIRECTION_RIGHT ? Math.max(0, newVelocityX) : Math.min(0, newVelocityX);
             newVelocityY = directionY === DIRECTION_DOWN ? Math.max(0, newVelocityY) : Math.min(0, newVelocityY);
 
-            if (newVelocityX === 0 && newVelocityY === 0) {
+            if (Math.abs(newVelocityX) < STOPPED_PXPF && Math.abs(newVelocityY) < STOPPED_PXPF) {
                 // Pointer is stationary
 
                 this.deletePointer(pointer);
@@ -649,9 +650,7 @@ class Dragster {
             this.deletePointer(this.virtual);
         }
 
-        if (!pointer.isPristine) {
-            pointer.stop();
-        }
+        pointer.stop();
     }
 
     /**
@@ -727,7 +726,7 @@ class Dragster {
 
         if (!(err instanceof TypeError) || !(matches = re.exec(err.message))) throw err;
 
-        const keys = Reflect.ownKeys(target);
+        const keys = Object.keys(target);
         const offender = matches[1].toLowerCase();
 
         const bestMatch = keys.reduce((bestMatch, key) => {
@@ -743,7 +742,7 @@ class Dragster {
 
         const suggestion = bestMatch ? `. Did you mean "${bestMatch}"?` : '';
 
-        throw new TypeError(`[Dragster] Invalid configuration option "${matches[1]}"${suggestion}`);
+        throw new TypeError(`[Pointerify] Invalid configuration option "${matches[1]}"${suggestion}`);
     }
 
     /* Public Methods
@@ -760,4 +759,4 @@ class Dragster {
     }
 }
 
-export default Dragster;
+export default Pointerify;

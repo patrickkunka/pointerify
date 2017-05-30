@@ -1,7 +1,7 @@
 {
-  "name": "dragster-js",
+  "name": "pointerify",
   "version": "0.3.0",
-  "main": "./dist/dragster.js",
+  "main": "./dist/pointerify.js",
   "scripts": {
     "webpack": "webpack --watch"
   },

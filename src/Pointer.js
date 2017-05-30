@@ -20,10 +20,10 @@ import {
     EVENT_POINTER_DRAG,
     EVENT_POINTER_UP,
     EVENT_POINTER_STOP,
-    EVENT_VIRTUAL_POINTER_DOWN,
-    EVENT_VIRTUAL_POINTER_DRAG,
+    EVENT_VIRTUAL_POINTER_CREATE,
+    EVENT_VIRTUAL_POINTER_MOVE,
     EVENT_VIRTUAL_POINTER_PINCH,
-    EVENT_VIRTUAL_POINTER_STOP
+    EVENT_VIRTUAL_POINTER_DESTROY
 } from './Constants';
 
 import StatePointer from './StatePointer';
@@ -45,7 +45,7 @@ class Pointer {
         this.velocitiesY        = [];
         this.velocitiesPinch    = [];
         this.type               = null;
-        this.dragster           = null;
+        this.pointerify         = null;
         this.yinPointer         = null;
         this.yangPointer        = null;
         this.status             = POINTER_STATUS_NEW;
@@ -166,7 +166,7 @@ class Pointer {
 
     down() {
         if (this.isVirtualPointer) {
-            this.dispatchEvent(EVENT_VIRTUAL_POINTER_DOWN);
+            this.dispatchEvent(EVENT_VIRTUAL_POINTER_CREATE);
         } else {
             this.dispatchEvent(EVENT_POINTER_DOWN);
         }
@@ -176,7 +176,7 @@ class Pointer {
         if (!this.isMonitoring && !this.isStopping) this.startMonitorVelocity();
 
         if (this.isVirtualPointer) {
-            this.dispatchEvent(EVENT_VIRTUAL_POINTER_DRAG);
+            this.dispatchEvent(EVENT_VIRTUAL_POINTER_MOVE);
         } else {
             this.dispatchEvent(EVENT_POINTER_DRAG);
         }
@@ -194,7 +194,7 @@ class Pointer {
 
     stop() {
         if (this.isVirtualPointer) {
-            this.dispatchEvent(EVENT_VIRTUAL_POINTER_STOP);
+            this.dispatchEvent(EVENT_VIRTUAL_POINTER_DESTROY);
         } else {
             this.dispatchEvent(EVENT_POINTER_STOP);
         }
@@ -240,12 +240,12 @@ class Pointer {
             bubbles: true
         });
 
-        this.dragster.emitEvent(event);
+        this.pointerify.emitEvent(event);
     }
 
     getState() {
         const state = new StatePointer();
-        const {clampX, clampY} = this.dragster.config.behavior;
+        const {clampX, clampY} = this.pointerify.config.behavior;
 
         state.id                      = `pointer-${this.id}`;
         state.deltaX                  = this.deltaX;

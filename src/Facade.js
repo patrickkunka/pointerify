@@ -1,8 +1,8 @@
-import _Dragster from './Dragster';
+import _Pointerify from './Pointerify';
 
-const Facade = class Dragster {
+const Facade = class Pointerify {
     constructor() {
-        const _ = new _Dragster(...arguments);
+        const _ = new _Pointerify(...arguments);
 
         this.destroy = _.destroy.bind(_);
         this.refresh = _.refresh.bind(_);

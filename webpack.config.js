@@ -6,9 +6,9 @@ const config = {
     devtool: 'source-map',
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: 'dragster.js',
+        filename: 'pointerify.js',
         sourceMapFilename: '[file].map',
-        library: 'dragster',
+        library: 'pointerify',
         libraryTarget: 'umd'
     },
     module: {

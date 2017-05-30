@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Dragster</title>
+        <title>Pointerify Demo</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
 
@@ -49,13 +49,13 @@
     </head>
     <body>
         <div id="sandbox">
-            Dragster Sandbox
+            Pointerify Sandbox
         </div>
 
-        <script src="../dist/dragster.js"></script>
+        <script src="../dist/pointerify.js"></script>
         <script>
             const sb = document.getElementById('sandbox');
-            const drg = dragster(sb, {
+            const ptr = pointerify(sb, {
                 behavior: {
                     // allowAxis: 'x'
                 },
@@ -64,6 +64,8 @@
                     // friction: 0.05
                 }
             });
+
+            console.log(ptr);
 
             function renderPointer(state) {
                 const el = document.createElement('div');
@@ -98,12 +100,12 @@
                 const el = document.getElementById(state.id);
 
                 el.classList.add('pointer__inertial');
-
-                console.log('flick', state);
             }
 
             function killPointer(state) {
                 const el = document.getElementById(state.id);
+
+                el.id = '';
 
                 el.style.transform = '';
 
@@ -122,18 +124,20 @@
                 el.style.transform = `scale(${state.deltaMultiplierDistance})`;
             }
 
-            sb.addEventListener('dragsterpointerdown', ({detail}) => renderPointer(detail));
-            sb.addEventListener('dragstervirtualpointerdown', ({detail}) => renderPointer(detail));
+            sb.addEventListener('pointerDown', ({detail}) => renderPointer(detail));
 
-            sb.addEventListener('dragsterpointerdrag', ({detail}) => movePointer(detail));
-            sb.addEventListener('dragstervirtualpointerdrag', ({detail}) => movePointer(detail));
+            sb.addEventListener('virtualPointerCreate', ({detail}) => renderPointer(detail));
 
-            sb.addEventListener('dragsterpointerpinch', ({detail}) => scalePointer(detail));
+            sb.addEventListener('pointerDrag', ({detail}) => movePointer(detail));
+            sb.addEventListener('virtualPointerMove', ({detail}) => movePointer(detail));
 
-            sb.addEventListener('dragsterpointerup', ({detail}) => flickPointer(detail));
+            sb.addEventListener('virtualPointerPinch', ({detail}) => scalePointer(detail));
 
-            sb.addEventListener('dragsterpointerstop', ({detail}) => killPointer(detail));
-            sb.addEventListener('dragstervirtualpointerstop', ({detail}) => killPointer(detail));
+            sb.addEventListener('pointerUp', ({detail}) => flickPointer(detail));
+
+            sb.addEventListener('pointerStop', ({detail}) => killPointer(detail));
+
+            sb.addEventListener('virtualPointerDestroy', ({detail}) => killPointer(detail));
         </script>
     </body>
 </html>

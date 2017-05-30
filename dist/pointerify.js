@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["dragster"] = factory();
+		exports["pointerify"] = factory();
 	else
-		root["dragster"] = factory();
+		root["pointerify"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -66,19 +66,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function dragster(root) {
+	function pointerify(root) {
 	    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 	    return new _Facade2.default(root, config);
 	}
 	
-	dragster.Constants = _Constants2.default;
+	pointerify.Constants = _Constants2.default;
 	
 	// deprecated
 	
-	dragster.constants = _Constants2.default;
+	pointerify.constants = _Constants2.default;
 	
-	module.exports = dragster;
+	module.exports = pointerify;
 
 /***/ },
 /* 1 */
@@ -90,18 +90,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _Dragster2 = __webpack_require__(2);
+	var _Pointerify2 = __webpack_require__(2);
 	
-	var _Dragster3 = _interopRequireDefault(_Dragster2);
+	var _Pointerify3 = _interopRequireDefault(_Pointerify2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var Facade = function Dragster() {
-	    _classCallCheck(this, Dragster);
+	var Facade = function Pointerify() {
+	    _classCallCheck(this, Pointerify);
 	
-	    var _ = new (Function.prototype.bind.apply(_Dragster3.default, [null].concat(Array.prototype.slice.call(arguments))))();
+	    var _ = new (Function.prototype.bind.apply(_Pointerify3.default, [null].concat(Array.prototype.slice.call(arguments))))();
 	
 	    this.destroy = _.destroy.bind(_);
 	    this.refresh = _.refresh.bind(_);
@@ -159,15 +159,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var Dragster = function () {
+	var Pointerify = function () {
 	    /**
 	     * @constructor
 	     * @param {HTMLElement} root
 	     * @param {object}      config
 	     */
 	
-	    function Dragster(root, config) {
-	        _classCallCheck(this, Dragster);
+	    function Pointerify(root, config) {
+	        _classCallCheck(this, Pointerify);
 	
 	        this.mouse = null;
 	        this.wheel = null;
@@ -184,7 +184,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.init(root, config);
 	    }
 	
-	    _createClass(Dragster, [{
+	    _createClass(Pointerify, [{
 	        key: 'init',
 	
 	
@@ -200,7 +200,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        value: function init(root, config) {
 	            if (!(root instanceof HTMLElement)) {
-	                throw new TypeError('[Dragster] Invalid root element');
+	                throw new TypeError('[Pointerify] Invalid root element');
 	            }
 	
 	            this.dom.root = root;
@@ -233,7 +233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (clampAxis = behavior.clampAxis) behavior.clampAxis = clampAxis.toUpperCase();
 	            }
 	
-	            _Util2.default.extend(this.config, config, true, Dragster.handleMergeError.bind(this));
+	            _Util2.default.extend(this.config, config, true, Pointerify.handleMergeError.bind(this));
 	
 	            this.config.physics.friction = _Util2.default.clamp(this.config.physics.friction, 0, 1);
 	        }
@@ -443,8 +443,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var didCancel = false;
 	
 	                for (var activeId in this.touches) {
-	                    // If any active touches in this dragster are stopping (i.e.
-	                    // already released but moving through inertia), cancel them.
+	                    // If any active touches in this instance are stopping (i.e.
+	                    // already released but moving via inertia), cancel them.
 	
 	                    var activePointer = null;
 	
@@ -459,7 +459,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                this.setRootGeometry();
 	
-	                if (this.totalTouches < 2) {
+	                if (this.totalTouches < 2 && !this.touches[newId]) {
 	                    this.touches[newId] = this.createPointer(touch, _Constants.POINTER_TYPE_TOUCH, didCancel);
 	                }
 	            }
@@ -575,12 +575,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                pointer.status = _Constants.POINTER_STATUS_EXTENDING;
 	            }
 	
-	            if (identifier) {
+	            if (typeof identifier !== 'undefined') {
 	                pointer.id = identifier;
 	            }
 	
 	            pointer.type = type;
-	            pointer.dragster = this;
+	            pointer.pointerify = this;
 	
 	            pointer.startX = pointer.currentX = clientX;
 	            pointer.startY = pointer.currentY = clientY;
@@ -613,7 +613,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var hypotenuse = _Util2.default.hypotenuse({ x: yinPointer.startX, y: yinPointer.startY }, { x: yangPointer.startX, y: yangPointer.startY });
 	
 	            pointer.type = _Constants.POINTER_TYPE_VIRTUAL;
-	            pointer.dragster = this;
+	            pointer.pointerify = this;
 	
 	            pointer.yinPointer = yinPointer;
 	            pointer.yangPointer = yangPointer;
@@ -723,7 +723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function releasePointer(pointer, e) {
 	            pointer.up();
 	
-	            if (pointer.isNew) {
+	            if (pointer.isNew && !pointer.isVirtualPointer) {
 	                this.click(e);
 	            }
 	
@@ -753,6 +753,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function stopPointer(pointer) {
 	            var _this2 = this;
 	
+	            var STOPPED_PXPF = 0.5;
 	            var initialVelocityX = pointer.velocityX;
 	            var initialVelocityY = pointer.velocityY;
 	            var directionX = pointer.directionX;
@@ -768,7 +769,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                newVelocityX = directionX === _Constants.DIRECTION_RIGHT ? Math.max(0, newVelocityX) : Math.min(0, newVelocityX);
 	                newVelocityY = directionY === _Constants.DIRECTION_DOWN ? Math.max(0, newVelocityY) : Math.min(0, newVelocityY);
 	
-	                if (newVelocityX === 0 && newVelocityY === 0) {
+	                if (Math.abs(newVelocityX) < STOPPED_PXPF && Math.abs(newVelocityY) < STOPPED_PXPF) {
 	                    // Pointer is stationary
 	
 	                    _this2.deletePointer(pointer);
@@ -849,9 +850,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.deletePointer(this.virtual);
 	            }
 	
-	            if (!pointer.isPristine) {
-	                pointer.stop();
-	            }
+	            pointer.stop();
 	        }
 	
 	        /**
@@ -959,7 +958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (!(err instanceof TypeError) || !(matches = re.exec(err.message))) throw err;
 	
-	            var keys = Reflect.ownKeys(target);
+	            var keys = Object.keys(target);
 	            var offender = matches[1].toLowerCase();
 	
 	            var bestMatch = keys.reduce(function (bestMatch, key) {
@@ -972,14 +971,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var suggestion = bestMatch ? '. Did you mean "' + bestMatch + '"?' : '';
 	
-	            throw new TypeError('[Dragster] Invalid configuration option "' + matches[1] + '"' + suggestion);
+	            throw new TypeError('[Pointerify] Invalid configuration option "' + matches[1] + '"' + suggestion);
 	        }
 	    }]);
 	
-	    return Dragster;
+	    return Pointerify;
 	}();
 	
-	exports.default = Dragster;
+	exports.default = Pointerify;
 
 /***/ },
 /* 3 */
@@ -1002,16 +1001,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	var POINTER_STATUS_STOPPING = exports.POINTER_STATUS_STOPPING = Symbol('POINTER_STATUS_STOPPING');
 	var POINTER_STATUS_PINCHING = exports.POINTER_STATUS_PINCHING = Symbol('POINTER_STATUS_PINCHING');
 	
-	var EVENT_POINTER_DOWN = exports.EVENT_POINTER_DOWN = 'dragsterpointerdown';
-	var EVENT_POINTER_DRAG = exports.EVENT_POINTER_DRAG = 'dragsterpointerdrag';
-	var EVENT_POINTER_UP = exports.EVENT_POINTER_UP = 'dragsterpointerup';
-	var EVENT_POINTER_STOP = exports.EVENT_POINTER_STOP = 'dragsterpointerstop';
-	var EVENT_POINTER_INSPECT = exports.EVENT_POINTER_INSPECT = 'dragsterpointerinspect';
-	var EVENT_POINTER_TAP = exports.EVENT_POINTER_TAP = 'dragsterpointertap';
-	var EVENT_VIRTUAL_POINTER_DOWN = exports.EVENT_VIRTUAL_POINTER_DOWN = 'dragstervirtualpointerdown';
-	var EVENT_VIRTUAL_POINTER_DRAG = exports.EVENT_VIRTUAL_POINTER_DRAG = 'dragstervirtualpointerdrag';
-	var EVENT_VIRTUAL_POINTER_PINCH = exports.EVENT_VIRTUAL_POINTER_PINCH = 'dragsterpointerpinch';
-	var EVENT_VIRTUAL_POINTER_STOP = exports.EVENT_VIRTUAL_POINTER_STOP = 'dragstervirtualpointerstop';
+	var EVENT_POINTER_DOWN = exports.EVENT_POINTER_DOWN = 'pointerDown';
+	var EVENT_POINTER_DRAG = exports.EVENT_POINTER_DRAG = 'pointerDrag';
+	var EVENT_POINTER_UP = exports.EVENT_POINTER_UP = 'pointerUp';
+	var EVENT_POINTER_STOP = exports.EVENT_POINTER_STOP = 'pointerStop';
+	var EVENT_POINTER_INSPECT = exports.EVENT_POINTER_INSPECT = 'pointerInspect';
+	var EVENT_POINTER_TAP = exports.EVENT_POINTER_TAP = 'pointerTap';
+	var EVENT_VIRTUAL_POINTER_CREATE = exports.EVENT_VIRTUAL_POINTER_CREATE = 'virtualPointerCreate';
+	var EVENT_VIRTUAL_POINTER_MOVE = exports.EVENT_VIRTUAL_POINTER_MOVE = 'virtualPointerMove';
+	var EVENT_VIRTUAL_POINTER_PINCH = exports.EVENT_VIRTUAL_POINTER_PINCH = 'virtualPointerPinch';
+	var EVENT_VIRTUAL_POINTER_DESTROY = exports.EVENT_VIRTUAL_POINTER_DESTROY = 'virtualPointerDestroy';
 	
 	var DIRECTION_STATIC = exports.DIRECTION_STATIC = Symbol('DIRECTION_STATIC');
 	var DIRECTION_LEFT = exports.DIRECTION_LEFT = Symbol('DIRECTION_LEFT');
@@ -1053,10 +1052,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    EVENT_POINTER_STOP: EVENT_POINTER_STOP,
 	    EVENT_POINTER_INSPECT: EVENT_POINTER_INSPECT,
 	    EVENT_POINTER_TAP: EVENT_POINTER_TAP,
-	    EVENT_VIRTUAL_POINTER_DOWN: EVENT_VIRTUAL_POINTER_DOWN,
-	    EVENT_VIRTUAL_POINTER_DRAG: EVENT_VIRTUAL_POINTER_DRAG,
+	    EVENT_VIRTUAL_POINTER_CREATE: EVENT_VIRTUAL_POINTER_CREATE,
+	    EVENT_VIRTUAL_POINTER_MOVE: EVENT_VIRTUAL_POINTER_MOVE,
 	    EVENT_VIRTUAL_POINTER_PINCH: EVENT_VIRTUAL_POINTER_PINCH,
-	    EVENT_VIRTUAL_POINTER_STOP: EVENT_VIRTUAL_POINTER_STOP
+	    EVENT_VIRTUAL_POINTER_DESTROY: EVENT_VIRTUAL_POINTER_DESTROY
 	};
 
 /***/ },
@@ -1154,7 +1153,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.velocitiesY = [];
 	        this.velocitiesPinch = [];
 	        this.type = null;
-	        this.dragster = null;
+	        this.pointerify = null;
 	        this.yinPointer = null;
 	        this.yangPointer = null;
 	        this.status = _Constants.POINTER_STATUS_NEW;
@@ -1170,7 +1169,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'down',
 	        value: function down() {
 	            if (this.isVirtualPointer) {
-	                this.dispatchEvent(_Constants.EVENT_VIRTUAL_POINTER_DOWN);
+	                this.dispatchEvent(_Constants.EVENT_VIRTUAL_POINTER_CREATE);
 	            } else {
 	                this.dispatchEvent(_Constants.EVENT_POINTER_DOWN);
 	            }
@@ -1181,7 +1180,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!this.isMonitoring && !this.isStopping) this.startMonitorVelocity();
 	
 	            if (this.isVirtualPointer) {
-	                this.dispatchEvent(_Constants.EVENT_VIRTUAL_POINTER_DRAG);
+	                this.dispatchEvent(_Constants.EVENT_VIRTUAL_POINTER_MOVE);
 	            } else {
 	                this.dispatchEvent(_Constants.EVENT_POINTER_DRAG);
 	            }
@@ -1202,7 +1201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'stop',
 	        value: function stop() {
 	            if (this.isVirtualPointer) {
-	                this.dispatchEvent(_Constants.EVENT_VIRTUAL_POINTER_STOP);
+	                this.dispatchEvent(_Constants.EVENT_VIRTUAL_POINTER_DESTROY);
 	            } else {
 	                this.dispatchEvent(_Constants.EVENT_POINTER_STOP);
 	            }
@@ -1253,15 +1252,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                bubbles: true
 	            });
 	
-	            this.dragster.emitEvent(event);
+	            this.pointerify.emitEvent(event);
 	        }
 	    }, {
 	        key: 'getState',
 	        value: function getState() {
 	            var state = new _StatePointer2.default();
-	            var _dragster$config$beha = this.dragster.config.behavior,
-	                clampX = _dragster$config$beha.clampX,
-	                clampY = _dragster$config$beha.clampY;
+	            var _pointerify$config$be = this.pointerify.config.behavior,
+	                clampX = _pointerify$config$be.clampX,
+	                clampY = _pointerify$config$be.clampY;
 	
 	
 	            state.id = 'pointer-' + this.id;
@@ -2065,4 +2064,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=dragster.js.map
+//# sourceMappingURL=pointerify.js.map
