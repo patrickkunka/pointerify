@@ -13,6 +13,8 @@
                 border-radius: 999px;
                 height: 30px;
                 width: 30px;
+                margin-left: -15px;
+                margin-right: -15px;
                 background: rgba(255, 0, 0, .5);
                 transition: transform 300ms;
                 transform: scale(0);
@@ -65,8 +67,6 @@
                 }
             });
 
-            console.log(ptr);
-
             function renderPointer(state) {
                 const el = document.createElement('div');
 
@@ -81,7 +81,11 @@
                 } else if (state.isTouchPointer) {
                     el.classList.add('pointer__touch');
                 } else if (state.isVirtualPointer) {
+                    const width = state.multiplierDistance;
+
                     el.classList.add('pointer__virtual');
+
+                    el.style.width = width + '%';
                 }
 
                 sb.appendChild(el);
@@ -121,7 +125,7 @@
 
                 el.classList.add('pointer__pinching');
 
-                el.style.transform = `scale(${state.deltaMultiplierDistance})`;
+                el.style.transform = `scale(${1 + state.deltaMultiplierDistance})`;
             }
 
             sb.addEventListener('pointerDown', ({detail}) => renderPointer(detail));

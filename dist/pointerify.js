@@ -1311,7 +1311,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'deltaMultiplierDistance',
 	        get: function get() {
-	            return (this.deltaDistance + this.startDistance) / this.startDistance;
+	            return this.deltaDistance / this.startDistance;
 	        }
 	    }, {
 	        key: 'multiplierX',

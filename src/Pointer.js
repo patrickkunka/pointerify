@@ -78,7 +78,7 @@ class Pointer {
     }
 
     get deltaMultiplierDistance() {
-        return (this.deltaDistance + this.startDistance) / this.startDistance;
+        return this.deltaDistance / this.startDistance;
     }
 
     get multiplierX() {
