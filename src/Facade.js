@@ -4,8 +4,9 @@ const Facade = class Pointerify {
     constructor() {
         const _ = new _Pointerify(...arguments);
 
-        this.destroy = _.destroy.bind(_);
-        this.refresh = _.refresh.bind(_);
+        this.configure  = _.configure.bind(_);
+        this.destroy    = _.destroy.bind(_);
+        this.refresh    = _.refresh.bind(_);
 
         Object.seal(this);
     }

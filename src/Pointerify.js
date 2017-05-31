@@ -74,30 +74,6 @@ class Pointerify {
 
     /**
      * @private
-     * @param   {object} config
-     * @return  {void}
-     */
-
-    configure(config) {
-        let behavior = null;
-
-        if ((behavior = config.behavior)) {
-            // Uppercase enum values if present
-
-            let allowAxis = '';
-            let clampAxis = '';
-
-            if ((allowAxis = behavior.allowAxis)) behavior.allowAxis = allowAxis.toUpperCase();
-            if ((clampAxis = behavior.clampAxis)) behavior.clampAxis = clampAxis.toUpperCase();
-        }
-
-        Util.extend(this.config, config, true, Pointerify.handleMergeError.bind(this));
-
-        this.config.physics.friction = Util.clamp(this.config.physics.friction, 0, 1);
-    }
-
-    /**
-     * @private
      * @param   {Array.<object>} eventsRaw
      * @return  {Array.<EventBinding>}
      */
@@ -351,15 +327,6 @@ class Pointerify {
      */
 
     handleResize() {
-        this.setRootGeometry();
-    }
-
-    /**
-     * @public
-     * @return {void}
-     */
-
-    refresh() {
         this.setRootGeometry();
     }
 
@@ -743,6 +710,39 @@ class Pointerify {
 
     /* Public Methods
     ---------------------------------------------------------------------- */
+
+    /**
+     * @public
+     * @param   {object} config
+     * @return  {void}
+     */
+
+    configure(config) {
+        let behavior = null;
+
+        if ((behavior = config.behavior)) {
+            // Uppercase enum values if present
+
+            let allowAxis = '';
+            let clampAxis = '';
+
+            if ((allowAxis = behavior.allowAxis)) behavior.allowAxis = allowAxis.toUpperCase();
+            if ((clampAxis = behavior.clampAxis)) behavior.clampAxis = clampAxis.toUpperCase();
+        }
+
+        Util.extend(this.config, config, true, Pointerify.handleMergeError.bind(this));
+
+        this.config.physics.friction = Util.clamp(this.config.physics.friction, 0, 1);
+    }
+
+    /**
+     * @public
+     * @return {void}
+     */
+
+    refresh() {
+        this.setRootGeometry();
+    }
 
     /**
      * @public

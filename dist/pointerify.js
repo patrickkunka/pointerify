@@ -103,6 +103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _ = new (Function.prototype.bind.apply(_Pointerify3.default, [null].concat(Array.prototype.slice.call(arguments))))();
 	
+	    this.configure = _.configure.bind(_);
 	    this.destroy = _.destroy.bind(_);
 	    this.refresh = _.refresh.bind(_);
 	
@@ -210,32 +211,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.setRootGeometry();
 	
 	            this.bindEvents(_events2.default);
-	        }
-	
-	        /**
-	         * @private
-	         * @param   {object} config
-	         * @return  {void}
-	         */
-	
-	    }, {
-	        key: 'configure',
-	        value: function configure(config) {
-	            var behavior = null;
-	
-	            if (behavior = config.behavior) {
-	                // Uppercase enum values if present
-	
-	                var allowAxis = '';
-	                var clampAxis = '';
-	
-	                if (allowAxis = behavior.allowAxis) behavior.allowAxis = allowAxis.toUpperCase();
-	                if (clampAxis = behavior.clampAxis) behavior.clampAxis = clampAxis.toUpperCase();
-	            }
-	
-	            _Util2.default.extend(this.config, config, true, Pointerify.handleMergeError.bind(this));
-	
-	            this.config.physics.friction = _Util2.default.clamp(this.config.physics.friction, 0, 1);
 	        }
 	
 	        /**
@@ -529,17 +504,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleResize',
 	        value: function handleResize() {
-	            this.setRootGeometry();
-	        }
-	
-	        /**
-	         * @public
-	         * @return {void}
-	         */
-	
-	    }, {
-	        key: 'refresh',
-	        value: function refresh() {
 	            this.setRootGeometry();
 	        }
 	
@@ -925,7 +889,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	
 	    }, {
-	        key: 'destroy',
+	        key: 'configure',
 	
 	
 	        /* Public Methods
@@ -933,10 +897,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        /**
 	         * @public
+	         * @param   {object} config
+	         * @return  {void}
+	         */
+	
+	        value: function configure(config) {
+	            var behavior = null;
+	
+	            if (behavior = config.behavior) {
+	                // Uppercase enum values if present
+	
+	                var allowAxis = '';
+	                var clampAxis = '';
+	
+	                if (allowAxis = behavior.allowAxis) behavior.allowAxis = allowAxis.toUpperCase();
+	                if (clampAxis = behavior.clampAxis) behavior.clampAxis = clampAxis.toUpperCase();
+	            }
+	
+	            _Util2.default.extend(this.config, config, true, Pointerify.handleMergeError.bind(this));
+	
+	            this.config.physics.friction = _Util2.default.clamp(this.config.physics.friction, 0, 1);
+	        }
+	
+	        /**
 	         * @public
 	         * @return {void}
 	         */
 	
+	    }, {
+	        key: 'refresh',
+	        value: function refresh() {
+	            this.setRootGeometry();
+	        }
+	
+	        /**
+	         * @public
+	         * @public
+	         * @return {void}
+	         */
+	
+	    }, {
+	        key: 'destroy',
 	        value: function destroy() {
 	            this.unbindEvents(this.bindings);
 	        }
