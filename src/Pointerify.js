@@ -478,19 +478,15 @@ class Pointerify {
         }
 
         if (!pointer.isMoving) {
-            const vector = Math.abs(pointer.deltaX / pointer.deltaY);
+            // NB: Do not use deltas here as may report `0`
+
+            const vector = Math.abs((pointer.currentX - pointer.startX) / (pointer.currentY - pointer.startY));
 
             if (allowAxis === AXIS_X && vector < 1 || allowAxis === AXIS_Y && vector >= 1) {
                 this.deletePointer(pointer);
 
                 return;
             }
-        }
-
-        if (allowAxis === AXIS_X) {
-            pointer.currentY = pointer.startY;
-        } if (allowAxis === AXIS_Y) {
-            pointer.currentX = pointer.startX;
         }
 
         if (pointer.isVirtualPointer && e === null) {

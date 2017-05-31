@@ -1,6 +1,8 @@
 import Util from './Util';
 
 import {
+    AXIS_X,
+    AXIS_Y,
     DIRECTION_STATIC,
     DIRECTION_LEFT,
     DIRECTION_RIGHT,
@@ -58,11 +60,11 @@ class Pointer {
     }
 
     get deltaX() {
-        return this.currentX - this.startX;
+        return this.pointerify.config.behavior.allowAxis === AXIS_Y ? 0 : this.currentX - this.startX;
     }
 
     get deltaY() {
-        return this.currentY - this.startY;
+        return this.pointerify.config.behavior.allowAxis === AXIS_X ? 0 : this.currentY - this.startY;
     }
 
     get deltaDistance() {
@@ -90,11 +92,13 @@ class Pointer {
     }
 
     get velocityX() {
-        return this.velocitiesX.length ? this.velocitiesX.reduce((value, sum) => value + sum, 0) / this.velocitiesX.length : 0;
+        return this.velocitiesX.length && this.pointerify.config.behavior.allowAxis !== AXIS_Y ?
+            this.velocitiesX.reduce((value, sum) => value + sum, 0) / this.velocitiesX.length : 0;
     }
 
     get velocityY() {
-        return this.velocitiesY.length ? this.velocitiesY.reduce((value, sum) => value + sum, 0) / this.velocitiesY.length : 0;
+        return this.velocitiesY.length && this.pointerify.config.behavior.allowAxis !== AXIS_X ?
+            this.velocitiesY.reduce((value, sum) => value + sum, 0) / this.velocitiesY.length : 0;
     }
 
     get velocityPinch() {

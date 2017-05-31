@@ -52,7 +52,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -80,9 +80,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	module.exports = pointerify;
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -111,9 +111,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = Facade;
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -667,19 +667,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            if (!pointer.isMoving) {
-	                var vector = Math.abs(pointer.deltaX / pointer.deltaY);
+	                // NB: Do not use deltas here as may report `0`
+	
+	                var vector = Math.abs((pointer.currentX - pointer.startX) / (pointer.currentY - pointer.startY));
 	
 	                if (allowAxis === _Constants.AXIS_X && vector < 1 || allowAxis === _Constants.AXIS_Y && vector >= 1) {
 	                    this.deletePointer(pointer);
 	
 	                    return;
 	                }
-	            }
-	
-	            if (allowAxis === _Constants.AXIS_X) {
-	                pointer.currentY = pointer.startY;
-	            }if (allowAxis === _Constants.AXIS_Y) {
-	                pointer.currentX = pointer.startX;
 	            }
 	
 	            if (pointer.isVirtualPointer && e === null) {
@@ -980,9 +976,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = Pointerify;
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -1058,9 +1054,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    EVENT_VIRTUAL_POINTER_DESTROY: EVENT_VIRTUAL_POINTER_DESTROY
 	};
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	
@@ -1079,9 +1075,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = Dom;
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -1108,9 +1104,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = EventBinding;
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1286,12 +1282,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'deltaX',
 	        get: function get() {
-	            return this.currentX - this.startX;
+	            return this.pointerify.config.behavior.allowAxis === _Constants.AXIS_Y ? 0 : this.currentX - this.startX;
 	        }
 	    }, {
 	        key: 'deltaY',
 	        get: function get() {
-	            return this.currentY - this.startY;
+	            return this.pointerify.config.behavior.allowAxis === _Constants.AXIS_X ? 0 : this.currentY - this.startY;
 	        }
 	    }, {
 	        key: 'deltaDistance',
@@ -1326,14 +1322,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'velocityX',
 	        get: function get() {
-	            return this.velocitiesX.length ? this.velocitiesX.reduce(function (value, sum) {
+	            return this.velocitiesX.length && this.pointerify.config.behavior.allowAxis !== _Constants.AXIS_Y ? this.velocitiesX.reduce(function (value, sum) {
 	                return value + sum;
 	            }, 0) / this.velocitiesX.length : 0;
 	        }
 	    }, {
 	        key: 'velocityY',
 	        get: function get() {
-	            return this.velocitiesY.length ? this.velocitiesY.reduce(function (value, sum) {
+	            return this.velocitiesY.length && this.pointerify.config.behavior.allowAxis !== _Constants.AXIS_X ? this.velocitiesY.reduce(function (value, sum) {
 	                return value + sum;
 	            }, 0) / this.velocitiesY.length : 0;
 	        }
@@ -1424,9 +1420,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = Pointer;
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -1754,9 +1750,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = Util;
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1817,9 +1813,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = StatePointer;
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1855,9 +1851,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = Config;
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1918,9 +1914,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = ConfigBehavior;
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1952,9 +1948,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = ConfigPhysics;
 
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1982,9 +1978,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = ConfigSelectors;
 
-/***/ },
+/***/ }),
 /* 13 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = [
 		{
@@ -2037,9 +2033,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	];
 
-/***/ },
+/***/ }),
 /* 14 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	
@@ -2060,7 +2056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = StateStatic;
 
-/***/ }
+/***/ })
 /******/ ])
 });
 ;
