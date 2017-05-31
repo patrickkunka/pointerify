@@ -35,6 +35,11 @@ export const AXIS_BOTH = 'BOTH';
 export const AXIS_NONE = 'NONE';
 
 export default {
+    AXIS_X,
+    AXIS_Y,
+    AXIS_BOTH,
+    AXIS_NONE,
+
     POINTER_TYPE_MOUSE,
     POINTER_TYPE_HOVER,
     POINTER_TYPE_TOUCH,

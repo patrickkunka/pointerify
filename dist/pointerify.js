@@ -1023,6 +1023,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var AXIS_NONE = exports.AXIS_NONE = 'NONE';
 	
 	exports.default = {
+	    AXIS_X: AXIS_X,
+	    AXIS_Y: AXIS_Y,
+	    AXIS_BOTH: AXIS_BOTH,
+	    AXIS_NONE: AXIS_NONE,
+	
 	    POINTER_TYPE_MOUSE: POINTER_TYPE_MOUSE,
 	    POINTER_TYPE_HOVER: POINTER_TYPE_HOVER,
 	    POINTER_TYPE_TOUCH: POINTER_TYPE_TOUCH,
