@@ -51,21 +51,33 @@
     </head>
     <body>
         <div id="sandbox">
-            Pointerify Sandbox
+            <pre id="log">
+
+            </pre>
         </div>
 
         <script src="../dist/pointerify.js"></script>
         <script>
             const sb = document.getElementById('sandbox');
+            const logger = document.getElementById('log');
+
             const ptr = pointerify(sb, {
                 behavior: {
-                    // allowAxis: 'x'
+                    allowAxis: 'x'
                 },
                 physics: {
                     // inertia: false,
                     // friction: 0.05
                 }
             });
+
+            function printlog(e) {
+                const div = document.createElement('div');
+
+                div.textContent = e.type + ' ' + e.detail.id;
+
+                logger.appendChild(div);
+            }
 
             function renderPointer(state) {
                 const el = document.createElement('div');
@@ -128,20 +140,53 @@
                 el.style.transform = `scale(${1 + state.deltaMultiplierDistance})`;
             }
 
-            sb.addEventListener('pointerDown', ({detail}) => renderPointer(detail));
+            sb.addEventListener('pointerDown', (e) => {
+                printlog(e);
 
-            sb.addEventListener('virtualPointerCreate', ({detail}) => renderPointer(detail));
+                renderPointer(e.detail);
+            });
 
-            sb.addEventListener('pointerDrag', ({detail}) => movePointer(detail));
-            sb.addEventListener('virtualPointerMove', ({detail}) => movePointer(detail));
+            sb.addEventListener('virtualPointerCreate', (e) => {
+                printlog(e);
 
-            sb.addEventListener('virtualPointerPinch', ({detail}) => scalePointer(detail));
+                renderPointer(e.detail);
+            });
 
-            sb.addEventListener('pointerUp', ({detail}) => flickPointer(detail));
+            sb.addEventListener('pointerDrag', (e) => {
+                printlog(e);
 
-            sb.addEventListener('pointerStop', ({detail}) => killPointer(detail));
+                movePointer(e.detail);
+            });
 
-            sb.addEventListener('virtualPointerDestroy', ({detail}) => killPointer(detail));
+            sb.addEventListener('virtualPointerMove', (e) => {
+                printlog(e);
+
+                movePointer(e.detail)
+            });
+
+            sb.addEventListener('virtualPointerPinch', (e) => {
+                printlog(e);
+
+                scalePointer(e.detail);
+            });
+
+            sb.addEventListener('pointerUp', (e) => {
+                printlog(e);
+
+                flickPointer(e.detail);
+            });
+
+            sb.addEventListener('pointerStop', (e) => {
+                printlog(e);
+
+                killPointer(e.detail);
+            });
+
+            sb.addEventListener('virtualPointerDestroy', (e) => {
+                printlog(e);
+
+                killPointer(e.detail);
+            });
         </script>
     </body>
 </html>

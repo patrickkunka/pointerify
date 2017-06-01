@@ -425,6 +425,8 @@ class Pointerify {
     movePointer(pointer, e=null, originalEvent=null) {
         const allowAxis = this.config.behavior.allowAxis;
 
+        let isValidVector = true;
+
         if (pointer.isVirtualPointer) {
             const hypotenuse = Util.hypotenuse(
                 {x: pointer.yinPointer.currentX, y: pointer.yinPointer.currentY},
@@ -452,23 +454,29 @@ class Pointerify {
             const vector = Math.abs((pointer.currentX - pointer.startX) / (pointer.currentY - pointer.startY));
 
             if (allowAxis === AXIS_X && vector < 1 || allowAxis === AXIS_Y && vector >= 1) {
-                this.deletePointer(pointer);
+                // this.deletePointer(pointer);
 
-                return;
+                isValidVector = false;
             }
         }
 
-        if (pointer.isVirtualPointer && e === null) {
-            pointer.status = POINTER_STATUS_STOPPING;
-        } else {
-            pointer.status = POINTER_STATUS_MOVING;
+        if (isValidVector) {
+            // Vector is within range, move pointer
+
+            if (pointer.isVirtualPointer && e === null) {
+                pointer.status = POINTER_STATUS_STOPPING;
+            } else {
+                pointer.status = POINTER_STATUS_MOVING;
+            }
+
+            pointer.move();
+
+            if (!pointer.isVirtualPointer) {
+                originalEvent.preventDefault();
+            }
         }
 
-        pointer.move();
-
-        if (!pointer.isVirtualPointer) {
-            originalEvent.preventDefault();
-        }
+        // Move virtual pointer, regardless of vector
 
         if (pointer.isTouchPointer && this.virtual !== null) {
             this.movePointer(this.virtual, e, originalEvent);
@@ -493,25 +501,26 @@ class Pointerify {
      */
 
     releasePointer(pointer, e) {
+        // NB: `pointerUp` fired before pointer is deleted
+        // and is included in `totalTouches` at time of event. May
+        // be counterintruitive, but is neccessary if `pointerStop`
+        // must always fire after `pointerUp`.
+
         pointer.up();
 
         if (pointer.isNew && !pointer.isVirtualPointer) {
             this.click(e);
         }
 
-        if (!pointer.isMoving) {
+        if (!pointer.isMoving || !this.config.physics.inertia) {
+            // Not moving, or inertia not enabled, delete immediately
+
             this.deletePointer(pointer);
+        } else {
+            // Moving + inertia enabled, allow natural stop then delete
 
-            return;
-        }
-
-        if (this.config.physics.inertia) {
             this.stopPointer(pointer);
-
-            return;
         }
-
-        this.deletePointer(pointer);
     }
 
     /**
@@ -596,6 +605,8 @@ class Pointerify {
      */
 
     deletePointer(pointer) {
+        pointer.stop();
+
         switch (pointer.type) {
             case POINTER_TYPE_MOUSE:
                 this.mouse = null;
@@ -614,8 +625,6 @@ class Pointerify {
         if (this.totalTouches < 2 && this.virtual) {
             this.deletePointer(this.virtual);
         }
-
-        pointer.stop();
     }
 
     /**
