@@ -2,7 +2,7 @@
     <head>
         <title>Pointerify Demo</title>
 
-        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
         <link rel="stylesheet" href="./reset.css"/>
         <link rel="stylesheet" href="./style.css"/>
@@ -59,7 +59,7 @@
             const sb = document.getElementById('sandbox');
             const ptr = pointerify(sb, {
                 behavior: {
-                    allowAxis: 'x'
+                    // allowAxis: 'x'
                 },
                 physics: {
                     // inertia: false,

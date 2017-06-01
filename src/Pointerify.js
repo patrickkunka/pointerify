@@ -276,6 +276,8 @@ class Pointerify {
             // Multiple touches exist, create a "virtual" pointer at the
             // midpoint
 
+            e.preventDefault();
+
             this.virtual = this.createVirtualPointer(this.touches[touchIds[0]], this.touches[touchIds[1]]);
         }
     }
