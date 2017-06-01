@@ -622,8 +622,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var allowAxis = this.config.behavior.allowAxis;
 	
-	            var isValidVector = true;
-	
 	            if (pointer.isVirtualPointer) {
 	                var hypotenuse = _Util2.default.hypotenuse({ x: pointer.yinPointer.currentX, y: pointer.yinPointer.currentY }, { x: pointer.yangPointer.currentX, y: pointer.yangPointer.currentY });
 	
@@ -648,13 +646,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var vector = Math.abs((pointer.currentX - pointer.startX) / (pointer.currentY - pointer.startY));
 	
 	                if (allowAxis === _Constants.AXIS_X && vector < 1 || allowAxis === _Constants.AXIS_Y && vector >= 1) {
-	                    // this.deletePointer(pointer);
-	
-	                    isValidVector = false;
+	                    pointer.status = _Constants.POINTER_STATUS_INVALID;
 	                }
 	            }
 	
-	            if (isValidVector) {
+	            if (!pointer.isInvalid) {
 	                // Vector is within range, move pointer
 	
 	                if (pointer.isVirtualPointer && e === null) {
@@ -1011,6 +1007,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var POINTER_TYPE_VIRTUAL = exports.POINTER_TYPE_VIRTUAL = Symbol('POINTER_TYPE_VIRTUAL');
 	
 	var POINTER_STATUS_NEW = exports.POINTER_STATUS_NEW = Symbol('POINTER_STATUS_NEW');
+	var POINTER_STATUS_INVALID = exports.POINTER_STATUS_INVALID = Symbol('POINTER_STATUS_INVALID');
 	var POINTER_STATUS_EXTENDING = exports.POINTER_STATUS_EXTENDING = Symbol('POINTER_STATUS_EXTENDING');
 	var POINTER_STATUS_MOVING = exports.POINTER_STATUS_MOVING = Symbol('POINTER_STATUS_MOVING');
 	var POINTER_STATUS_INSPECTING = exports.POINTER_STATUS_INSPECTING = Symbol('POINTER_STATUS_INSPECTING');
@@ -1053,6 +1050,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    POINTER_TYPE_VIRTUAL: POINTER_TYPE_VIRTUAL,
 	
 	    POINTER_STATUS_NEW: POINTER_STATUS_NEW,
+	    POINTER_STATUS_INVALID: POINTER_STATUS_INVALID,
 	    POINTER_STATUS_EXTENDING: POINTER_STATUS_EXTENDING,
 	    POINTER_STATUS_MOVING: POINTER_STATUS_MOVING,
 	    POINTER_STATUS_PINCHING: POINTER_STATUS_PINCHING,
@@ -1384,6 +1382,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'isNew',
 	        get: function get() {
 	            return this.status === _Constants.POINTER_STATUS_NEW;
+	        }
+	    }, {
+	        key: 'isInvalid',
+	        get: function get() {
+	            return this.status === _Constants.POINTER_STATUS_INVALID;
 	        }
 	    }, {
 	        key: 'isExtending',

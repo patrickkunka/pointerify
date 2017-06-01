@@ -14,6 +14,7 @@ import {
     POINTER_TYPE_TOUCH,
     POINTER_TYPE_VIRTUAL,
     POINTER_STATUS_NEW,
+    POINTER_STATUS_INVALID,
     POINTER_STATUS_EXTENDING,
     POINTER_STATUS_MOVING,
     POINTER_STATUS_PINCHING,
@@ -120,6 +121,10 @@ class Pointer {
 
     get isNew() {
         return this.status === POINTER_STATUS_NEW;
+    }
+
+    get isInvalid() {
+        return this.status === POINTER_STATUS_INVALID;
     }
 
     get isExtending() {

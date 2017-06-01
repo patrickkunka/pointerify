@@ -7,6 +7,7 @@ import {
     POINTER_STATUS_EXTENDING,
     POINTER_STATUS_MOVING,
     POINTER_STATUS_STOPPING,
+    POINTER_STATUS_INVALID,
     DIRECTION_RIGHT,
     DIRECTION_DOWN,
     EVENT_POINTER_INSPECT,
@@ -425,8 +426,6 @@ class Pointerify {
     movePointer(pointer, e=null, originalEvent=null) {
         const allowAxis = this.config.behavior.allowAxis;
 
-        let isValidVector = true;
-
         if (pointer.isVirtualPointer) {
             const hypotenuse = Util.hypotenuse(
                 {x: pointer.yinPointer.currentX, y: pointer.yinPointer.currentY},
@@ -454,13 +453,11 @@ class Pointerify {
             const vector = Math.abs((pointer.currentX - pointer.startX) / (pointer.currentY - pointer.startY));
 
             if (allowAxis === AXIS_X && vector < 1 || allowAxis === AXIS_Y && vector >= 1) {
-                // this.deletePointer(pointer);
-
-                isValidVector = false;
+                pointer.status = POINTER_STATUS_INVALID;
             }
         }
 
-        if (isValidVector) {
+        if (!pointer.isInvalid) {
             // Vector is within range, move pointer
 
             if (pointer.isVirtualPointer && e === null) {
