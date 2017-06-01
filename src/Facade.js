@@ -8,6 +8,12 @@ const Facade = class Pointerify {
         this.destroy    = _.destroy.bind(_);
         this.refresh    = _.refresh.bind(_);
 
+        Object.defineProperties(this, {
+            totalTouches: {
+                get: () => _.totalTouches
+            }
+        });
+
         Object.seal(this);
     }
 };
