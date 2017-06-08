@@ -11,7 +11,8 @@ import {
     DIRECTION_RIGHT,
     DIRECTION_DOWN,
     EVENT_POINTER_INSPECT,
-    EVENT_POINTER_TAP
+    EVENT_POINTER_TAP,
+    EVENT_POINTER_DOUBLE_TAP
 } from './Constants';
 
 import Dom          from './Dom';
@@ -30,15 +31,17 @@ class Pointerify {
      */
 
     constructor(root, config) {
-        this.mouse      = null;
-        this.wheel      = null;
-        this.virtual    = null;
-        this.touches    = {};
-        this.bindings   = [];
-        this.rootRect   = null;
-        this.dom        = new Dom();
-        this.config     = new Config();
-        this.isClicking = false;
+        this.mouse              = null;
+        this.wheel              = null;
+        this.virtual            = null;
+        this.touches            = {};
+        this.bindings           = [];
+        this.rootRect           = null;
+        this.dom                = new Dom();
+        this.config             = new Config();
+        this.isClicking         = false;
+        this.hasTapped          = false;
+        this.timerIdDoubleTap   = -1;
 
         Object.seal(this);
 
@@ -506,7 +509,17 @@ class Pointerify {
         pointer.up();
 
         if (pointer.isNew && !pointer.isVirtualPointer) {
-            this.click(e);
+            if (this.hasTapped) {
+                this.hasTapped = false;
+
+                this.tap(e, true);
+            } else {
+                this.hasTapped = true;
+
+                this.timerIdDoubleTap = setTimeout(() => (this.hasTapped = false), Pointerify.DURATION_DOUBLE_TAP);
+
+                this.tap(e);
+            }
         }
 
         if (!pointer.isMoving || !this.config.physics.inertia) {
@@ -661,17 +674,24 @@ class Pointerify {
     /**
      * @private
      * @param   {(TouchEvent|MouseEvent)} e
+     * @param   {boolean}                 isDouble
      * @return  {void}
      */
 
-    click(e) {
+    tap(e, isDouble) {
         let target = e.target;
 
         this.isClicking = true;
 
-        this.emitStatic(e, EVENT_POINTER_TAP);
+        if (isDouble) {
+            this.emitStatic(e, EVENT_POINTER_DOUBLE_TAP);
+        } else {
+            this.emitStatic(e, EVENT_POINTER_TAP);
+        }
 
         while (typeof target.click !== 'function') {
+            // Target is a text node
+
             target = target.parentElement;
         }
 
@@ -762,5 +782,7 @@ class Pointerify {
         this.unbindEvents(this.bindings);
     }
 }
+
+Pointerify.DURATION_DOUBLE_TAP = 500;
 
 export default Pointerify;

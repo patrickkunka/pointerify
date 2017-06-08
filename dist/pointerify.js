@@ -187,6 +187,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.dom = new _Dom2.default();
 	        this.config = new _Config2.default();
 	        this.isClicking = false;
+	        this.hasTapped = false;
+	        this.timerIdDoubleTap = -1;
 	
 	        Object.seal(this);
 	
@@ -695,6 +697,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'releasePointer',
 	        value: function releasePointer(pointer, e) {
+	            var _this2 = this;
+	
 	            // NB: `pointerUp` fired before pointer is deleted
 	            // and is included in `totalTouches` at time of event. May
 	            // be counterintruitive, but is neccessary if `pointerStop`
@@ -703,7 +707,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	            pointer.up();
 	
 	            if (pointer.isNew && !pointer.isVirtualPointer) {
-	                this.click(e);
+	                if (this.hasTapped) {
+	                    this.hasTapped = false;
+	
+	                    this.tap(e, true);
+	                } else {
+	                    this.hasTapped = true;
+	
+	                    this.timerIdDoubleTap = setTimeout(function () {
+	                        return _this2.hasTapped = false;
+	                    }, Pointerify.DURATION_DOUBLE_TAP);
+	
+	                    this.tap(e);
+	                }
 	            }
 	
 	            if (!pointer.isMoving || !this.config.physics.inertia) {
@@ -726,7 +742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'stopPointer',
 	        value: function stopPointer(pointer) {
-	            var _this2 = this;
+	            var _this3 = this;
 	
 	            var STOPPED_PXPF = 0.5;
 	            var initialVelocityX = pointer.velocityX;
@@ -735,8 +751,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var directionY = pointer.directionY;
 	
 	            var render = function render() {
-	                var progress = _this2.config.physics.friction * count;
-	                var eased = _this2.config.physics.easing(progress);
+	                var progress = _this3.config.physics.friction * count;
+	                var eased = _this3.config.physics.easing(progress);
 	
 	                var newVelocityX = initialVelocityX - initialVelocityX * eased;
 	                var newVelocityY = initialVelocityY - initialVelocityY * eased;
@@ -747,7 +763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (Math.abs(newVelocityX) < STOPPED_PXPF && Math.abs(newVelocityY) < STOPPED_PXPF) {
 	                    // Pointer is stationary
 	
-	                    _this2.deletePointer(pointer);
+	                    _this3.deletePointer(pointer);
 	
 	                    return;
 	                }
@@ -763,8 +779,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (pointer.currentX !== lastX || pointer.currentY !== lastY) {
 	                    pointer.move();
 	
-	                    if (pointer.isTouchPointer && _this2.virtual !== null) {
-	                        _this2.movePointer(_this2.virtual);
+	                    if (pointer.isTouchPointer && _this3.virtual !== null) {
+	                        _this3.movePointer(_this3.virtual);
 	                    }
 	                }
 	
@@ -872,19 +888,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * @private
 	         * @param   {(TouchEvent|MouseEvent)} e
+	         * @param   {boolean}                 isDouble
 	         * @return  {void}
 	         */
 	
 	    }, {
-	        key: 'click',
-	        value: function click(e) {
+	        key: 'tap',
+	        value: function tap(e, isDouble) {
 	            var target = e.target;
 	
 	            this.isClicking = true;
 	
-	            this.emitStatic(e, _Constants.EVENT_POINTER_TAP);
+	            if (isDouble) {
+	                this.emitStatic(e, _Constants.EVENT_POINTER_DOUBLE_TAP);
+	            } else {
+	                this.emitStatic(e, _Constants.EVENT_POINTER_TAP);
+	            }
 	
 	            while (typeof target.click !== 'function') {
+	                // Target is a text node
+	
 	                target = target.parentElement;
 	            }
 	
@@ -990,6 +1013,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Pointerify;
 	}();
 	
+	Pointerify.DURATION_DOUBLE_TAP = 500;
+	
 	exports.default = Pointerify;
 
 /***/ }),
@@ -1020,6 +1045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EVENT_POINTER_STOP = exports.EVENT_POINTER_STOP = 'pointerStop';
 	var EVENT_POINTER_INSPECT = exports.EVENT_POINTER_INSPECT = 'pointerInspect';
 	var EVENT_POINTER_TAP = exports.EVENT_POINTER_TAP = 'pointerTap';
+	var EVENT_POINTER_DOUBLE_TAP = exports.EVENT_POINTER_DOUBLE_TAP = 'pointerDoubleTap';
 	var EVENT_VIRTUAL_POINTER_CREATE = exports.EVENT_VIRTUAL_POINTER_CREATE = 'virtualPointerCreate';
 	var EVENT_VIRTUAL_POINTER_MOVE = exports.EVENT_VIRTUAL_POINTER_MOVE = 'virtualPointerMove';
 	var EVENT_VIRTUAL_POINTER_PINCH = exports.EVENT_VIRTUAL_POINTER_PINCH = 'virtualPointerPinch';

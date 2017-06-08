@@ -107,6 +107,12 @@ This event can be used as a substitute for `click` events in gesture-enabled UI 
 
 This event name can also be accessed via the `pointerify.Constants.EVENT_POINTER_TAP` constant.
 
+#### `pointerDoubleTap`
+
+Dispatched when a second tap event (see above) occurs within 500ms of the first one.
+
+This event name can also be accessed via the `pointerify.Constants.EVENT_POINTER_DOUBLE_TAP` constant.
+
 #### `virtualPointerCreate`
 
 Dispatched when two fingers come into contact with the device glass. A "virtual pointer" is created at the exact midpoint of the two touch points and forms the origin of any resulting "pinch" gestures.

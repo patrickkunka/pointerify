@@ -17,6 +17,7 @@ export const EVENT_POINTER_UP              = 'pointerUp';
 export const EVENT_POINTER_STOP            = 'pointerStop';
 export const EVENT_POINTER_INSPECT         = 'pointerInspect';
 export const EVENT_POINTER_TAP             = 'pointerTap';
+export const EVENT_POINTER_DOUBLE_TAP      = 'pointerDoubleTap';
 export const EVENT_VIRTUAL_POINTER_CREATE  = 'virtualPointerCreate';
 export const EVENT_VIRTUAL_POINTER_MOVE    = 'virtualPointerMove';
 export const EVENT_VIRTUAL_POINTER_PINCH   = 'virtualPointerPinch';

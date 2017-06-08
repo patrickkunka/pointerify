@@ -187,6 +187,14 @@
 
                 killPointer(e.detail);
             });
+
+            sb.addEventListener('pointerTap', (e) => {
+                printlog(e);
+            });
+
+            sb.addEventListener('pointerDoubleTap', (e) => {
+                printlog(e);
+            });
         </script>
     </body>
 </html>
