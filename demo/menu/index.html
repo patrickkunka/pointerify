@@ -1,0 +1,239 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="../reset.css">
+
+        <style>
+            .menu {
+                position: fixed;
+                right: -15rem;
+                top: 0;
+                bottom: 0;
+                width: 20rem;
+                background: #ccc;
+                transition: transform 200ms cubic-bezier(0.165, 0.84, 0.44, 1);
+                will-change: transform;
+                cursor: pointer;
+            }
+
+            .menu__open {
+                transform: translateX(-15rem);
+            }
+
+            .menu__dragging {
+                transition: none;
+            }
+        </style>
+
+        <title>Menu | Pointerify Demo</title>
+    </head>
+    <body>
+        <aside class="menu" data-ref="menu">
+
+        </aside>
+
+        <script src="../../dist/pointerify.js"></script>
+        <script>
+            const STATUS_OPEN        = Symbol('STATUS_OPEN');
+            const STATUS_CLOSED      = Symbol('STATUS_CLOSED');
+            const STATUS_DRAGGING    = Symbol('STATUS_DRAGGING');
+            const STATUS_SNAPPING    = Symbol('STATUS_SNAPPING');
+
+            const ACTION_OPEN        = Symbol('ACTION_OPEN');
+            const ACTION_CLOSE       = Symbol('ACTION_CLOSE');
+            const ACTION_RESET       = Symbol('ACTION_RESET');
+
+            const CLASSNAME_OPEN     = 'menu__open';
+            const CLASSNAME_DRAGGING = 'menu__dragging';
+
+            class Menu {
+                constructor(el) {
+                    this.status         = STATUS_CLOSED;
+                    this.previousStatus = null;
+                    this.isMoving       = false;
+                    this.el             = null;
+                    this.pointerify     = null;
+
+                    this.rafIdDrag        = -1;
+                    this.menuWidth        = -1;
+                    this.minTranslate     = -1;
+
+                    this.finalTranslate   = 0;
+                    this.workingTranslate = 0;
+
+                    Object.defineProperties(this, {
+                        isOpen: {
+                            get: () => this.status === STATUS_OPEN
+                        },
+                        isClosed: {
+                            get: () => this.status === STATUS_CLOSED
+                        },
+                        isDragging: {
+                            get: () => this.status === STATUS_DRAGGING
+                        },
+                        isSnapping: {
+                            get: () => this.status === STATUS_SNAPPING
+                        }
+                    });
+
+                    Object.seal(this);
+
+                    this.init(el);
+                }
+
+                init(el) {
+                    this.el = el;
+
+                    this.pointerify = pointerify(el, {
+                        physics: {
+                            inertia: false
+                        }
+                    });
+
+                    this.setGeometry();
+                    this.bindEvents();
+                }
+
+                setGeometry() {
+                    this.menuWidth = this.el.offsetWidth;
+                    this.minTranslate = this.menuWidth * -0.75;
+                }
+
+                bindEvents() {
+                    window.addEventListener('resize', this.handleResize.bind(this));
+                    this.el.addEventListener('pointerTap', this.handleTap.bind(this));
+                    this.el.addEventListener('pointerDrag', this.handlePointerDrag.bind(this));
+                    this.el.addEventListener('pointerUp', this.handlePointerUp.bind(this));
+                }
+
+                handleResize() {
+                    this.setGeometry();
+                }
+
+                handleTap() {
+                    if (this.isMoving || this.isDragging) return;
+
+                    if (this.isOpen) {
+                        this.move(ACTION_CLOSE);
+                    } else {
+                        this.move(ACTION_OPEN);
+                    }
+                }
+
+                handlePointerDrag(e) {
+                    const pointerState = e.detail;
+
+                    if (!this.isDragging) {
+                        this.updateStatus(STATUS_DRAGGING);
+
+                        this.el.classList.add(CLASSNAME_DRAGGING);
+                    }
+
+                    this.workingTranslate =
+                        Math.min(Math.max(this.finalTranslate + pointerState.deltaX, this.minTranslate), 0);
+
+                    this.rafIdDrag = requestAnimationFrame(() => this.renderDrag(this.workingTranslate));
+                }
+
+                handlePointerUp(e) {
+                    const pointerState = e.detail;
+
+                    let action;
+
+                    if (!this.isDragging) return;
+
+                    this.updateStatus(STATUS_SNAPPING);
+
+                    this.el.classList.remove(CLASSNAME_DRAGGING);
+
+                    switch (pointerState.directionX) {
+                        case pointerify.Constants.DIRECTION_LEFT:
+                            this.finalTranslate = this.minTranslate;
+
+                            action = ACTION_OPEN;
+
+                            break;
+                        case pointerify.Constants.DIRECTION_RIGHT:
+                            this.finalTranslate = 0;
+
+                            action = ACTION_CLOSE;
+
+                            break;
+                        case pointerify.Constants.DIRECTION_STATIC:
+                            action = ACTION_RESET;
+
+                            break;
+                    }
+
+                    cancelAnimationFrame(this.rafIdDrag);
+
+                    this.move(action);
+                }
+
+                updateStatus(status) {
+                    this.previousStatus = this.status;
+                    this.status = status;
+                }
+
+                move(action) {
+                    this.isMoving = true;
+
+                    return Promise.resolve()
+                        .then(() => {
+                            return new Promise(resolve => {
+                                const handler = e => {
+                                    if (e.target !== this.el || e.propertyName !== 'transform') return;
+
+                                    this.el.removeEventListener('transitionend', handler);
+
+                                    resolve();
+                                };
+
+                                this.el.addEventListener('transitionend', handler);
+
+                                switch(action) {
+                                    case ACTION_OPEN:
+                                        this.el.classList.add(CLASSNAME_OPEN);
+
+                                        this.finalTranslate = this.minTranslate;
+
+                                        break;
+                                    case ACTION_CLOSE:
+                                        this.el.classList.remove(CLASSNAME_OPEN);
+
+                                        this.finalTranslate = 0;
+
+                                        break;
+                                }
+
+                                this.el.style.transform = '';
+
+                                if (this.workingTranslate === this.minTranslate || this.workingTranslate === 0) resolve();
+                            });
+                        })
+                        .then(() => {
+                            switch(action) {
+                                case ACTION_OPEN:
+                                    this.updateStatus(STATUS_OPEN);
+
+                                    break;
+                                case ACTION_CLOSE:
+                                    this.updateStatus(STATUS_CLOSED);
+
+                                    break;
+                                case ACTION_RESET:
+                                    this.updateStatus(this.previousStatus);
+                            }
+
+                            this.isMoving = false;
+                        });
+                }
+
+                renderDrag(delta) {
+                    this.el.style.transform = `translateX(${delta}px)`;
+                }
+            }
+
+            new Menu(document.querySelector('[data-ref="menu"]'));
+        </script>
+    </body>
+</html>
