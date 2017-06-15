@@ -37,6 +37,7 @@
             const STATUS_CLOSED      = Symbol('STATUS_CLOSED');
             const STATUS_DRAGGING    = Symbol('STATUS_DRAGGING');
             const STATUS_SNAPPING    = Symbol('STATUS_SNAPPING');
+            const STATUS_TOGGLING    = Symbol('STATUS_TOGGLING');
 
             const ACTION_OPEN        = Symbol('ACTION_OPEN');
             const ACTION_CLOSE       = Symbol('ACTION_CLOSE');
@@ -48,8 +49,6 @@
             class Menu {
                 constructor(el) {
                     this.status         = STATUS_CLOSED;
-                    this.previousStatus = null;
-                    this.isMoving       = false;
                     this.el             = null;
                     this.pointerify     = null;
 
@@ -72,6 +71,9 @@
                         },
                         isSnapping: {
                             get: () => this.status === STATUS_SNAPPING
+                        },
+                        isToggling: {
+                            get: () => this.status === STATUS_TOGGLING
                         }
                     });
 
@@ -94,7 +96,7 @@
                 }
 
                 setGeometry() {
-                    this.menuWidth = this.el.offsetWidth;
+                    this.menuWidth    = this.el.offsetWidth;
                     this.minTranslate = this.menuWidth * -0.75;
                 }
 
@@ -110,13 +112,18 @@
                 }
 
                 handleTap() {
-                    if (this.isMoving || this.isDragging) return;
+                    let action;
+
+                    if (!this.isOpen && !this.isClosed) return;
 
                     if (this.isOpen) {
-                        this.move(ACTION_CLOSE);
+                        action = ACTION_CLOSE;
                     } else {
-                        this.move(ACTION_OPEN);
+                        action = ACTION_OPEN;
                     }
+
+                    this.updateStatus(STATUS_TOGGLING);
+                    this.move(action);
                 }
 
                 handlePointerDrag(e) {
@@ -170,13 +177,12 @@
                 }
 
                 updateStatus(status) {
-                    this.previousStatus = this.status;
                     this.status = status;
+
+                    console.log(status);
                 }
 
                 move(action) {
-                    this.isMoving = true;
-
                     return Promise.resolve()
                         .then(() => {
                             return new Promise(resolve => {
@@ -221,10 +227,8 @@
 
                                     break;
                                 case ACTION_RESET:
-                                    this.updateStatus(this.previousStatus);
+                                    this.updateStatus(this.finalTranslate < 0 ? STATUS_OPEN : STATUS_CLOSED);
                             }
-
-                            this.isMoving = false;
                         });
                 }
 
