@@ -2,7 +2,7 @@
 
 A unified events-based API for mouse and multi-touch with built-in geometry and physics.
 
-Pointerfy is currently used in production on [wearecolony.com](https://www.wearecolony.com) to power sliders, image galleries, video player UI and more.
+Pointerfy is currently used in production on the [Colony](https://www.wearecolony.com) platform to power sliders, image galleries, video player UI and more.
 
 ### Contents
 - [Features](#features)
