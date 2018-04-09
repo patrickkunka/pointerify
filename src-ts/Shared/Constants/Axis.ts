@@ -5,4 +5,14 @@ enum Axis {
     NONE = 'NONE'
 }
 
-export default Axis;
+const AxisStore = {
+    X: Axis.X,
+    Y: Axis.Y,
+    BOTH: Axis.BOTH,
+    NONE: Axis.NONE
+};
+
+export {
+    AxisStore,
+    Axis as default
+};
