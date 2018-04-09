@@ -1,8 +1,17 @@
-import IConfig from '../Config/Interfaces/IConfig';
+import IConfig    from '../Config/Interfaces/IConfig';
+import Pointerify from './Interfaces/Pointerify';
 
 class PointerifyFacade {
-    constructor(root: HTMLElement, config: IConfig) {
+    public configure: (options: IConfig) => void;
+    public destroy: () => void;
+    public refresh: () => void;
 
+    constructor(root: HTMLElement, options: IConfig) {
+        const pointerify = new Pointerify(root, options);
+
+        this.configure = pointerify.configure.bind(pointerify);
+        this.destroy   = pointerify.destroy.bind(pointerify);
+        this.refresh   = pointerify.refresh.bind(pointerify);
     }
 }
 
