@@ -26,3 +26,5 @@ function closestParent(
 
     return null;
 }
+
+export default closestParent;

@@ -5,6 +5,10 @@ import IPointerifyFactory from './Interfaces/IPointerifyFactory';
 import PointerifyFacade   from './PointerifyFacade';
 
 function pointerifyFactory(root: HTMLElement, config: IConfig = {}): PointerifyFacade {
+    if (!(root instanceof HTMLElement)) {
+        throw new TypeError('[Pointerify] Invalid element provided');
+    }
+
     return new PointerifyFacade(root, config);
 }
 
