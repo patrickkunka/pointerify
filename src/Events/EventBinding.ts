@@ -1,11 +1,10 @@
 import IEventBinding from './Interfaces/IEventBinding';
-import IEventHandler from './Interfaces/IEventHandler';
 
 class EventBinding implements IEventBinding {
     public type: string = '';
     public target: HTMLElement = null;
     public debounce: number = 0;
-    public handler: IEventHandler = null;
+    public handler: EventListener = null;
     public passive: boolean = false;
 
     constructor(eventBindingRaw: IEventBinding|string) {

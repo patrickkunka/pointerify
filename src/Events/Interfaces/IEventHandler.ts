@@ -1,3 +1,5 @@
-type IEventHandler = (e: Event) => void;
+import Pointerify from '../../Pointerify/Pointerify';
+
+type IEventHandler = (pointerify: Pointerify, e: Event) => void;
 
 export default IEventHandler;

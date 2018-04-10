@@ -1,5 +1,6 @@
-import * as path from 'path';
-import * as webpack from 'webpack';
+// tslint:disable:no-var-requires
+const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
     entry: './src/index.ts',
