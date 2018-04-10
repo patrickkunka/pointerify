@@ -13,12 +13,12 @@
     "lint": "tslint --project tsconfig.json -c tslint.json './src/**/*.ts'",
     "test": "mocha --opts ./config/mocha.opts",
     "test:watch": "mocha --opts ./config/mocha.opts --watch",
-    "build": "tsc",
+    "build": "npm run lint && tsc",
     "watch": "tsc --watch",
     "bundle:watch": "webpack --config ./config/webpack.config.ts --watch",
-    "bundle:build": "npm run lint && npm run test && webpack --config ./config/webpack.config.ts",
+    "bundle:build": "npm run lint && webpack --config ./config/webpack.config.ts",
     "cover": "nyc mocha **/*.test.ts",
-    "prepublishOnly": "npm run test && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "nyc": {
     "require": [
