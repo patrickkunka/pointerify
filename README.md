@@ -2,7 +2,7 @@
 
 A unified events-based API for mouse and multi-touch with built-in geometry and physics.
 
-Pointerify is perfect for taking the hard work out of cross-platform sliders, image galleries, media controls, menus and more.
+Pointerify takes the hard work and math out of cross-platform sliders, image galleries, media controls, menus and more.
 
 ### Contents
 - [Features](#features)
@@ -38,15 +38,6 @@ You may then import the pointerify factory function into your project's modules.
 import pointerify from 'pointerify';
 ```
 
-You may also load Pointerify via a `<script>` tag, and the `pointerify` factory function will be added to the global namespace.
-
-```html
-        ...
-        <script src="/path/to/pointerify.js"></script>
-    </body>
-</html>
-```
-
 ## Instantiation
 
 The `pointerify` factory function then can be used to create a discrete pointerify instance on a provided "root" element.
@@ -65,79 +56,63 @@ For example, if the root element is `500px` wide and a user performs a mouse dow
 
 ## Events
 
-Each pointerify instance dispatches the following DOM events from the ("root") element on which it is instantiated. Each event contains a reference to a `PointerState` object via the event `detail` property, containing various geometry data points.
+Each pointerify instance dispatches the following DOM events from the ("root") element on which it is instantiated. Each event contains a reference to a pointer "state" object via the event `detail` property, containing various geometry data points.
 
-NB: All event names are written in "camelCase" to differentiate them from the lowercase native pointer events that are dispatched on some platforms.
+NB: All event names are written in "camelCase" to differentiate them from the lowercase native pointer events that are dispatched on some platforms. To avoid magic strings, it is recommended that event types are accessed via the exported `EventType` enum in your code.
 
-#### `pointerDown`
+```js
+import pointerify, {EventType} from 'pointerify';
+
+console.log(EventType.POINTER_DOWN); // pointerDown
+```
+
+#### `EventType.POINTER_DOWN`
 
 Dispatched when the primary mouse button is depressed, or when a finger makes contact with the device glass.
 
-This event name can also be accessed via the `pointerify.Constants.EVENT_POINTER_DOWN` constant.
-
-#### `pointerDrag`
+#### `EventType.POINTER_DRAG`
 
 Dispatched when the mouse is moved while its primary button is depressed, or when a finger is moved across the device screen while in contact with the glass.
 
 When `physics.inertia` is enabled, drag events will continue to be dispatched after the pointer is released, for an amount of time determined by the drag velocity at the time of release, and the specified `physics.friction` value.
 
-This event name can also be accessed via the `pointerify.Constants.EVENT_POINTER_DRAG` constant.
-
-#### `pointerUp`
+#### `EventType.POINTER_UP`
 
 Dispatched when the primary mouse button is released after being depressed while within the root element, or when a finger leaves contact with the device glass after having made contact while within the root element.
 
-This event name can also be accessed via the `pointerify.Constants.EVENT_POINTER_UP` constant.
-
-#### `pointerStop`
+#### `EventType.POINTER_STOP`
 
 Dispatched after the pointer is released (when inertia is disabled), or after the inertial phase of a "swipe" gesture, when the pointer comes to a complete stop as inertia is depleted due to friction (when inertia is enabled).
 
-This event name can also be accessed via the `pointerify.Constants.EVENT_POINTER_STOP` constant.
-
-#### `pointerInspect`
+#### `EventType.POINTER_INSPECT`
 
 Dispatched when the mouse moves across the root element without any buttons depressed. Similar to a "hover" event.
 
-This event name can also be accessed via the `pointerify.Constants.EVENT_POINTER_INSPECT` constant.
-
-#### `pointerTap`
+#### `EventType.POINTER_TAP`
 
 Dispatched when the primary mouse button is depressed and immediately released without any lateral movement taking place, or when a finger makes contact with the device glass and then leaves contact without any lateral movement taking place.
 
 This event can be used as a substitute for `click` events in gesture-enabled UI where a swipe might cause unintended click events to be dispatched.
 
-This event name can also be accessed via the `pointerify.Constants.EVENT_POINTER_TAP` constant.
-
-#### `pointerDoubleTap`
+#### `EventType.POINTER_DOUBLE_TAP`
 
 Dispatched when a second tap event (see above) occurs within 500ms of the first one.
 
-This event name can also be accessed via the `pointerify.Constants.EVENT_POINTER_DOUBLE_TAP` constant.
-
-#### `virtualPointerCreate`
+#### `EventType.VIRTUAL_POINTER_CREATE`
 
 Dispatched when two fingers come into contact with the device glass. A "virtual pointer" is created at the exact midpoint of the two touch points and forms the origin of any resulting "pinch" gestures.
 
-This event name can also be accessed via the `pointerify.Constants.EVENT_VIRTUAL_POINTER_CREATE` constant.
-
-#### `virtualPointerMove`
+#### `EventType.VIRTUAL_POINTER_MOVE`
 
 Dispatched when a virtual pointer moves in response either of its two physical touch points being dragged. The virtual pointer equivalent of `pointerDrag`.
 
-This event name can also be accessed via the `pointerify.Constants.EVENT_VIRTUAL_POINTER_MOVE` constant.
-
-#### `virtualPointPinch`
+#### `EventType.VIRTUAL_POINTER_PINCH`
 
 Dispatched when a virtual pointer's two physical touch points converge or diverge from the virtual pointer midpoint, forming a "pinch" gesture.
 
-This event name can also be accessed via the `pointerify.Constants.EVENT_VIRTUAL_POINTER_PINCH` constant.
-
-#### `virtualPointerDestroy`
+#### `EventType.VIRTUAL_POINTER_DESTROY`
 
 Dispatched when a virtual pointer is destroyed in response to the termination of either one of its physical touch points (either due to a pointer release, or the depletion of inertia).
-
-This event name can also be accessed via the `pointerify.Constants.EVENT_VIRTUAL_POINTER_DESTROY` constant.
 
 ---
 *&copy; 2017 Patrick Kunka / KunkaLabs Ltd*
