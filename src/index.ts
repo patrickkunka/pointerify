@@ -1,3 +1,4 @@
+import PointerifyFacade       from './Pointerify/PointerifyFacade';
 import pointerifyFactory      from './Pointerify/pointerifyFactory';
 import Axis                   from './Shared/Constants/Axis';
 import Direction              from './Shared/Constants/Direction';
@@ -13,6 +14,7 @@ export {
     Direction,
     EventType,
     PointerifyDynamicEvent,
+    PointerifyFacade as Pointerify,
     PointerifyStaticEvent,
     pointerifyFactory as default
 };
