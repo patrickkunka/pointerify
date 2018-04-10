@@ -1,6 +1,7 @@
-import Axis from '../Shared/Constants/Axis';
+import Axis      from '../Shared/Constants/Axis';
+import IBehavior from './Interfaces/IBehavior';
 
-class Behavior {
+class Behavior implements IBehavior {
     public pressDuration: number = 0;
     public allowAxis: Axis = Axis.BOTH;
     public clampAxis: Axis = Axis.NONE;
@@ -10,19 +11,19 @@ class Behavior {
         Object.seal(this);
     }
 
-    get allowX() {
+    public get allowX(): boolean {
         return this.allowAxis === Axis.X || this.allowAxis === Axis.BOTH;
     }
 
-    get allowY() {
+    public get allowY(): boolean {
         return this.allowAxis === Axis.Y || this.allowAxis === Axis.BOTH;
     }
 
-    get clampX() {
+    public get clampX(): boolean {
         return this.clampAxis === Axis.X || this.clampAxis === Axis.BOTH;
     }
 
-    get clampY() {
+    public get clampY(): boolean {
         return this.clampAxis === Axis.Y || this.clampAxis === Axis.BOTH;
     }
 }

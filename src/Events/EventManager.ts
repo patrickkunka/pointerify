@@ -34,7 +34,7 @@ class EventManager {
         e.stopPropagation();
     }
 
-    protected handleMouseDown(e: MouseEvent): void {
+    protected handleMousedown(e: MouseEvent): void {
         const target = e.target as HTMLElement;
         const handleSelector = this.pointerify.config.selectors.handle;
 
@@ -57,7 +57,7 @@ class EventManager {
         e.preventDefault();
     }
 
-    protected handleMouseMove(e: MouseEvent): void {
+    protected handleMousemove(e: MouseEvent): void {
         const {mouse} = this.pointerify;
 
         if (e.target === window && mouse && !mouse.isStopping) {
@@ -67,7 +67,7 @@ class EventManager {
         }
     }
 
-    protected handleMouseUp(e: MouseEvent) {
+    protected handleMouseup(e: MouseEvent) {
         if (!this.pointerify.mouse) return;
 
         this.pointerify.releasePointer(this.pointerify.mouse, e);
@@ -75,7 +75,7 @@ class EventManager {
         e.preventDefault();
     }
 
-    protected handleTouchStart(e: TouchEvent) {
+    protected handleTouchstart(e: TouchEvent) {
         const target = e.target as HTMLElement;
         const {handle: handleSelector} = this.pointerify.config.selectors;
 
@@ -125,7 +125,7 @@ class EventManager {
         }
     }
 
-    protected handleTouchMove(e: TouchEvent): void {
+    protected handleTouchmove(e: TouchEvent): void {
         if (this.pointerify.totalTouches < 1) return;
 
         for (let i = 0, touch; (touch = e.changedTouches[i]); i++) {
@@ -139,7 +139,7 @@ class EventManager {
         }
     }
 
-    protected handleTouchEnd(e: TouchEvent): void {
+    protected handleTouchend(e: TouchEvent): void {
         if (this.pointerify.totalTouches < 1) return;
 
         for (let i = 0, touch; (touch = e.changedTouches[i]); i++) {

@@ -5,6 +5,7 @@ import IConfig             from '../Config/Interfaces/IConfig';
 import EventManager        from '../Events/EventManager';
 import events              from '../Events/events';
 import Pointer             from '../Pointer/Pointer';
+import PointerStateStatic  from '../Pointer/PointerStateStatic';
 import Axis                from '../Shared/Constants/Axis';
 import Direction           from '../Shared/Constants/Direction';
 import EventType           from '../Shared/Constants/EventType';
@@ -79,8 +80,7 @@ class Pointerify {
 
     public createPointer(e: IMouseOrTouchEvent, type: PointerType, isExtending: boolean = false): Pointer {
         const pointer = new Pointer(this);
-        const {clientX, clientY} = e;
-        const identifier: number = (e as any);
+        const {clientX, clientY, identifier} = e;
 
         if (isExtending) {
             pointer.status = PointerStatus.EXTENDING;
@@ -208,7 +208,10 @@ class Pointerify {
             } else {
                 this.hasTapped = true;
 
-                this.timerIdDoubleTap = setTimeout(() => (this.hasTapped = false), Pointerify.DURATION_DOUBLE_TAP);
+                this.timerIdDoubleTap = window.setTimeout(
+                    () => (this.hasTapped = false),
+                    Pointerify.DURATION_DOUBLE_TAP
+                );
 
                 this.tap(e);
             }
@@ -226,7 +229,7 @@ class Pointerify {
     }
 
     public emitStatic(e: IMouseOrTouchEvent, type: string): void {
-        const state = new StateStatic();
+        const state = new PointerStateStatic();
 
         const event = new CustomEvent(type, {
             detail: state,

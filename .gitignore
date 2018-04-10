@@ -1,4 +1,6 @@
 .tmp
 .DS_Store
+dist
+bundle
 npm-debug.*
 node_modules

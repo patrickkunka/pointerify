@@ -1,17 +1,69 @@
 {
   "name": "pointerify",
-  "version": "0.3.9",
-  "main": "./dist/pointerify.js",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "license": "Apache-2.0",
+  "types": "./dist/index.d.ts",
+  "browser": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/patrickkunka/pointerify/"
+  },
   "scripts": {
-    "webpack": "webpack --watch"
+    "lint": "tslint --project tsconfig.json -c tslint.json './src/**/*.ts'",
+    "test": "mocha --opts ./config/mocha.opts",
+    "test:watch": "mocha --opts ./config/mocha.opts --watch",
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "bundle:watch": "webpack --config ./config/webpack.config.ts --watch",
+    "bundle:build": "npm run lint && npm run test && webpack --config ./config/webpack.config.ts",
+    "cover": "nyc mocha **/*.test.ts",
+    "prepublishOnly": "npm run test && npm run build"
+  },
+  "nyc": {
+    "require": [
+      "ts-node/register",
+      "source-map-support/register"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src"
+    ],
+    "exclude": [
+      "**/index.ts",
+      "**/*.d.ts",
+      "**/**.test.ts",
+      "**/Interfaces",
+      "**/Constants",
+      "dist",
+      "coverage"
+    ],
+    "all": true
   },
   "devDependencies": {
-    "babel-core": "^6.18.0",
-    "babel-loader": "^6.2.7",
-    "babel-preset-es2015": "^6.18.0",
+    "@types/chai": "^4.0.5",
+    "@types/mocha": "^2.2.44",
+    "@types/node": "^8.0.53",
+    "@types/sinon": "^4.3.0",
+    "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
+    "jsdom": "^11.7.0",
+    "jsdom-global": "^3.0.2",
     "json-loader": "^0.5.4",
-    "source-map-support": "^0.4.10",
-    "webpack": "^1.14.0"
+    "mocha": "^3.0.2",
+    "mocha-lcov-reporter": "^1.2.0",
+    "nyc": "^11.6.0",
+    "sinon": "^1.17.7",
+    "ts-loader": "^3.1.1",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.6.1",
+    "webpack": "^3.8.1"
   },
   "dependencies": {
     "helpful-merge": "0.0.8"

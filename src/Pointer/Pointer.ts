@@ -1,38 +1,37 @@
-import Pointerify    from '../Pointerify/Pointerify';
-import Axis          from '../Shared/Constants/Axis';
-import Direction     from '../Shared/Constants/Direction';
-import EventType     from '../Shared/Constants/EventType';
-import PointerStatus from '../Shared/Constants/PointerStatus';
-import PointerType   from '../Shared/Constants/PointerType';
-import clamp         from '../Shared/Util/clamp';
-import randomHex     from '../Shared/Util/randomHex';
-
-// import StatePointer from './StatePointer';
+import Pointerify          from '../Pointerify/Pointerify';
+import Axis                from '../Shared/Constants/Axis';
+import Direction           from '../Shared/Constants/Direction';
+import EventType           from '../Shared/Constants/EventType';
+import PointerStatus       from '../Shared/Constants/PointerStatus';
+import PointerType         from '../Shared/Constants/PointerType';
+import clamp               from '../Shared/Util/clamp';
+import randomHex           from '../Shared/Util/randomHex';
+import PointerStateDynamic from './PointerStateDynamic';
 
 class Pointer {
-    public id:               string = randomHex();
+    public id:               string        = randomHex();
     public status:           PointerStatus = PointerStatus.NEW;
-    public rafIdInertia:     number = -1;
-    public type:             PointerType = null;
-    public startX:           number = -1;
-    public startY:           number = -1;
-    public startDistance:    number = -1;
-    public currentX:         number = -1;
-    public currentY:         number = -1;
-    public currentDistance:  number = -1;
-    public rootWidth:        number = -1;
-    public rootHeight:       number = -1;
-    public rootOffsetX:      number = -1;
-    public rootOffsetY:      number = -1;
-    public yinPointer:       Pointer = null;
-    public yangPointer:      Pointer = null;
+    public rafIdInertia:     number        = -1;
+    public type:             PointerType   = null;
+    public startX:           number        = -1;
+    public startY:           number        = -1;
+    public startDistance:    number        = -1;
+    public currentX:         number        = -1;
+    public currentY:         number        = -1;
+    public currentDistance:  number        = -1;
+    public rootWidth:        number        = -1;
+    public rootHeight:       number        = -1;
+    public rootOffsetX:      number        = -1;
+    public rootOffsetY:      number        = -1;
+    public yinPointer:       Pointer       = null;
+    public yangPointer:      Pointer       = null;
 
-    private velocitiesX:      number[] = [];
-    private velocitiesY:      number[] = [];
-    private velocitiesPinch:  number[] = [];
-    private pointerify:       Pointerify = null;
-    private isMonitoring:     boolean = false;
-    private rafIdVelocity:    number = -1;
+    private velocitiesX:     number[]   = [];
+    private velocitiesY:     number[]   = [];
+    private velocitiesPinch: number[]   = [];
+    private pointerify:      Pointerify = null;
+    private isMonitoring:    boolean    = false;
+    private rafIdVelocity:   number     = -1;
 
     constructor(pointerify: Pointerify) {
         this.pointerify = pointerify;
@@ -231,7 +230,7 @@ class Pointer {
     }
 
     private getState() {
-        const state = new StatePointer();
+        const state = new PointerStateDynamic();
         const {clampX, clampY} = this.pointerify.config.behavior;
 
         state.id                      = `pointer-${this.id}`;

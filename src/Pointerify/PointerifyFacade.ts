@@ -1,5 +1,5 @@
 import IConfig    from '../Config/Interfaces/IConfig';
-import Pointerify from './Interfaces/Pointerify';
+import Pointerify from './Pointerify';
 
 class PointerifyFacade {
     public configure: (options: IConfig) => void;

@@ -33,7 +33,8 @@
                 "protected-static-method",
                 "private-static-method"
             ]
-        }]
+        }],
+        "member-access": [true, "check-accessor"]
     },
     "rulesDirectory": []
 }
