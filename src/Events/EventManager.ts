@@ -60,9 +60,9 @@ class EventManager {
     protected handleMousemove(e: MouseEvent): void {
         const {mouse} = this.pointerify;
 
-        if (e.target === window && mouse && !mouse.isStopping) {
+        if (e.target !== window && mouse && !mouse.isStopping) {
             this.pointerify.movePointer(mouse, e, e);
-        } else if (e.target !== window && !mouse) {
+        } else if (e.target === window && !mouse) {
             this.pointerify.emitStatic(e, EventType.POINTER_INSPECT);
         }
     }

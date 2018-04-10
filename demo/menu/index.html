@@ -85,7 +85,7 @@
                 init(el) {
                     this.el = el;
 
-                    this.pointerify = pointerify(el, {
+                    this.pointerify = pointerify.create(el, {
                         physics: {
                             inertia: false
                         }
@@ -153,19 +153,19 @@
                     this.el.classList.remove(CLASSNAME_DRAGGING);
 
                     switch (pointerState.directionX) {
-                        case pointerify.Constants.DIRECTION_LEFT:
+                        case pointerify.Direction.LEFT:
                             this.finalTranslate = this.minTranslate;
 
                             action = ACTION_OPEN;
 
                             break;
-                        case pointerify.Constants.DIRECTION_RIGHT:
+                        case pointerify.Direction.RIGHT:
                             this.finalTranslate = 0;
 
                             action = ACTION_CLOSE;
 
                             break;
-                        case pointerify.Constants.DIRECTION_STATIC:
+                        case pointerify.Direction.STATIC:
                             action = ACTION_RESET;
 
                             break;
