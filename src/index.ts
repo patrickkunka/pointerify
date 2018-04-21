@@ -1,10 +1,9 @@
-import PointerifyFacade       from './Pointerify/PointerifyFacade';
-import pointerifyFactory      from './Pointerify/pointerifyFactory';
-import Axis                   from './Shared/Constants/Axis';
-import Direction              from './Shared/Constants/Direction';
-import EventType              from './Shared/Constants/EventType';
-import PointerifyDynamicEvent from './Shared/Events/PointerifyDynamicEvent';
-import PointerifyStaticEvent  from './Shared/Events/PointerifyStaticEvent';
+import PointerifyFacade  from './Pointerify/PointerifyFacade';
+import pointerifyFactory from './Pointerify/pointerifyFactory';
+import Axis              from './Shared/Constants/Axis';
+import Direction         from './Shared/Constants/Direction';
+import EventType         from './Shared/Constants/EventType';
+import * as Events       from './Shared/Events/';
 
 const create = pointerifyFactory;
 
@@ -13,8 +12,7 @@ export {
     create,
     Direction,
     EventType,
-    PointerifyDynamicEvent,
+    Events,
     PointerifyFacade as Pointerify,
-    PointerifyStaticEvent,
     pointerifyFactory as default
 };
