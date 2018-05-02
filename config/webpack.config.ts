@@ -3,6 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
+    mode: 'production',
     entry: './src/index.ts',
     output: {
         filename: 'pointerify.js',
@@ -11,11 +12,9 @@ module.exports = {
         libraryTarget: 'umd'
     },
     devtool: 'source-map',
-    plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            sourceMap: true
-        })
-    ],
+    optimization: {
+        minimize: true
+    },
     resolve: {
         extensions: ['.ts', '.js']
     },
