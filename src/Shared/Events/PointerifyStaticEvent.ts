@@ -1,5 +1,5 @@
 import PointerStateStatic from '../../Pointer/PointerStateStatic';
 
-class PointerifyStaticEvent extends CustomEvent<PointerStateStatic> {}
+const PointerifyStaticEvent = CustomEvent as any as CustomEvent<PointerStateStatic>;
 
 export default PointerifyStaticEvent;

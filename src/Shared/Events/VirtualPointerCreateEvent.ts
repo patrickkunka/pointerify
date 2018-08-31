@@ -1,5 +1,5 @@
 import PointerifyDynamicEvent from './PointerifyDynamicEvent';
 
-type VirtualPointerCreateEvent = PointerifyDynamicEvent;
+type VirtualPointerCreateEvent = typeof PointerifyDynamicEvent;
 
 export default VirtualPointerCreateEvent;

@@ -1,5 +1,5 @@
 import PointerifyDynamicEvent from './PointerifyDynamicEvent';
 
-type PointerStopEvent = PointerifyDynamicEvent;
+type PointerStopEvent = typeof PointerifyDynamicEvent;
 
 export default PointerStopEvent;

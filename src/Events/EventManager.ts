@@ -2,7 +2,7 @@ import Pointerify        from '../Pointerify/Pointerify';
 import debounce          from '../Shared/Util/debounce';
 import pascalCase        from '../Shared/Util/pascalCase';
 import EventBinding      from './EventBinding';
-import * as handlers     from './handlers/';
+import * as handlers     from './Handlers';
 import IEventBinding     from './Interfaces/IEventBinding';
 import IEventHandlersMap from './Interfaces/IEventHandlersMap';
 
