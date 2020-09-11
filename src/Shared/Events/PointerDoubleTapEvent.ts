@@ -1,5 +1,5 @@
 import PointerifyStaticEvent from './PointerifyStaticEvent';
 
-type PointerDoubleTapEvent = typeof PointerifyStaticEvent;
+type PointerDoubleTapEvent = PointerifyStaticEvent;
 
 export default PointerDoubleTapEvent;

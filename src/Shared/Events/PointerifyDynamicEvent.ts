@@ -1,5 +1,5 @@
 import PointerStateDynamic from '../../Pointer/PointerStateDynamic';
 
-const PointerifyDynamicEvent = CustomEvent as any as CustomEvent<PointerStateDynamic>;
+type PointerifyDynamicEvent = CustomEvent<PointerStateDynamic>;
 
 export default PointerifyDynamicEvent;

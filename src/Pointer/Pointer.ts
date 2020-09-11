@@ -220,7 +220,7 @@ class Pointer {
         this.isMonitoring = false;
     }
 
-    private dispatchEvent(eventType) {
+    private dispatchEvent(eventType: string) {
         const event = new CustomEvent(eventType, {
             detail: this.getState(),
             bubbles: true

@@ -1,5 +1,5 @@
 import PointerifyStaticEvent from './PointerifyStaticEvent';
 
-type PointerInspectEvent = typeof PointerifyStaticEvent;
+type PointerInspectEvent = PointerifyStaticEvent;
 
 export default PointerInspectEvent;

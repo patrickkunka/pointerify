@@ -1,5 +1,5 @@
 import PointerifyDynamicEvent from './PointerifyDynamicEvent';
 
-type VirtualPointerPinchEvent = typeof PointerifyDynamicEvent;
+type VirtualPointerPinchEvent = PointerifyDynamicEvent;
 
 export default VirtualPointerPinchEvent;
