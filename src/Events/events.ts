@@ -1,6 +1,6 @@
 import IEventBinding from './Interfaces/IEventBinding';
 
-const events: Array<IEventBinding|string> = [
+const events: (IEventBinding|string)[] = [
     'mousedown',
     'touchstart',
     'click',

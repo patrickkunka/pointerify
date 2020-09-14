@@ -19,7 +19,7 @@ class EventManager {
         return this.pointerify.refs.root;
     }
 
-    public bindEvents(events: Array<string|IEventBinding>): void {
+    public bindEvents(events: (string|IEventBinding)[]): void {
         this.bindings = events.map(this.bindEvent.bind(this));
     }
 
